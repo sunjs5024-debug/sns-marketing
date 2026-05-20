@@ -1,0 +1,182 @@
+// SNS 마케팅 & 상위노출 쇼핑몰 스키마
+// 카테고리 → 상품 → 옵션(수량/품질) → 주문/주문아이템/타겟URL
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Platform {
+  SNS
+  RANK
+}
+
+enum Badge {
+  HOT
+  BEST
+  SALE
+  NEW
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CARD
+  TRANSFER
+  KAKAOPAY
+  NAVERPAY
+  TOSS
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String?
+  phone        String?
+  role         Role     @default(USER)
+  points       Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  orders    Order[]
+  cartItems CartItem[]
+  reviews   Review[]
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  platform  Platform
+  parentId  String?
+  parent    Category?  @relation("Subcategories", fields: [parentId], references: [id])
+  children  Category[] @relation("Subcategories")
+  iconEmoji String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  products Product[]
+}
+
+model Product {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  name         String
+  description  String?
+  longDescription String?
+  categoryId   String
+  category     Category @relation(fields: [categoryId], references: [id])
+  basePrice    Int
+  imageUrl     String?
+  badge        Badge?
+  deliveryInfo String?
+  guaranteeInfo String?
+  minQty       Int      @default(1)
+  isActive     Boolean  @default(true)
+  isFeatured   Boolean  @default(false)
+  salesCount   Int      @default(0)
+  rating       Float    @default(5.0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  options    ProductOption[]
+  orderItems OrderItem[]
+  cartItems  CartItem[]
+  reviews    Review[]
+}
+
+model ProductOption {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  label     String
+  quantity  Int
+  price     Int
+  sortOrder Int     @default(0)
+
+  orderItems OrderItem[]
+  cartItems  CartItem[]
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  optionId  String?
+  option    ProductOption? @relation(fields: [optionId], references: [id])
+  quantity  Int      @default(1)
+  targetUrl String?
+  memo      String?
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId, optionId])
+}
+
+model Order {
+  id            String        @id @default(cuid())
+  orderNumber   String        @unique
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
+  status        OrderStatus   @default(PENDING)
+  totalAmount   Int
+  paymentMethod PaymentMethod?
+  paymentKey    String?
+  buyerName     String
+  buyerPhone    String
+  buyerEmail    String
+  memo          String?
+  createdAt     DateTime      @default(now())
+  paidAt        DateTime?
+  completedAt   DateTime?
+
+  items OrderItem[]
+}
+
+model OrderItem {
+  id            String  @id @default(cuid())
+  orderId       String
+  order         Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product @relation(fields: [productId], references: [id])
+  productName   String
+  optionId      String?
+  option        ProductOption? @relation(fields: [optionId], references: [id])
+  optionLabel   String?
+  unitPrice     Int
+  quantity      Int
+  totalPrice    Int
+  targetUrl     String?
+  memo          String?
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  rating    Int
+  content   String
+  isVerified Boolean @default(false)
+  createdAt DateTime @default(now())
+}

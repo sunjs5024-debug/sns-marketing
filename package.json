@@ -1,0 +1,31 @@
+{
+  "name": "sns-marketing-nuxt",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "@prisma/adapter-neon": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "@sidebase/nuxt-auth": "^1.2.0",
+    "@tailwindcss/vite": "^4.3.0",
+    "bcryptjs": "^3.0.3",
+    "next-auth": "^4.21.1",
+    "nuxt": "^4.4.6",
+    "prisma": "^7.8.0",
+    "tailwindcss": "^4.3.0",
+    "vue": "^3.5.34",
+    "vue-router": "^5.0.7",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "tsx": "^4.22.2"
+  }
+}

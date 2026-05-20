@@ -1,0 +1,18 @@
+# nuxt
+.nuxt
+.output
+.data
+.cache
+node_modules
+.env*
+!.env.example
+dist
+*.log
+.DS_Store
+
+# prisma generated client
+generated/prisma
+
+# 로컬 SQLite (이제 안 쓰지만 혹시 모르니)
+*.db
+*.db-journal
