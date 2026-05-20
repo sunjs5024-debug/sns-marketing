@@ -3,11 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "nuxt build",
+    "build": "prisma generate --no-engine && nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "prisma generate --no-engine && nuxt prepare"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
