@@ -44,7 +44,7 @@ async function social(provider: "kakao" | "naver" | "google") {
 <template>
   <div class="mx-auto flex max-w-md flex-col items-center px-4 py-16">
     <h1 class="font-display text-3xl text-neutral-900">로그인</h1>
-    <p class="mt-2 text-sm text-neutral-500">부스터마켓에 오신 걸 환영해요</p>
+    <p class="mt-2 text-sm text-neutral-500">SNS 소셜팩토리에 오신 걸 환영해요</p>
 
     <p v-if="error" class="mt-4 w-full rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{{ error }}</p>
 

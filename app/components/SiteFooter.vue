@@ -20,8 +20,8 @@ const year = new Date().getFullYear();
       <div class="grid grid-cols-2 gap-8 md:grid-cols-5">
         <div class="col-span-2">
           <div class="flex items-center gap-2 font-display text-lg">
-            <span class="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white">B</span>
-            부스터마켓
+            <span class="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white">S</span>
+            SNS 소셜팩토리
           </div>
           <p class="mt-3 text-sm leading-6 text-neutral-600">
             SNS 마케팅과 상위노출이 가장 빠르게 시작되는 곳.<br />
@@ -61,9 +61,9 @@ const year = new Date().getFullYear();
       </div>
 
       <div class="mt-10 border-t border-neutral-200 pt-6 text-xs text-neutral-500 leading-6">
-        상호: 부스터마켓 · 대표: 홍길동 · 사업자등록번호: 000-00-00000 · 통신판매업: 0000-서울-0000<br />
+        상호: SNS 소셜팩토리 · 대표: 홍길동 · 사업자등록번호: 000-00-00000 · 통신판매업: 0000-서울-0000<br />
         주소: 서울특별시 강남구 테헤란로 000, 00층 · 고객센터: 1588-0000 (평일 10:00 ~ 18:00)<br />
-        © {{ year }} 부스터마켓. All rights reserved.
+        © {{ year }} SNS 소셜팩토리. All rights reserved.
       </div>
     </div>
   </footer>

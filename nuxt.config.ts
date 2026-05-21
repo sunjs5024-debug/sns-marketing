@@ -44,7 +44,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: { lang: "ko" },
-      title: "부스터마켓 — SNS 마케팅 & 상위노출 전문",
+      title: "SNS 소셜팩토리 — SNS 마케팅 & 상위노출 전문",
       meta: [
         { charset: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },

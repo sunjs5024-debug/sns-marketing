@@ -65,7 +65,7 @@ const FAQS = [
     </section>
 
     <section class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-      <SectionTitle eyebrow="WHY US" title="왜 부스터마켓을 선택할까요?" />
+      <SectionTitle eyebrow="WHY US" title="왜 SNS 소셜팩토리를 선택할까요?" />
       <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <div
           v-for="(w, i) in WHY_ITEMS"

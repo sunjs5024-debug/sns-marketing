@@ -45,8 +45,8 @@ const rankItems: DropItem[] = RANK_PLATFORMS.map((s) => ({
           <span
             class="grid h-9 w-9 place-items-center rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white shadow-md anim-gradient-flow"
             style="background-size: 200% 200%"
-          >B</span>
-          <span>부스터마켓</span>
+          >S</span>
+          <span>SNS 소셜팩토리</span>
         </NuxtLink>
 
         <nav class="hidden md:flex items-center gap-1 text-sm font-medium text-neutral-700">

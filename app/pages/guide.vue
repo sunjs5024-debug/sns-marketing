@@ -35,7 +35,7 @@ const FAQS = [
       <div class="relative">
         <p class="text-xs uppercase tracking-widest text-emerald-700">HOW IT WORKS</p>
         <h1 class="mt-2 font-display text-3xl text-neutral-900 sm:text-4xl">이용안내</h1>
-        <p class="mt-3 text-sm text-neutral-700">결제부터 작업 완료까지 — 부스터마켓 이용 방법을 한눈에 확인하세요.</p>
+        <p class="mt-3 text-sm text-neutral-700">결제부터 작업 완료까지 — SNS 소셜팩토리 이용 방법을 한눈에 확인하세요.</p>
       </div>
     </section>
 
@@ -59,7 +59,7 @@ const FAQS = [
     </section>
 
     <section class="mt-12">
-      <h2 class="font-display text-2xl text-neutral-900">부스터마켓이 안전한 이유</h2>
+      <h2 class="font-display text-2xl text-neutral-900">SNS 소셜팩토리가 안전한 이유</h2>
       <div class="mt-6 grid gap-4 sm:grid-cols-2">
         <div
           v-for="w in WHY"
