@@ -2,7 +2,7 @@
 import { formatPrice, platformKeyFor } from "#shared/catalog";
 
 definePageMeta({ middleware: ["auth"] });
-useHead({ title: "장바구니" });
+useSeoMeta({ title: "장바구니", robots: "noindex, nofollow" });
 
 const { data: items, refresh } = await useFetch("/api/cart");
 

@@ -2,7 +2,16 @@
 import { formatPrice } from "#shared/catalog";
 
 definePageMeta({ middleware: ["auth"] });
-useHead({ title: "결제 진행" });
+useSeoMeta({ title: "결제 진행", robots: "noindex, nofollow" });
+
+// 결제수단 영문 코드 → 한글 표시
+const PAYMENT_LABEL: Record<string, string> = {
+  TRANSFER: "계좌이체",
+  CARD: "신용카드",
+  KAKAOPAY: "카카오페이",
+  NAVERPAY: "네이버페이",
+  TOSS: "토스",
+};
 
 const route = useRoute();
 const orderNumber = computed(() => String(route.params.orderNumber));
@@ -43,7 +52,7 @@ async function pay() {
         </div>
         <div class="flex justify-between">
           <dt class="text-neutral-500">결제 수단</dt>
-          <dd>{{ order.paymentMethod ?? "—" }}</dd>
+          <dd>{{ order.paymentMethod ? (PAYMENT_LABEL[order.paymentMethod] ?? order.paymentMethod) : "—" }}</dd>
         </div>
         <div class="flex justify-between border-t border-neutral-100 pt-2 text-base">
           <dt class="text-neutral-900">결제 금액</dt>

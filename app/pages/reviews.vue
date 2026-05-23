@@ -1,5 +1,14 @@
 <script setup lang="ts">
-useHead({ title: "고객 후기" });
+useSeoMeta({
+  title: "고객 후기 — 실제 사용 후기 모음",
+  description:
+    "인스타·유튜브·틱톡·네이버 카페·블로그·스마트스토어까지 — 실제 고객들의 SNS 마케팅·상위노출 후기. 평균 만족도 4.9/5.0, 검증된 리뷰만 노출.",
+  ogTitle: "고객 후기 4.9/5.0 — SNS소셜팩토리 실사용 후기 모음",
+  ogDescription:
+    "실제 마케터·소상공인·크리에이터의 진짜 후기. 인스타·유튜브·틱톡·네이버 상위노출까지 검증된 성과.",
+  ogType: "website",
+  ogLocale: "ko_KR",
+});
 
 type Review = {
   author: string;
@@ -41,6 +50,44 @@ const REVIEWS: Review[] = [
 ];
 
 const avgRating = REVIEWS.reduce((s, r) => s + r.rating, 0) / REVIEWS.length;
+
+// 구조화 데이터 — Organization 에 AggregateRating 부여 + 상위 6개 Review 노출
+useSchemaOrg([
+  defineWebPage({
+    name: "고객 후기 — 실제 사용 후기 모음",
+    description: "SNS 마케팅·상위노출 실제 고객 후기 모음",
+  }),
+  {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "홈", item: "https://xn--sns-yg9lh0pw9l.kr/" },
+      { "@type": "ListItem", position: 2, name: "고객 후기", item: "https://xn--sns-yg9lh0pw9l.kr/reviews" },
+    ],
+  },
+  // Organization 에 AggregateRating 덧붙임 — 검색 결과에 별점 노출 가능
+  {
+    "@type": "Organization",
+    name: "SNS소셜팩토리",
+    url: "https://xn--sns-yg9lh0pw9l.kr",
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: Number(avgRating.toFixed(2)),
+      bestRating: 5,
+      reviewCount: REVIEWS.length,
+    },
+    review: REVIEWS.slice(0, 6).map((r) => ({
+      "@type": "Review",
+      author: { "@type": "Person", name: r.author },
+      datePublished: r.date.replace(/\./g, "-"),
+      reviewRating: {
+        "@type": "Rating",
+        ratingValue: r.rating,
+        bestRating: 5,
+      },
+      reviewBody: r.text,
+    })),
+  },
+]);
 </script>
 
 <template>

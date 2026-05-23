@@ -1,5 +1,5 @@
 <script setup lang="ts">
-useHead({ title: "회원가입" });
+useSeoMeta({ title: "회원가입", robots: "noindex, nofollow" });
 
 const route = useRoute();
 const { signIn } = useAuth();

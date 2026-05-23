@@ -1,7 +1,30 @@
 <script setup lang="ts">
 import { PLATFORMS, RANK_PLATFORMS, platformKeyFor } from "#shared/catalog";
 
-useHead({ title: "상위노출 — 스마트스토어·블로그·카페" });
+useSeoMeta({
+  title: "검색 상위노출 — 스마트스토어·네이버 블로그·네이버 카페",
+  description:
+    "스마트스토어 구매평·찜·트래픽, 네이버 블로그 이웃·공감·체험단, 네이버 카페 가입자·댓글로 검색 상위노출. 한국어 검색 알고리즘에 최적화된 마케팅.",
+  ogTitle: "스마트스토어·네이버 블로그·카페 상위노출 | SNS소셜팩토리",
+  ogDescription:
+    "검색 키워드 상위노출로 매출과 방문이 함께 오르는 마케팅. 네이버 알고리즘 최적화.",
+  ogType: "website",
+  ogLocale: "ko_KR",
+});
+
+useSchemaOrg([
+  defineWebPage({
+    name: "검색 상위노출",
+    description: "스마트스토어·네이버 블로그·카페 검색 상위노출 마케팅 카테고리",
+  }),
+  {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "홈", item: "https://xn--sns-yg9lh0pw9l.kr/" },
+      { "@type": "ListItem", position: 2, name: "상위노출", item: "https://xn--sns-yg9lh0pw9l.kr/rank" },
+    ],
+  },
+]);
 
 const { data: products } = await useFetch("/api/products/by-section", {
   query: { section: "RANK" },

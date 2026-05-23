@@ -3,7 +3,15 @@ import { formatPrice, platformKeyFor } from "#shared/catalog";
 import { STATUS_LABEL, STATUS_STYLE } from "~~/server/utils/orderStatus";
 
 definePageMeta({ middleware: ["auth"] });
-useHead({ title: "주문 상세" });
+useSeoMeta({ title: "주문 상세", robots: "noindex, nofollow" });
+
+const PAYMENT_LABEL: Record<string, string> = {
+  TRANSFER: "계좌이체",
+  CARD: "신용카드",
+  KAKAOPAY: "카카오페이",
+  NAVERPAY: "네이버페이",
+  TOSS: "토스",
+};
 
 const route = useRoute();
 const orderNumber = computed(() => String(route.params.orderNumber));
@@ -56,7 +64,7 @@ if (!order.value) throw createError({ statusCode: 404 });
       <h2 class="font-display text-lg text-neutral-900">결제 정보</h2>
       <dl class="mt-4 grid grid-cols-2 gap-y-2 text-sm">
         <dt class="text-neutral-500">결제 방법</dt>
-        <dd>{{ order.paymentMethod ?? "—" }}</dd>
+        <dd>{{ order.paymentMethod ? (PAYMENT_LABEL[order.paymentMethod] ?? order.paymentMethod) : "—" }}</dd>
         <dt class="text-neutral-500">결제 금액</dt>
         <dd class="font-display text-neutral-900">{{ formatPrice(order.totalAmount) }}</dd>
         <dt class="text-neutral-500">결제 일시</dt>

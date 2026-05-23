@@ -7,7 +7,58 @@ const slug = computed(() => String(route.params.slug));
 const { data: product } = await useFetch(`/api/products/${slug.value}`);
 if (!product.value) throw createError({ statusCode: 404 });
 
-useHead({ title: product.value.name, meta: [{ name: "description", content: product.value.description ?? "" }] });
+// SEO 메타 — 상품명 + 설명 + OG
+useSeoMeta({
+  title: product.value.name,
+  description: product.value.description ?? `${product.value.name} | ${product.value.category.name}`,
+  ogTitle: `${product.value.name} | SNS소셜팩토리`,
+  ogDescription: product.value.description ?? "",
+  ogType: "product",
+  ogLocale: "ko_KR",
+});
+
+// 구조화 데이터 — Product + AggregateRating + Offer + BreadcrumbList
+// → 구글 검색 결과에 별점·가격 리치 스니펫 노출 유도
+const sectionLabel = product.value.category.platform === "SNS" ? "SNS 마케팅" : "상위노출";
+const sectionPath = product.value.category.platform === "SNS" ? "/sns" : "/rank";
+
+useSchemaOrg([
+  {
+    "@type": "Product",
+    name: product.value.name,
+    description: product.value.description ?? "",
+    category: product.value.category.name,
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: product.value.rating,
+      bestRating: 5,
+      reviewCount: Math.max(product.value.salesCount, 1),
+    },
+    offers: {
+      "@type": "Offer",
+      url: `https://xn--sns-yg9lh0pw9l.kr/products/${product.value.slug}`,
+      priceCurrency: "KRW",
+      price: product.value.basePrice,
+      availability: product.value.isActive
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      seller: { "@type": "Organization", name: "SNS소셜팩토리" },
+    },
+  },
+  {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "홈", item: "https://xn--sns-yg9lh0pw9l.kr/" },
+      { "@type": "ListItem", position: 2, name: sectionLabel, item: `https://xn--sns-yg9lh0pw9l.kr${sectionPath}` },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: product.value.category.name,
+        item: `https://xn--sns-yg9lh0pw9l.kr/products/${product.value.slug}`,
+      },
+    ],
+  },
+]);
 
 const iconKey = computed(() => (product.value ? platformKeyFor(product.value.category.slug) : null));
 const selectedOption = ref(product.value.options[0] ?? null);

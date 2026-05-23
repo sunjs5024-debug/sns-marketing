@@ -3,7 +3,7 @@ import { formatPrice } from "#shared/catalog";
 import { STATUS_LABEL, STATUS_STYLE } from "~~/server/utils/orderStatus";
 
 definePageMeta({ middleware: ["auth"] });
-useHead({ title: "내 주문" });
+useSeoMeta({ title: "내 주문", robots: "noindex, nofollow" });
 
 const { data: orders } = await useFetch("/api/orders");
 </script>

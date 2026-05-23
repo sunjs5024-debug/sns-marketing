@@ -1,7 +1,31 @@
 <script setup lang="ts">
 import { PLATFORMS, SNS_PLATFORMS, platformKeyFor } from "#shared/catalog";
 
-useHead({ title: "SNS 마케팅 — 인스타그램·유튜브·틱톡·텔레그램·카카오톡·X" });
+useSeoMeta({
+  title: "SNS 마케팅 — 인스타그램·유튜브·틱톡·카카오톡·텔레그램·X",
+  description:
+    "인스타그램 팔로워·좋아요, 유튜브 구독자·조회수, 틱톡 팔로워, 카카오톡 채널친구, 텔레그램, X(트위터)까지 — 한국인 실계정 기반 SNS 마케팅을 한 곳에서.",
+  ogTitle: "SNS 마케팅 — 인스타·유튜브·틱톡·카카오톡·텔레그램·X | SNS소셜팩토리",
+  ogDescription:
+    "SNS 채널 성장을 위한 모든 마케팅 상품. 한국인 실계정 기반 안전 부스팅, 결과보고서 보장.",
+  ogType: "website",
+  ogLocale: "ko_KR",
+});
+
+// 브레드크럼 + 카테고리 페이지 구조화 데이터
+useSchemaOrg([
+  defineWebPage({
+    name: "SNS 마케팅",
+    description: "인스타·유튜브·틱톡·카카오톡·텔레그램·X SNS 마케팅 상품 전체 카테고리",
+  }),
+  {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "홈", item: "https://xn--sns-yg9lh0pw9l.kr/" },
+      { "@type": "ListItem", position: 2, name: "SNS 마케팅", item: "https://xn--sns-yg9lh0pw9l.kr/sns" },
+    ],
+  },
+]);
 
 const { data: products } = await useFetch("/api/products/by-section", {
   query: { section: "SNS" },

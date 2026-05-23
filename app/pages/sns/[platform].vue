@@ -10,7 +10,34 @@ if (!isValidPlatformSlug(platformParam.value) || !SNS_PLATFORMS.includes(platfor
 
 const meta = PLATFORMS[platformParam.value];
 
-useHead({ title: meta.name });
+useSeoMeta({
+  title: meta.name,
+  description: meta.description,
+  ogTitle: `${meta.name} | SNS소셜팩토리`,
+  ogDescription: meta.description,
+  ogType: "website",
+  ogLocale: "ko_KR",
+});
+
+useSchemaOrg([
+  defineWebPage({
+    name: meta.name,
+    description: meta.description,
+  }),
+  {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "홈", item: "https://xn--sns-yg9lh0pw9l.kr/" },
+      { "@type": "ListItem", position: 2, name: "SNS 마케팅", item: "https://xn--sns-yg9lh0pw9l.kr/sns" },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: meta.shortName,
+        item: `https://xn--sns-yg9lh0pw9l.kr/sns/${meta.slug}`,
+      },
+    ],
+  },
+]);
 
 const { data: products } = await useFetch(
   `/api/products/by-platform/${platformParam.value}`,

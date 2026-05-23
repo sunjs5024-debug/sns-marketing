@@ -1,7 +1,8 @@
 <script setup lang="ts">
-useHead({ title: "로그인" });
+useSeoMeta({ title: "로그인", robots: "noindex, nofollow" });
 
-const { signIn } = useAuth();
+// ⚠️ useAuth().signIn() 은 sidebase 의 AUTH_NO_ORIGIN 이슈로 클라이언트에서 fetch 가
+//    트리거 안 되는 경우가 있어 직접 next-auth credentials 콜백을 호출함
 const route = useRoute();
 
 const email = ref("");
@@ -18,18 +19,41 @@ async function onSubmit() {
   error.value = null;
   pending.value = true;
   try {
-    const result = await signIn("credentials", {
-      email: email.value,
-      password: password.value,
-      redirect: false,
+    // 1) CSRF 토큰 — credentials: include 로 쿠키 받기
+    const csrf = await $fetch<{ csrfToken: string }>("/api/auth/csrf", {
+      credentials: "include",
     });
-    const err = (result as { error?: string } | undefined)?.error;
-    if (err) {
+    // 2) Credentials 콜백 (json=true 로 redirect 대신 JSON 응답 받음)
+    //    credentials: include 로 set-cookie (세션 토큰) 가 브라우저 쿠키 jar 에 저장
+    const result = await $fetch<{ url: string }>(
+      "/api/auth/callback/credentials?json=true",
+      {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          csrfToken: csrf.csrfToken,
+          email: email.value,
+          password: password.value,
+          callbackUrl: callbackUrl.value,
+          json: "true",
+        }).toString(),
+      },
+    );
+    // 실패 시 next-auth 가 ?csrf=true 또는 /signin?error= 로 응답 url 만들어줌
+    const url = result?.url ?? "";
+    if (
+      url.includes("csrf=true") ||
+      url.includes("error=") ||
+      url.includes("/api/auth/signin")
+    ) {
       error.value = "이메일 또는 비밀번호가 올바르지 않습니다.";
       return;
     }
-    await navigateTo(callbackUrl.value);
-  } catch {
+    // 성공 — 세션 쿠키 반영 위해 페이지 자체 이동
+    window.location.href = callbackUrl.value;
+  } catch (e: unknown) {
+    console.error("[signin]", e);
     error.value = "로그인 중 오류가 발생했습니다.";
   } finally {
     pending.value = false;
@@ -37,14 +61,16 @@ async function onSubmit() {
 }
 
 async function social(provider: "kakao" | "naver" | "google") {
-  await signIn(provider, { callbackUrl: callbackUrl.value });
+  // 소셜 로그인은 OAuth 리다이렉트 흐름 — sidebase 의 signIn 대신 직접 이동
+  const url = `/api/auth/signin/${provider}?callbackUrl=${encodeURIComponent(callbackUrl.value)}`;
+  window.location.href = url;
 }
 </script>
 
 <template>
   <div class="mx-auto flex max-w-md flex-col items-center px-4 py-16">
     <h1 class="font-display text-3xl text-neutral-900">로그인</h1>
-    <p class="mt-2 text-sm text-neutral-500">SNS 소셜팩토리에 오신 걸 환영해요</p>
+    <p class="mt-2 text-sm text-neutral-500">SNS소셜팩토리에 오신 걸 환영해요</p>
 
     <p v-if="error" class="mt-4 w-full rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{{ error }}</p>
 
@@ -90,7 +116,9 @@ async function social(provider: "kakao" | "naver" | "google") {
       <hr class="flex-1 border-neutral-200" />
     </div>
 
-    <form class="w-full space-y-3" @submit.prevent="onSubmit">
+    <!-- form 태그 제거 — hydrate 안 됐을 때 브라우저 기본 submit 으로 페이지 reload 되는 걸 차단.
+         button 은 type="button" 으로 명시, Enter 키도 별도 keydown 으로 처리 -->
+    <div class="w-full space-y-3">
       <label class="block">
         <span class="text-sm text-neutral-700">이메일</span>
         <input
@@ -100,6 +128,7 @@ async function social(provider: "kakao" | "naver" | "google") {
           autocomplete="email"
           class="mt-1 block w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm focus:border-neutral-900 focus:outline-none"
           placeholder="you@example.com"
+          @keydown.enter="onSubmit"
         />
       </label>
       <label class="block">
@@ -111,16 +140,18 @@ async function social(provider: "kakao" | "naver" | "google") {
           autocomplete="current-password"
           class="mt-1 block w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm focus:border-neutral-900 focus:outline-none"
           placeholder="8자 이상"
+          @keydown.enter="onSubmit"
         />
       </label>
       <button
-        type="submit"
+        type="button"
         :disabled="pending"
         class="mt-2 w-full rounded-full bg-neutral-900 py-3 text-sm text-white hover:bg-neutral-700 disabled:opacity-60"
+        @click="onSubmit"
       >
         {{ pending ? "로그인 중…" : "로그인" }}
       </button>
-    </form>
+    </div>
 
     <p class="mt-6 text-sm text-neutral-600">
       아직 계정이 없으신가요?

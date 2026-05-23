@@ -39,19 +39,19 @@ const rankItems: DropItem[] = RANK_PLATFORMS.map((s) => ({
 
 <template>
   <header class="sticky top-0 z-40 w-full border-b border-neutral-100 bg-white/85 backdrop-blur-md">
-    <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center gap-8">
-        <NuxtLink to="/" class="flex items-center gap-2 font-display text-xl tracking-tight">
+    <div class="mx-auto flex h-16 max-w-7xl flex-nowrap items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+      <div class="flex shrink-0 items-center gap-6 lg:gap-8">
+        <NuxtLink to="/" class="flex shrink-0 items-center gap-2 font-display text-xl tracking-tight whitespace-nowrap">
           <span
             class="grid h-9 w-9 place-items-center rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white shadow-md anim-gradient-flow"
             style="background-size: 200% 200%"
           >S</span>
-          <span>SNS 소셜팩토리</span>
+          <span>SNS소셜팩토리</span>
         </NuxtLink>
 
-        <nav class="hidden md:flex items-center gap-1 text-sm font-medium text-neutral-700">
+        <nav class="hidden lg:flex items-center gap-1 text-sm font-medium text-neutral-700 whitespace-nowrap">
           <div class="group relative">
-            <NuxtLink to="/sns" class="inline-flex items-center gap-1 rounded-md px-3 py-2 hover:bg-neutral-100">
+            <NuxtLink to="/sns" class="inline-flex items-center gap-1 rounded-md px-3 py-2 hover:bg-neutral-100 whitespace-nowrap">
               SNS 마케팅
               <svg class="h-3 w-3" viewBox="0 0 12 12" fill="none">
                 <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -76,7 +76,7 @@ const rankItems: DropItem[] = RANK_PLATFORMS.map((s) => ({
           </div>
 
           <div class="group relative">
-            <NuxtLink to="/rank" class="inline-flex items-center gap-1 rounded-md px-3 py-2 hover:bg-neutral-100">
+            <NuxtLink to="/rank" class="inline-flex items-center gap-1 rounded-md px-3 py-2 hover:bg-neutral-100 whitespace-nowrap">
               상위노출
               <svg class="h-3 w-3" viewBox="0 0 12 12" fill="none">
                 <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -100,27 +100,28 @@ const rankItems: DropItem[] = RANK_PLATFORMS.map((s) => ({
             </div>
           </div>
 
-          <NuxtLink to="/reviews" class="rounded-md px-3 py-2 hover:bg-neutral-100">후기</NuxtLink>
-          <NuxtLink to="/guide" class="rounded-md px-3 py-2 hover:bg-neutral-100">이용안내</NuxtLink>
+          <NuxtLink to="/reviews" class="rounded-md px-3 py-2 hover:bg-neutral-100 whitespace-nowrap">후기</NuxtLink>
+          <NuxtLink to="/guide" class="rounded-md px-3 py-2 hover:bg-neutral-100 whitespace-nowrap">이용안내</NuxtLink>
         </nav>
       </div>
 
-      <div class="flex items-center gap-2 text-sm">
+      <div class="flex shrink-0 items-center gap-2 text-sm whitespace-nowrap">
         <template v-if="header?.isAuthed">
-          <NuxtLink to="/orders" class="hidden sm:inline-flex rounded-full px-3 py-2 text-neutral-700 hover:bg-neutral-100">내 주문</NuxtLink>
-          <span class="hidden sm:inline-flex items-center gap-2 rounded-full bg-neutral-100 px-3 py-1.5 text-xs text-neutral-700">
-            {{ header?.name }}
+          <NuxtLink to="/orders" class="hidden lg:inline-flex rounded-full px-3 py-2 text-neutral-700 hover:bg-neutral-100 whitespace-nowrap">내 주문</NuxtLink>
+          <!-- 사용자 배지: 이름 8자 초과 시 ... 처리해서 한 줄 유지 -->
+          <span class="hidden sm:inline-flex items-center gap-2 rounded-full bg-neutral-100 px-3 py-1.5 text-xs text-neutral-700 whitespace-nowrap">
+            <span class="max-w-[7rem] truncate">{{ header?.name }}</span>
             <span class="text-neutral-400">·</span>
             <span class="text-indigo-600">{{ (header?.points ?? 0).toLocaleString("ko-KR") }}P</span>
           </span>
-          <NuxtLink v-if="header?.role === 'ADMIN'" to="/admin" class="hidden sm:inline-flex rounded-full bg-amber-100 px-3 py-2 text-xs text-amber-800 hover:bg-amber-200">관리자</NuxtLink>
-          <button type="button" class="hidden sm:inline-flex rounded-full px-3 py-2 text-neutral-500 hover:bg-neutral-100" @click="onSignOut">로그아웃</button>
+          <NuxtLink v-if="header?.role === 'ADMIN'" to="/admin" class="hidden sm:inline-flex rounded-full bg-amber-100 px-3 py-2 text-xs text-amber-800 hover:bg-amber-200 whitespace-nowrap">관리자</NuxtLink>
+          <button type="button" class="hidden sm:inline-flex rounded-full px-3 py-2 text-neutral-500 hover:bg-neutral-100 whitespace-nowrap" @click="onSignOut">로그아웃</button>
         </template>
         <template v-else>
-          <NuxtLink to="/auth/signin" class="hidden sm:inline-flex rounded-full px-3 py-2 text-neutral-700 hover:bg-neutral-100">로그인</NuxtLink>
-          <NuxtLink to="/auth/signup" class="hidden sm:inline-flex rounded-full bg-neutral-900 px-4 py-2 text-white hover:bg-neutral-700">회원가입</NuxtLink>
+          <NuxtLink to="/auth/signin" class="hidden sm:inline-flex rounded-full px-3 py-2 text-neutral-700 hover:bg-neutral-100 whitespace-nowrap">로그인</NuxtLink>
+          <NuxtLink to="/auth/signup" class="hidden sm:inline-flex rounded-full bg-neutral-900 px-4 py-2 text-white hover:bg-neutral-700 whitespace-nowrap">회원가입</NuxtLink>
         </template>
-        <NuxtLink to="/cart" class="relative grid h-9 w-9 place-items-center rounded-full text-neutral-700 hover:bg-neutral-100" aria-label="장바구니">
+        <NuxtLink to="/cart" class="relative grid h-9 w-9 shrink-0 place-items-center rounded-full text-neutral-700 hover:bg-neutral-100" aria-label="장바구니">
           🛒
           <span v-if="(header?.cartCount ?? 0) > 0" class="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-rose-500 px-1 text-[10px] text-white">
             {{ header?.cartCount }}

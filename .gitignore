@@ -16,3 +16,6 @@ generated/prisma
 # 로컬 SQLite (이제 안 쓰지만 혹시 모르니)
 *.db
 *.db-journal
+
+# DB 백업 (로컬 전용 — 절대 git 에 올리지 말 것)
+backups/

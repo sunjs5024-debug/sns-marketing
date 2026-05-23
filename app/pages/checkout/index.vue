@@ -2,7 +2,7 @@
 import { formatPrice, platformKeyFor } from "#shared/catalog";
 
 definePageMeta({ middleware: ["auth"] });
-useHead({ title: "주문하기" });
+useSeoMeta({ title: "주문하기", robots: "noindex, nofollow" });
 
 const { data: items } = await useFetch("/api/cart");
 if (!items.value || items.value.length === 0) {
@@ -16,7 +16,8 @@ const buyerName = ref(userInfo?.name ?? "");
 const buyerPhone = ref("");
 const buyerEmail = ref(userInfo?.email ?? "");
 const memo = ref("");
-const paymentMethod = ref<"CARD" | "TRANSFER" | "KAKAOPAY" | "NAVERPAY" | "TOSS">("CARD");
+// 현재는 계좌이체만 지원 (PG 미연동 상태)
+const paymentMethod = ref<"TRANSFER">("TRANSFER");
 const pending = ref(false);
 const errorMsg = ref<string | null>(null);
 
@@ -105,24 +106,9 @@ async function submit() {
 
         <section class="rounded-3xl border border-neutral-100 bg-white p-6">
           <h2 class="font-display text-lg text-neutral-900">결제수단</h2>
-          <div class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-5">
-            <label
-              v-for="m in [
-                { v: 'CARD', label: '신용카드' },
-                { v: 'TRANSFER', label: '계좌이체' },
-                { v: 'KAKAOPAY', label: '카카오페이' },
-                { v: 'NAVERPAY', label: '네이버페이' },
-                { v: 'TOSS', label: '토스' },
-              ]"
-              :key="m.v"
-              :class="[
-                'cursor-pointer rounded-2xl border bg-white px-3 py-3 text-center text-sm transition',
-                paymentMethod === m.v ? 'border-neutral-900 bg-neutral-900 text-white' : 'border-neutral-200',
-              ]"
-            >
-              <input type="radio" name="paymentMethod" :value="m.v" v-model="paymentMethod" class="sr-only" />
-              {{ m.label }}
-            </label>
+          <div class="mt-4 flex items-center gap-3 rounded-2xl border border-neutral-900 bg-neutral-900 px-4 py-3 text-sm text-white">
+            <span class="text-base">🏦</span>
+            <span>계좌이체</span>
           </div>
           <p class="mt-3 text-[11px] text-neutral-400">
             * 현재 환경엔 PG사 연동이 안 되어 있어, 다음 단계는 mock 결제로 자동 완료됩니다.

@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/* ⚠️ hover variant 를 @media (hover: hover) 매체쿼리 밖으로 빼서 모든 환경에서 동작.
+   Tailwind v4 기본값은 hover: hover 매체쿼리 안에 박는데, 노트북 터치스크린 / 일부 드라이버
+   환경에서 매치 안 되어 호버 효과가 전부 무력화되는 케이스 회피 */
+@custom-variant hover (&:hover);
+@custom-variant group-hover (&:is(:where(.group):hover *));
+
+/* WHY US 카드 — v-for 안 동적 :class 의 그라데이션·호버 클래스를 강제 컴파일에 포함 */
+@source inline("from-blue-500 from-pink-500 from-emerald-500 from-amber-500 from-indigo-500 from-yellow-400 from-rose-500 to-cyan-500 to-rose-500 to-teal-500 to-orange-500 to-violet-500 to-amber-500 to-rose-600 group-hover:scale-110 group-hover:rotate-3 group-hover:opacity-30 group-hover:opacity-100 group-hover:-translate-y-1 group-hover:shadow-xl group-hover:translate-x-1 group-hover:visible bg-gradient-to-br");
+
 /* 여기어때 잘난체 */
 @font-face {
   font-family: "Jalnan";
