@@ -65,8 +65,14 @@ if (!order.value) throw createError({ statusCode: 404 });
       <dl class="mt-4 grid grid-cols-2 gap-y-2 text-sm">
         <dt class="text-neutral-500">결제 방법</dt>
         <dd>{{ order.paymentMethod ? (PAYMENT_LABEL[order.paymentMethod] ?? order.paymentMethod) : "—" }}</dd>
-        <dt class="text-neutral-500">결제 금액</dt>
-        <dd class="font-display text-neutral-900">{{ formatPrice(order.totalAmount) }}</dd>
+        <dt class="text-neutral-500">상품 금액</dt>
+        <dd>{{ formatPrice(order.totalAmount) }}</dd>
+        <template v-if="order.pointsUsed > 0">
+          <dt class="text-rose-500">포인트 사용</dt>
+          <dd class="text-rose-600">−{{ order.pointsUsed.toLocaleString("ko-KR") }}P</dd>
+        </template>
+        <dt class="text-neutral-900">실 결제 금액</dt>
+        <dd class="font-display text-neutral-900">{{ formatPrice(order.finalAmount || order.totalAmount) }}</dd>
         <dt class="text-neutral-500">결제 일시</dt>
         <dd>{{ order.paidAt ? new Date(order.paidAt).toLocaleString("ko-KR") : "—" }}</dd>
       </dl>

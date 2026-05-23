@@ -12,12 +12,19 @@ if (!items.value || items.value.length === 0) {
 const { data: authData } = useAuth();
 const userInfo = authData.value?.user as { name?: string; email?: string } | undefined;
 
+// 사용자 보유 포인트 가져오기 (헤더 정보 활용)
+const { data: header } = await useFetch("/api/header", {
+  default: () => ({ isAuthed: false, role: null, cartCount: 0, name: null, points: 0 }),
+});
+const myPoints = computed(() => header.value?.points ?? 0);
+
 const buyerName = ref(userInfo?.name ?? "");
 const buyerPhone = ref("");
 const buyerEmail = ref(userInfo?.email ?? "");
 const memo = ref("");
 // 현재는 계좌이체만 지원 (PG 미연동 상태)
 const paymentMethod = ref<"TRANSFER">("TRANSFER");
+const pointsToUse = ref(0);
 const pending = ref(false);
 const errorMsg = ref<string | null>(null);
 
@@ -27,6 +34,27 @@ const total = computed(() =>
     0,
   ),
 );
+
+// 포인트 사용 한도 — 결제 금액의 30%, 보유 포인트, 결제 금액 중 최소
+const MAX_RATIO = 0.3;
+const maxUsablePoints = computed(() =>
+  Math.min(myPoints.value, Math.floor(total.value * MAX_RATIO)),
+);
+const finalAmount = computed(() => Math.max(0, total.value - pointsToUse.value));
+const earnedAfterUse = computed(() => Math.floor(finalAmount.value * 0.02));
+
+// 사용자가 입력 변경 시 한도 초과/음수 자동 보정
+watch([pointsToUse, maxUsablePoints], () => {
+  if (pointsToUse.value < 0) pointsToUse.value = 0;
+  if (pointsToUse.value > maxUsablePoints.value) pointsToUse.value = maxUsablePoints.value;
+});
+
+function useAllPoints() {
+  pointsToUse.value = maxUsablePoints.value;
+}
+function clearPoints() {
+  pointsToUse.value = 0;
+}
 
 async function submit() {
   errorMsg.value = null;
@@ -40,6 +68,7 @@ async function submit() {
         buyerEmail: buyerEmail.value,
         memo: memo.value || null,
         paymentMethod: paymentMethod.value,
+        pointsToUse: pointsToUse.value,
       },
     });
     await navigateTo(`/checkout/${res.orderNumber}/pay`);
@@ -114,26 +143,75 @@ async function submit() {
             * 현재 환경엔 PG사 연동이 안 되어 있어, 다음 단계는 mock 결제로 자동 완료됩니다.
           </p>
         </section>
+
+        <!-- 포인트 사용 -->
+        <section class="rounded-3xl border border-neutral-100 bg-white p-6">
+          <div class="flex items-center justify-between">
+            <h2 class="font-display text-lg text-neutral-900">포인트 사용</h2>
+            <span class="text-xs text-neutral-500">
+              보유 <span class="text-indigo-600">{{ myPoints.toLocaleString("ko-KR") }}P</span>
+            </span>
+          </div>
+          <p class="mt-1 text-[11px] text-neutral-400">
+            결제 금액의 {{ Math.round(MAX_RATIO * 100) }}% (최대
+            <span class="font-mono">{{ maxUsablePoints.toLocaleString("ko-KR") }}P</span>)까지 사용 가능합니다.
+          </p>
+
+          <div class="mt-4 flex items-stretch gap-2">
+            <div class="relative flex-1">
+              <input
+                v-model.number="pointsToUse"
+                type="number"
+                :max="maxUsablePoints"
+                min="0"
+                step="1"
+                placeholder="0"
+                class="block w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 pr-12 text-right text-sm focus:border-neutral-900 focus:outline-none"
+              />
+              <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm text-neutral-400">P</span>
+            </div>
+            <button
+              type="button"
+              :disabled="maxUsablePoints === 0"
+              class="rounded-xl bg-neutral-900 px-4 text-sm text-white hover:bg-neutral-700 disabled:bg-neutral-300"
+              @click="useAllPoints"
+            >전액 사용</button>
+            <button
+              v-if="pointsToUse > 0"
+              type="button"
+              class="rounded-xl border border-neutral-300 px-3 text-sm text-neutral-600 hover:bg-neutral-50"
+              @click="clearPoints"
+            >×</button>
+          </div>
+
+          <p v-if="myPoints === 0" class="mt-3 text-[11px] text-neutral-400">
+            * 결제 시 자동 적립된 포인트는 다음 주문부터 사용 가능합니다.
+          </p>
+        </section>
       </div>
 
-      <aside class="h-fit space-y-3 rounded-3xl border border-neutral-100 bg-white p-6">
+      <aside class="h-fit space-y-3 rounded-3xl border border-neutral-100 bg-white p-6 lg:sticky lg:top-20">
         <h2 class="font-display text-lg text-neutral-900">최종 결제 금액</h2>
         <dl class="space-y-2 text-sm">
           <div class="flex justify-between text-neutral-600">
             <dt>상품 금액</dt>
             <dd>{{ formatPrice(total) }}</dd>
           </div>
-          <div class="flex justify-between text-neutral-600">
+          <div v-if="pointsToUse > 0" class="flex justify-between text-rose-600">
+            <dt>포인트 사용</dt>
+            <dd>−{{ pointsToUse.toLocaleString("ko-KR") }}P</dd>
+          </div>
+          <div class="flex justify-between text-neutral-500">
             <dt>적립 예정</dt>
-            <dd class="text-indigo-600">+{{ Math.floor(total * 0.02).toLocaleString("ko-KR") }}P</dd>
+            <dd class="text-indigo-600">+{{ earnedAfterUse.toLocaleString("ko-KR") }}P</dd>
           </div>
           <div class="border-t border-neutral-100 pt-2 flex justify-between text-base">
             <dt class="text-neutral-900">총 결제 금액</dt>
-            <dd class="font-display text-neutral-900">{{ formatPrice(total) }}</dd>
+            <dd class="font-display text-neutral-900">{{ formatPrice(finalAmount) }}</dd>
           </div>
         </dl>
         <button type="submit" :disabled="pending" class="w-full rounded-full bg-neutral-900 py-3 text-center text-sm text-white hover:bg-neutral-700 disabled:opacity-60">
-          {{ pending ? "처리 중…" : `${formatPrice(total)} 결제하기` }}
+          {{ pending ? "처리 중…" : `${formatPrice(finalAmount)} 결제하기` }}
         </button>
         <NuxtLink to="/cart" class="block text-center text-xs text-neutral-500 hover:text-neutral-700">← 장바구니로 돌아가기</NuxtLink>
       </aside>

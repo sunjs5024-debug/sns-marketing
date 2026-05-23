@@ -2,9 +2,20 @@
 import { SNS_PLATFORMS, RANK_PLATFORMS, PLATFORMS, type PlatformSlug } from "#shared/catalog";
 
 // sidebase의 useAuth() 는 SSR 중 재귀 이슈가 있어 자체 API로 우회
-const { data: header } = await useFetch("/api/header", {
+// key 명시 → refreshNuxtData("header") 로 외부에서 갱신 가능
+const { data: header, refresh: refreshHeader } = await useFetch("/api/header", {
+  key: "header",
   default: () => ({ isAuthed: false, role: null, cartCount: 0, name: null, points: 0 }),
 });
+
+// 페이지 이동 시 자동 refresh — 포인트/카트 변경 사항 즉시 반영
+const route = useRoute();
+watch(
+  () => route.fullPath,
+  () => {
+    if (import.meta.client) refreshHeader();
+  },
+);
 
 async function onSignOut() {
   // CSRF 토큰 가져와서 sidebase signout 호출
@@ -106,14 +117,29 @@ const rankItems: DropItem[] = RANK_PLATFORMS.map((s) => ({
       </div>
 
       <div class="flex shrink-0 items-center gap-2 text-sm whitespace-nowrap">
+        <!-- 검색 (항상 노출, 로그인 무관) -->
+        <NuxtLink
+          to="/search"
+          class="grid h-9 w-9 shrink-0 place-items-center rounded-full text-neutral-700 hover:bg-neutral-100"
+          aria-label="검색"
+        >
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7" />
+            <line x1="21" y1="21" x2="16.5" y2="16.5" />
+          </svg>
+        </NuxtLink>
+
         <template v-if="header?.isAuthed">
           <NuxtLink to="/orders" class="hidden lg:inline-flex rounded-full px-3 py-2 text-neutral-700 hover:bg-neutral-100 whitespace-nowrap">내 주문</NuxtLink>
-          <!-- 사용자 배지: 이름 8자 초과 시 ... 처리해서 한 줄 유지 -->
-          <span class="hidden sm:inline-flex items-center gap-2 rounded-full bg-neutral-100 px-3 py-1.5 text-xs text-neutral-700 whitespace-nowrap">
+          <!-- 사용자 배지 = 마이페이지 진입점 (클릭하면 /mypage) -->
+          <NuxtLink
+            to="/mypage"
+            class="hidden sm:inline-flex items-center gap-2 rounded-full bg-neutral-100 px-3 py-1.5 text-xs text-neutral-700 whitespace-nowrap transition hover:bg-neutral-200"
+          >
             <span class="max-w-[7rem] truncate">{{ header?.name }}</span>
             <span class="text-neutral-400">·</span>
             <span class="text-indigo-600">{{ (header?.points ?? 0).toLocaleString("ko-KR") }}P</span>
-          </span>
+          </NuxtLink>
           <NuxtLink v-if="header?.role === 'ADMIN'" to="/admin" class="hidden sm:inline-flex rounded-full bg-amber-100 px-3 py-2 text-xs text-amber-800 hover:bg-amber-200 whitespace-nowrap">관리자</NuxtLink>
           <button type="button" class="hidden sm:inline-flex rounded-full px-3 py-2 text-neutral-500 hover:bg-neutral-100 whitespace-nowrap" @click="onSignOut">로그아웃</button>
         </template>

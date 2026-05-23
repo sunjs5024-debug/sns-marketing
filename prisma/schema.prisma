@@ -138,7 +138,9 @@ model Order {
   userId        String
   user          User          @relation(fields: [userId], references: [id])
   status        OrderStatus   @default(PENDING)
-  totalAmount   Int
+  totalAmount   Int           // 상품 합계 (포인트 차감 전)
+  pointsUsed    Int           @default(0) // 결제 시 차감한 포인트
+  finalAmount   Int           @default(0) // 실 결제 금액 = totalAmount - pointsUsed
   paymentMethod PaymentMethod?
   paymentKey    String?
   buyerName     String

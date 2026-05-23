@@ -39,8 +39,31 @@ useSchemaOrg([
   },
 ]);
 
+// 필터/정렬 — URL 쿼리와 양방향 동기화
+const router = useRouter();
+const sort = computed({
+  get: () => (typeof route.query.sort === "string" ? route.query.sort : "popular"),
+  set: (v) => updateQuery({ sort: v === "popular" ? undefined : v }),
+});
+const badge = computed({
+  get: () => (typeof route.query.badge === "string" ? route.query.badge : null),
+  set: (v) => updateQuery({ badge: v ?? undefined }),
+});
+const price = computed({
+  get: () => (typeof route.query.price === "string" ? route.query.price : null),
+  set: (v) => updateQuery({ price: v ?? undefined }),
+});
+
+function updateQuery(patch: Record<string, string | undefined>) {
+  router.replace({ query: { ...route.query, ...patch } });
+}
+function resetFilters() {
+  router.replace({ path: route.path });
+}
+
 const { data: products } = await useFetch(
   `/api/products/by-platform/${platformParam.value}`,
+  { query: { sort, badge, price }, watch: [sort, badge, price] },
 );
 </script>
 
@@ -64,9 +87,24 @@ const { data: products } = await useFetch(
     </section>
 
     <section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-      <SectionTitle :title="`전체 ${meta.shortName} 상품`" :description="`총 ${(products ?? []).length}개의 상품이 준비되어 있습니다.`" />
-      <p v-if="(products ?? []).length === 0" class="mt-12 text-center text-sm text-neutral-500">아직 등록된 상품이 없습니다.</p>
-      <div v-else class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      <h2 class="font-display text-2xl text-neutral-900">전체 {{ meta.shortName }} 상품</h2>
+
+      <CategoryToolbar
+        class="mt-5"
+        :total="(products ?? []).length"
+        :sort="sort"
+        :badge="badge"
+        :price="price"
+        @update:sort="(v) => sort = v"
+        @update:badge="(v) => badge = v"
+        @update:price="(v) => price = v"
+        @reset="resetFilters"
+      />
+
+      <p v-if="(products ?? []).length === 0" class="mt-12 rounded-3xl border border-neutral-100 bg-neutral-50 p-12 text-center text-sm text-neutral-500">
+        조건에 맞는 상품이 없습니다. 필터를 조정해보세요.
+      </p>
+      <div v-else class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         <ProductCard
           v-for="p in products ?? []"
           :key="p.id"

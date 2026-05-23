@@ -3,20 +3,13 @@ import type { PlatformSlug } from "#shared/catalog";
 
 type Tick = { kind: PlatformSlug; who: string; what: string; time: string };
 
-const TICKS: Tick[] = [
-  { kind: "instagram", who: "ji****@naver.com", what: "인스타 한국인 팔로워 1,000명 주문", time: "방금 전" },
-  { kind: "telegram", who: "tg_c**", what: "텔레그램 채널 구독자 1,000명 주문", time: "1분 전" },
-  { kind: "youtube", who: "da****_yt", what: "유튜브 쇼츠 조회수 10,000회 주문", time: "2분 전" },
-  { kind: "tiktok", who: "tt**_kr", what: "틱톡 글로벌 팔로워 1,000명 주문", time: "3분 전" },
-  { kind: "smartstore", who: "vintage**", what: "스마트스토어 포토 구매평 5건 주문", time: "4분 전" },
-  { kind: "naver-blog", who: "감성카**", what: "블로그 체험단 5명 매칭 주문", time: "6분 전" },
-  { kind: "instagram", who: "design**", what: "인스타 릴스 조회수 10,000회 주문", time: "7분 전" },
-  { kind: "naver-cafe", who: "강남맘**", what: "네이버 카페 가입자 200명 주문", time: "8분 전" },
-  { kind: "x", who: "@k_dev**", what: "X(트위터) 한국인 팔로워 500명 주문", time: "9분 전" },
-  { kind: "kakaotalk", who: "광교카**", what: "카톡 채널친구 1,000명 주문", time: "10분 전" },
-];
-
-const list = [...TICKS, ...TICKS];
+// 페이지 새로고침마다 새 데이터. SSR 응답이라 처음부터 다양한 닉네임 노출
+const { data } = await useFetch<{ activeUsers: number; recentOrders: Tick[] }>(
+  "/api/live",
+  { key: "live", default: () => ({ activeUsers: 158, recentOrders: [] }) },
+);
+// marquee 연속 효과용으로 2번 복제
+const list = computed<Tick[]>(() => [...(data.value?.recentOrders ?? []), ...(data.value?.recentOrders ?? [])]);
 </script>
 
 <template>

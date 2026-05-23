@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import type { PlatformSlug } from "#shared/catalog";
 
+// 실시간 인원 — /api/live 와 같은 key 공유 → Ticker 와 같은 요청 1번으로 둘 다 채움
+const { data: live } = await useFetch<{ activeUsers: number }>("/api/live", {
+  key: "live",
+  default: () => ({ activeUsers: 158 }),
+});
+
 type FloatCardData = {
   topPx: number;
   side: "left" | "right";
@@ -40,7 +46,7 @@ const cards: FloatCardData[] = [
               <span class="absolute inset-0 rounded-full bg-emerald-500 anim-pulse" />
               <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
             </span>
-            지금 158명이 마케팅을 진행 중
+            지금 {{ (live?.activeUsers ?? 158).toLocaleString("ko-KR") }}명이 마케팅을 진행 중
           </div>
 
           <h1 class="mt-5 font-display text-4xl tracking-tight text-neutral-900 sm:text-5xl lg:text-[3.5rem] leading-[1.2] text-balance">

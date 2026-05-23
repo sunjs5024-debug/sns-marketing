@@ -54,9 +54,17 @@ async function pay() {
           <dt class="text-neutral-500">결제 수단</dt>
           <dd>{{ order.paymentMethod ? (PAYMENT_LABEL[order.paymentMethod] ?? order.paymentMethod) : "—" }}</dd>
         </div>
+        <div class="flex justify-between border-t border-neutral-100 pt-2 text-neutral-600">
+          <dt>상품 금액</dt>
+          <dd>{{ formatPrice(order.totalAmount) }}</dd>
+        </div>
+        <div v-if="order.pointsUsed > 0" class="flex justify-between text-rose-600">
+          <dt>포인트 사용</dt>
+          <dd>−{{ order.pointsUsed.toLocaleString("ko-KR") }}P</dd>
+        </div>
         <div class="flex justify-between border-t border-neutral-100 pt-2 text-base">
           <dt class="text-neutral-900">결제 금액</dt>
-          <dd class="font-display text-neutral-900">{{ formatPrice(order.totalAmount) }}</dd>
+          <dd class="font-display text-neutral-900">{{ formatPrice(order.finalAmount) }}</dd>
         </div>
       </dl>
     </div>
@@ -66,7 +74,7 @@ async function pay() {
     </p>
 
     <button type="button" :disabled="pending" class="mt-6 w-full rounded-full bg-neutral-900 py-3 text-sm text-white hover:bg-neutral-700 disabled:opacity-60" @click="pay">
-      {{ pending ? "결제 중…" : `${formatPrice(order.totalAmount)} 결제 완료 (mock)` }}
+      {{ pending ? "결제 중…" : `${formatPrice(order.finalAmount)} 결제 완료 (mock)` }}
     </button>
   </div>
 </template>
