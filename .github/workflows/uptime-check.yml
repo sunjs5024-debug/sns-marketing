@@ -8,11 +8,9 @@ name: Uptime Check
 
 on:
   schedule:
-    # 5분 간격 (GitHub Actions cron 최소 단위, 약간 지연 있을 수 있음)
     - cron: "*/5 * * * *"
-  workflow_dispatch: # 수동 실행 가능
+  workflow_dispatch:
 
-# 동시 실행 방지 (이전 run 끝나기 전 새 run 안 띄움)
 concurrency:
   group: uptime-check
   cancel-in-progress: false
@@ -26,72 +24,55 @@ jobs:
 
     steps:
       - name: Restore last state
-        id: cache-restore
         uses: actions/cache/restore@v4
         with:
           path: .uptime-state
           key: uptime-state-v1
-          # restore-keys 로 항상 최신 상태 복원
           restore-keys: |
             uptime-state-
 
-      - name: Check site & build alert
-        id: check
+      - name: Check site & send alert
         env:
           SITE_URL: https://xn--sns-yg9lh0pw9l.kr/
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           set +e
-          # 응답 시간 + HTTP 상태 코드 둘 다 측정
           START=$(date +%s)
           HTTP_CODE=$(curl -s -o /tmp/body.html -w "%{http_code}" --max-time 20 "$SITE_URL")
           END=$(date +%s)
           ELAPSED=$((END - START))
 
-          # 200-399 = up, 그 외 = down (timeout 시 000)
           if [[ "$HTTP_CODE" =~ ^[23][0-9][0-9]$ ]]; then
             CURR_STATE="up"
           else
             CURR_STATE="down"
           fi
 
-          # 이전 상태 읽기 (없으면 unknown)
           PREV_STATE=$(cat .uptime-state 2>/dev/null || echo "unknown")
           echo "PREV=$PREV_STATE CURR=$CURR_STATE HTTP=$HTTP_CODE ELAPSED=${ELAPSED}s"
 
-          # 상태 변화 시에만 알림
           send_alert() {
-            local msg="$1"
             curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-              -d "chat_id=${TELEGRAM_CHAT_ID}" \
-              -d "parse_mode=HTML" \
-              -d "text=${msg}"
+              --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
+              --data-urlencode "parse_mode=HTML" \
+              --data-urlencode "text=$1"
           }
 
-          if [ "$CURR_STATE" = "down" ] && [ "$PREV_STATE" != "down" ]; then
-            MSG="🔴 <b>SNS소셜팩토리 다운</b>
-URL: ${SITE_URL}
-HTTP: ${HTTP_CODE}
-응답시간: ${ELAPSED}s
-시간: $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M:%S KST')
+          NOW=$(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M:%S KST')
 
-확인 후 서버를 다시 띄워주세요."
+          if [ "$CURR_STATE" = "down" ] && [ "$PREV_STATE" != "down" ]; then
+            MSG=$(printf '🔴 <b>SNS소셜팩토리 다운</b>\nURL: %s\nHTTP: %s\n응답시간: %ss\n시간: %s\n\n확인 후 서버를 다시 띄워주세요.' "$SITE_URL" "$HTTP_CODE" "$ELAPSED" "$NOW")
             send_alert "$MSG"
             echo "ALERT sent: down"
           elif [ "$CURR_STATE" = "up" ] && [ "$PREV_STATE" = "down" ]; then
-            MSG="🟢 <b>SNS소셜팩토리 복구</b>
-URL: ${SITE_URL}
-HTTP: ${HTTP_CODE}
-응답시간: ${ELAPSED}s
-시간: $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M:%S KST')"
+            MSG=$(printf '🟢 <b>SNS소셜팩토리 복구</b>\nURL: %s\nHTTP: %s\n응답시간: %ss\n시간: %s' "$SITE_URL" "$HTTP_CODE" "$ELAPSED" "$NOW")
             send_alert "$MSG"
             echo "ALERT sent: recovered"
           else
             echo "No state change. silent."
           fi
 
-          # 현재 상태 저장
           echo "$CURR_STATE" > .uptime-state
 
       - name: Save state
@@ -99,5 +80,4 @@ HTTP: ${HTTP_CODE}
         uses: actions/cache/save@v4
         with:
           path: .uptime-state
-          # 같은 key 면 덮어쓰기 (GitHub Actions 4.x 동작)
           key: uptime-state-v1-${{ github.run_id }}
