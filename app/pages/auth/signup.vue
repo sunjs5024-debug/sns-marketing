@@ -99,7 +99,7 @@ async function onOAuthSignIn(provider: "kakao" | "naver" | "google") {
       <p class="text-xs uppercase tracking-widest text-indigo-700">SIGNUP BONUS</p>
       <ul class="mt-2 space-y-1 text-xs text-neutral-700">
         <li class="flex items-center gap-1.5"><span class="text-emerald-600">✓</span> SNS 비밀번호 요구 없이 안전하게 진행</li>
-        <li class="flex items-center gap-1.5"><span class="text-emerald-600">✓</span> 첫 충전 시 5% 보너스 포인트 (오픈 기념)</li>
+        <li class="flex items-center gap-1.5"><span class="text-emerald-600">✓</span> 가입 즉시 전 상품 주문 가능 (오픈 기념가)</li>
         <li class="flex items-center gap-1.5"><span class="text-emerald-600">✓</span> 30일 유지 보장 + 결과보고서 자동 발송</li>
       </ul>
     </div>

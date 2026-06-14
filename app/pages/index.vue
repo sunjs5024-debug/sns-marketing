@@ -104,30 +104,44 @@ useSchemaOrg([
   },
 ]);
 
-// 회원가입 후 환영 토스트
+// 회원가입 후 환영 팝업(모달) — 가입 성공을 확실히 보여주기 위해 가운데 모달로 표시
 const route = useRoute();
 const router = useRouter();
 const showWelcome = ref(false);
 onMounted(() => {
   if (route.query.welcome === "1") {
     showWelcome.value = true;
-    // URL 정리 (welcome 쿼리 제거)
+    // URL 정리 (welcome 쿼리 제거) — 새로고침 시 다시 안 뜨게
     router.replace({ query: {} });
-    setTimeout(() => { showWelcome.value = false; }, 8000);
   }
 });
 </script>
 
 <template>
   <div>
-    <!-- 회원가입 환영 토스트 -->
+    <!-- 회원가입 환영 팝업(모달) -->
     <Transition name="welcome">
-      <div
-        v-if="showWelcome"
-        class="fixed left-1/2 top-20 z-50 -translate-x-1/2 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 px-6 py-4 text-white shadow-2xl"
-      >
-        <p class="font-display text-base">🎉 가입을 환영합니다!</p>
-        <p class="mt-1 text-xs text-indigo-100">첫 충전 시 5% 보너스 포인트가 자동 적립됩니다.</p>
+      <div v-if="showWelcome" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <!-- 어두운 배경 (클릭 시 닫힘) -->
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="showWelcome = false" />
+        <!-- 팝업 카드 -->
+        <div class="welcome-card relative w-full max-w-sm rounded-3xl bg-white p-8 text-center shadow-2xl">
+          <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-3xl shadow-lg">
+            🎉
+          </div>
+          <h2 class="mt-5 font-display text-2xl text-neutral-900">가입을 환영합니다!</h2>
+          <p class="mt-3 text-sm leading-relaxed text-neutral-500">
+            회원가입이 정상적으로 완료되었습니다.<br />
+            지금 바로 SNS소셜팩토리의<br />모든 서비스를 이용하실 수 있어요.
+          </p>
+          <button
+            type="button"
+            class="mt-7 w-full rounded-xl bg-neutral-900 py-3.5 text-sm font-medium text-white transition hover:bg-neutral-700"
+            @click="showWelcome = false"
+          >
+            시작하기
+          </button>
+        </div>
       </div>
     </Transition>
 
@@ -355,13 +369,20 @@ onMounted(() => {
 </template>
 
 <style scoped>
+/* 모달 전체 페이드 */
 .welcome-enter-active,
 .welcome-leave-active {
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+  transition: opacity 0.25s ease;
 }
 .welcome-enter-from,
 .welcome-leave-to {
   opacity: 0;
-  transform: translate(-50%, -150%);
+}
+/* 팝업 카드 등장 (살짝 튀어오르는 느낌) */
+.welcome-enter-active .welcome-card {
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.welcome-enter-from .welcome-card {
+  transform: scale(0.85);
 }
 </style>
