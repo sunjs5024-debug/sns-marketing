@@ -27,13 +27,21 @@ function parseBankSms(raw: string): { bank: string | null; amount: number | null
   const bankMatch = raw.match(/\[([가-힣A-Z]{1,8}(?:은행|뱅크)?)\]/);
   const bank = bankMatch?.[1] ?? null;
 
-  // 금액 (예: "100,000원", "1,234,567원")
-  const amountMatch = raw.match(/([\d,]{1,15})\s*원/);
-  const amount = amountMatch ? parseInt(amountMatch[1]!.replace(/,/g, ""), 10) : null;
+  // 금액 — 1순위 "N원"(예: "100,000원"), 2순위 "입금" 직후 숫자(KB 압축형: "입금\n2\n잔액3")
+  let amount: number | null = null;
+  const amountWon = raw.match(/([\d,]{1,15})\s*원/);
+  if (amountWon) {
+    amount = parseInt(amountWon[1]!.replace(/,/g, ""), 10);
+  } else {
+    // "입금" 뒤(공백/줄바꿈 몇 개 건너) 처음 나오는 숫자 = 금액. 계좌번호는 "입금" 앞이라 안 잡힘.
+    const amountAfter = raw.match(/입금[^\d]{0,5}([\d,]{1,15})/);
+    if (amountAfter) amount = parseInt(amountAfter[1]!.replace(/,/g, ""), 10);
+  }
 
   // 입금자명 — 한국 주요 은행 SMS 패턴 (여러 시도)
-  //   "입금 홍길동", "이체 홍길동", "홍길동님", "[홍길동]", "홍길동 잔액"
+  //   "김선민\n입금"(KB 압축형), "입금 홍길동", "홍길동님", "[홍길동]", "홍길동 잔액"
   const patterns: RegExp[] = [
+    /([가-힣]{2,5})\s*[\r\n]+\s*입금/, // 이름이 "입금" 윗줄 (KB 압축형)
     /(?:입금|이체|타행이체)\s+([가-힣A-Za-z]{2,10})/,
     /([가-힣]{2,5})\s*님/,
     /([가-힣A-Za-z]{2,10})\s+잔액/,
