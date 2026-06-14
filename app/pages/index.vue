@@ -104,18 +104,17 @@ useSchemaOrg([
   },
 ]);
 
-// 회원가입 후 환영 팝업(모달) — 가입 성공을 확실히 보여주기 위해 가운데 모달로 표시
-const route = useRoute();
-const router = useRouter();
+// 회원가입 후 환영 팝업(모달) — 신규 계정이면 서버가 딱 한 번 welcome:true 반환
+// (이메일/구글/네이버/카카오 무관, 어느 버튼에서 가입했든 동작)
+const { status } = useAuth();
 const showWelcome = ref(false);
-onMounted(() => {
-  // 이메일 가입 → ?welcome=1 쿼리 / OAuth 가입 → localStorage(snsf_welcome) 둘 다 처리
-  const fromQuery = route.query.welcome === "1";
-  const fromStorage = localStorage.getItem("snsf_welcome") === "1";
-  if (fromQuery || fromStorage) {
-    showWelcome.value = true;
-    localStorage.removeItem("snsf_welcome");
-    if (fromQuery) router.replace({ query: {} }); // URL 정리 — 새로고침 시 다시 안 뜨게
+onMounted(async () => {
+  if (status.value === "unauthenticated") return; // 비로그인 방문자/크롤러는 호출 안 함
+  try {
+    const r = await $fetch<{ welcome: boolean }>("/api/me/welcome-check", { method: "POST" });
+    if (r?.welcome) showWelcome.value = true;
+  } catch {
+    /* 비로그인/오류 시 무시 */
   }
 });
 </script>

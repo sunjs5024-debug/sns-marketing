@@ -85,9 +85,7 @@ async function onSubmit() {
 }
 
 async function onOAuthSignIn(provider: "kakao" | "naver" | "google") {
-  // OAuth는 외부 인증을 거치며 ?welcome=1 쿼리가 유실됨 → localStorage로 표시 남김
-  // (같은 도메인으로 돌아오므로 localStorage 유지됨). 홈에서 이 값을 보고 환영 모달 표시.
-  if (import.meta.client) localStorage.setItem("snsf_welcome", "1");
+  // 환영 모달은 홈에서 서버(hasSeenWelcome)로 판단하므로 여기선 표시 안 남겨도 됨
   await signIn(provider, { callbackUrl: callbackUrl.value });
 }
 </script>

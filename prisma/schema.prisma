@@ -52,6 +52,8 @@ model User {
   phone        String?
   role         Role     @default(USER)
   points       Int      @default(0)
+  // 가입 환영 모달 1회 표시용 — 신규 가입(이메일/OAuth 무관) 후 홈에서 한 번만 true 로 전환
+  hasSeenWelcome Boolean @default(false)
   // 회원 탈퇴 처리 — 전자상거래법상 거래기록 5년 보관 의무 때문에 hard delete 대신 soft delete + PII 익명화
   isDeleted    Boolean  @default(false)
   deletedAt    DateTime?
