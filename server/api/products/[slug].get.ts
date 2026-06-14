@@ -7,6 +7,7 @@ export default defineEventHandler(async (event) => {
     where: { slug },
     include: { category: true, options: { orderBy: { sortOrder: "asc" } } },
   });
-  if (!product) throw createError({ statusCode: 404, statusMessage: "Not found" });
+  // 판매중지(isActive=false) 상품은 직접 링크로도 접근/구매 불가
+  if (!product || !product.isActive) throw createError({ statusCode: 404, statusMessage: "Not found" });
   return product;
 });
