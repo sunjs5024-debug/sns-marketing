@@ -2,7 +2,7 @@
 // 카테고리 페이지 공용 toolbar — 정렬 + 뱃지 필터 + 가격대 필터
 // v-model 로 양방향 바인딩 (페이지가 URL 동기화 담당)
 
-defineProps<{
+const props = defineProps<{
   total: number;
   sort: string;
   badge: string | null;
@@ -38,28 +38,41 @@ const PRICE_OPTIONS = [
   { value: "over-100k", label: "10만원 이상" },
 ];
 
-function toggleBadge(v: string) {
-  emit("update:badge", v === ($attrs.badge as string) ? null : v);
-}
-function togglePrice(v: string) {
-  emit("update:price", v === ($attrs.price as string) ? null : v);
-}
+// 활성 필터 개수 (정렬은 제외)
+const activeFilterCount = computed(() => {
+  let n = 0;
+  if (props.badge) n++;
+  if (props.price) n++;
+  return n;
+});
 
-const $attrs = useAttrs() as Record<string, unknown>;
+// 필터 펼침 토글 (모바일에서 유용)
+const filterOpen = ref(false);
 </script>
 
 <template>
-  <div class="rounded-3xl border border-neutral-100 bg-white p-4 sm:p-5">
-    <!-- 1행: 결과 수 + 정렬 -->
+  <div class="sticky top-16 z-30 -mx-4 rounded-none border-b border-neutral-100 bg-white/95 px-4 py-3 backdrop-blur-md sm:mx-0 sm:rounded-3xl sm:border sm:px-5 sm:py-4">
+    <!-- 1행: 결과 수 + 정렬 + 필터 토글 -->
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div class="text-sm text-neutral-600">
         총 <span class="font-display text-neutral-900">{{ total.toLocaleString("ko-KR") }}</span>개 상품
+        <span v-if="activeFilterCount > 0" class="ml-2 inline-flex items-center gap-1 rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] text-indigo-700">
+          필터 {{ activeFilterCount }}개 적용 중
+        </span>
       </div>
-      <div class="flex items-center gap-2 text-sm">
-        <label class="text-xs text-neutral-500">정렬</label>
+      <div class="flex items-center gap-2">
+        <!-- 모바일 필터 토글 -->
+        <button
+          type="button"
+          class="inline-flex items-center gap-1 rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-xs hover:bg-neutral-50 sm:hidden"
+          @click="filterOpen = !filterOpen"
+        >
+          ⚙ 필터
+          <span v-if="activeFilterCount > 0" class="grid h-4 min-w-4 place-items-center rounded-full bg-indigo-600 px-1 text-[9px] text-white">{{ activeFilterCount }}</span>
+        </button>
         <select
           :value="sort"
-          class="rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-sm focus:border-neutral-900 focus:outline-none"
+          class="rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-xs focus:border-neutral-900 focus:outline-none sm:text-sm"
           @change="emit('update:sort', ($event.target as HTMLSelectElement).value)"
         >
           <option v-for="o in SORT_OPTIONS" :key="o.value" :value="o.value">{{ o.label }}</option>
@@ -67,8 +80,13 @@ const $attrs = useAttrs() as Record<string, unknown>;
       </div>
     </div>
 
-    <!-- 2행: 뱃지 필터 + 가격 필터 -->
-    <div class="mt-4 flex flex-wrap items-center gap-3 border-t border-neutral-100 pt-4">
+    <!-- 2행: 필터 (sm+ 항상 표시 / 모바일은 토글) -->
+    <div
+      :class="[
+        'flex-wrap items-center gap-x-3 gap-y-2 border-t border-neutral-100 pt-3 sm:mt-3 sm:flex',
+        filterOpen ? 'mt-3 flex' : 'hidden',
+      ]"
+    >
       <span class="shrink-0 text-xs text-neutral-500">뱃지</span>
       <div class="flex flex-wrap gap-1.5">
         <button
@@ -76,9 +94,9 @@ const $attrs = useAttrs() as Record<string, unknown>;
           :key="b.value"
           type="button"
           :class="[
-            'rounded-full border px-3 py-1 text-xs transition whitespace-nowrap',
+            'rounded-full border px-2.5 py-1 text-[11px] transition whitespace-nowrap sm:px-3 sm:text-xs',
             badge === b.value
-              ? `${b.color} border-current font-bold`
+              ? `${b.color} border-current font-semibold`
               : 'border-neutral-200 bg-white text-neutral-500 hover:border-neutral-400',
           ]"
           @click="emit('update:badge', badge === b.value ? null : b.value)"
@@ -94,7 +112,7 @@ const $attrs = useAttrs() as Record<string, unknown>;
           :key="p.value"
           type="button"
           :class="[
-            'rounded-full border px-3 py-1 text-xs transition whitespace-nowrap',
+            'rounded-full border px-2.5 py-1 text-[11px] transition whitespace-nowrap sm:px-3 sm:text-xs',
             price === p.value
               ? 'border-neutral-900 bg-neutral-900 text-white'
               : 'border-neutral-200 bg-white text-neutral-500 hover:border-neutral-400',

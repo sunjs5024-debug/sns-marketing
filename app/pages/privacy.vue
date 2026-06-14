@@ -20,13 +20,14 @@ useSchemaOrg([
   },
 ]);
 
-const lastUpdated = "2026-05-24";
+const lastUpdated = "2026-05-30";
 
 const COMPANY = {
-  name: "SNS소셜팩토리",
-  ceo: "(대표자명)",
-  privacyOfficer: "(개인정보보호 책임자)",
-  privacyEmail: "(개인정보보호 이메일)",
+  name: "주식회사 영천기획",
+  service: "SNS소셜팩토리",
+  ceo: "김선민",
+  privacyOfficer: "김선민",
+  email: "dkssudgktka53@gmail.com",
 };
 </script>
 
@@ -146,10 +147,10 @@ const COMPANY = {
         <h2 class="font-display text-base text-neutral-900">개인정보보호 책임자</h2>
         <dl class="mt-3 grid grid-cols-1 gap-1 text-xs text-neutral-600">
           <div><dt class="inline text-neutral-500">책임자: </dt><dd class="inline">{{ COMPANY.privacyOfficer }}</dd></div>
-          <div><dt class="inline text-neutral-500">연락처: </dt><dd class="inline">{{ COMPANY.privacyEmail }}</dd></div>
+          <div><dt class="inline text-neutral-500">이메일: </dt><dd class="inline">{{ COMPANY.email }}</dd></div>
         </dl>
         <p class="mt-3 text-xs text-neutral-500">
-          개인정보 처리와 관련된 문의·불만·피해구제 요청은 위 연락처로 접수해주시면 신속히 처리해드립니다.
+          개인정보 처리와 관련된 문의는 위 이메일 또는 텔레그램(@snssocialfactory)을 통해 접수해주시면 신속히 처리해드립니다.
         </p>
       </section>
     </article>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { formatPrice, platformKeyFor } from "#shared/catalog";
+import { formatPrice, platformKeyFor, CONTACT } from "#shared/catalog";
 
 const route = useRoute();
 const slug = computed(() => String(route.params.slug));
@@ -7,12 +7,56 @@ const slug = computed(() => String(route.params.slug));
 const { data: product } = await useFetch(`/api/products/${slug.value}`);
 if (!product.value) throw createError({ statusCode: 404 });
 
-// SEO 메타 — 상품명 + 설명 + OG
+// 관련 상품 (같은 카테고리 + 같은 플랫폼 다른 카테고리)
+type RelatedProduct = {
+  id: string;
+  slug: string;
+  name: string;
+  basePrice: number;
+  badge: "HOT" | "BEST" | "SALE" | "NEW" | null;
+  rating: number;
+  salesCount: number;
+  category: { name: string; slug: string };
+  _count: { options: number };
+};
+type Related = { sameCategory: RelatedProduct[]; samePlatform: RelatedProduct[] };
+const { data: related } = await useFetch<Related>(`/api/products/${slug.value}/related`);
+
+// 이 상품의 실제 승인된 리뷰
+type ProductReview = {
+  id: string;
+  rating: number;
+  content: string;
+  date: string;
+  author: string;
+};
+const { data: reviewsData } = await useFetch<{ reviews: ProductReview[]; avgRating: number; totalCount: number }>(
+  () => `/api/reviews?productId=${product.value!.id}&limit=8`,
+  { default: () => ({ reviews: [], avgRating: 5.0, totalCount: 0 }) },
+);
+const productReviews = computed(() => reviewsData.value?.reviews ?? []);
+const productRating = computed(() =>
+  (reviewsData.value?.totalCount ?? 0) > 0 ? reviewsData.value!.avgRating : product.value!.rating,
+);
+const productReviewCount = computed(() =>
+  (reviewsData.value?.totalCount ?? 0) > 0 ? reviewsData.value!.totalCount : Math.max(product.value!.salesCount, 1),
+);
+
+// SEO 메타 — 상품명 + 설명 + 키워드 + OG
+const metaDesc = computed(() => {
+  const base = product.value?.description ?? `${product.value?.name} | ${product.value?.category.name}`;
+  // 너무 짧으면 카테고리·brand 보강
+  return base.length < 80
+    ? `${base} | 한국인 실계정 · 빠른 처리 · 30일 보장 | SNS소셜팩토리`
+    : base;
+});
+
 useSeoMeta({
-  title: product.value.name,
-  description: product.value.description ?? `${product.value.name} | ${product.value.category.name}`,
+  title: `${product.value.name} | SNS소셜팩토리`,
+  description: metaDesc.value,
+  keywords: product.value.keywords ?? undefined,
   ogTitle: `${product.value.name} | SNS소셜팩토리`,
-  ogDescription: product.value.description ?? "",
+  ogDescription: metaDesc.value,
   ogType: "product",
   ogLocale: "ko_KR",
 });
@@ -22,29 +66,49 @@ useSeoMeta({
 const sectionLabel = product.value.category.platform === "SNS" ? "SNS 마케팅" : "상위노출";
 const sectionPath = product.value.category.platform === "SNS" ? "/sns" : "/rank";
 
-useSchemaOrg([
-  {
-    "@type": "Product",
-    name: product.value.name,
-    description: product.value.description ?? "",
-    category: product.value.category.name,
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: product.value.rating,
-      bestRating: 5,
-      reviewCount: Math.max(product.value.salesCount, 1),
-    },
-    offers: {
-      "@type": "Offer",
-      url: `https://xn--sns-yg9lh0pw9l.kr/products/${product.value.slug}`,
-      priceCurrency: "KRW",
-      price: product.value.basePrice,
-      availability: product.value.isActive
-        ? "https://schema.org/InStock"
-        : "https://schema.org/OutOfStock",
-      seller: { "@type": "Organization", name: "SNS소셜팩토리" },
-    },
+// FAQ 파싱 — DB Json 필드
+type Faq = { q: string; a: string };
+const faqs = computed<Faq[]>(() => {
+  const raw = product.value?.faqs as unknown;
+  if (Array.isArray(raw)) return raw.filter((f) => f?.q && f?.a) as Faq[];
+  return [];
+});
+
+// Product JSON-LD — review 배열은 실제 DB 리뷰가 있으면 6개 노출 (구글 리치 결과 별점)
+const productSchema: Record<string, unknown> = {
+  "@type": "Product",
+  name: product.value.name,
+  description: product.value.description ?? "",
+  category: product.value.category.name,
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: productRating.value,
+    bestRating: 5,
+    reviewCount: productReviewCount.value,
   },
+  offers: {
+    "@type": "Offer",
+    url: `https://xn--sns-yg9lh0pw9l.kr/products/${product.value.slug}`,
+    priceCurrency: "KRW",
+    price: product.value.basePrice,
+    availability: product.value.isActive
+      ? "https://schema.org/InStock"
+      : "https://schema.org/OutOfStock",
+    seller: { "@type": "Organization", name: "SNS소셜팩토리" },
+  },
+};
+if (productReviews.value.length > 0) {
+  productSchema.review = productReviews.value.slice(0, 6).map((r) => ({
+    "@type": "Review",
+    author: { "@type": "Person", name: r.author },
+    datePublished: r.date.replace(/\./g, "-"),
+    reviewRating: { "@type": "Rating", ratingValue: r.rating, bestRating: 5 },
+    reviewBody: r.content,
+  }));
+}
+
+const schemaList: Array<Record<string, unknown>> = [
+  productSchema,
   {
     "@type": "BreadcrumbList",
     itemListElement: [
@@ -58,7 +122,21 @@ useSchemaOrg([
       },
     ],
   },
-]);
+];
+
+// FAQ 가 있으면 FAQPage 마크업 추가 (구글 검색 결과 리치 스니펫)
+if (faqs.value.length > 0) {
+  schemaList.push({
+    "@type": "FAQPage",
+    mainEntity: faqs.value.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  });
+}
+
+useSchemaOrg(schemaList);
 
 const iconKey = computed(() => (product.value ? platformKeyFor(product.value.category.slug) : null));
 const selectedOption = ref(product.value.options[0] ?? null);
@@ -106,7 +184,7 @@ async function handleAdd(mode: "cart" | "buy") {
 </script>
 
 <template>
-  <div v-if="product" class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+  <div v-if="product" class="mx-auto max-w-7xl px-4 py-6 pb-24 sm:px-6 sm:py-10 lg:px-8 lg:pb-10">
     <nav class="mb-6 text-xs text-neutral-500">
       <span>홈</span> <span class="mx-1">/</span>
       <span>{{ product.category.platform === "SNS" ? "SNS 마케팅" : "상위노출" }}</span>
@@ -114,17 +192,18 @@ async function handleAdd(mode: "cart" | "buy") {
       <span class="text-neutral-900">{{ product.category.name }}</span>
     </nav>
 
-    <div class="grid gap-10 lg:grid-cols-2">
-      <div class="relative aspect-square overflow-hidden rounded-3xl bg-gradient-to-br from-neutral-50 to-neutral-100">
+    <div class="grid gap-6 lg:grid-cols-2 lg:gap-10">
+      <!-- 이미지: 모바일에서는 작게(h-56), lg부터 정사각형 -->
+      <div class="relative h-56 sm:h-72 lg:aspect-square lg:h-auto overflow-hidden rounded-3xl bg-gradient-to-br from-neutral-50 to-neutral-100">
         <div class="pointer-events-none absolute -right-10 -top-10 h-60 w-60 bg-indigo-200/40 blur-3xl anim-blob" />
         <div class="pointer-events-none absolute -left-10 -bottom-10 h-60 w-60 bg-pink-200/40 blur-3xl anim-blob" style="animation-delay: -7s" />
         <div class="absolute inset-0 grid place-items-center">
           <div class="anim-float-up">
-            <BrandIcon v-if="iconKey" :kind="iconKey" :size="220" class="drop-shadow-2xl" />
-            <span v-else class="text-9xl">📦</span>
+            <BrandIcon v-if="iconKey" :kind="iconKey" :size="120" class="drop-shadow-2xl lg:[--size:220px]" />
+            <span v-else class="text-7xl lg:text-9xl">📦</span>
           </div>
         </div>
-        <div v-if="product.badge" class="absolute left-5 top-5 z-10">
+        <div v-if="product.badge" class="absolute left-4 top-4 z-10 sm:left-5 sm:top-5">
           <BadgePill :badge="product.badge" />
         </div>
       </div>
@@ -132,10 +211,12 @@ async function handleAdd(mode: "cart" | "buy") {
       <div>
         <p class="text-xs text-indigo-600">{{ product.category.name }}</p>
         <h1 class="mt-2 font-display text-2xl tracking-tight text-neutral-900 sm:text-3xl text-balance leading-tight">{{ product.name }}</h1>
-        <div class="mt-3 flex items-center gap-3 text-sm text-neutral-600">
-          <span class="text-amber-500">★ {{ product.rating.toFixed(1) }}</span>
+        <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-neutral-600">
+          <span class="text-amber-500">★ {{ productRating.toFixed(1) }}</span>
+          <span v-if="productReviews.length > 0" class="text-xs text-neutral-500">({{ productReviewCount.toLocaleString("ko-KR") }}건 후기)</span>
           <span>·</span>
           <span>판매 {{ product.salesCount.toLocaleString("ko-KR") }}</span>
+          <a v-if="productReviews.length > 0" href="#product-reviews" class="text-xs text-indigo-600 hover:underline">후기 보기 →</a>
         </div>
         <p v-if="product.description" class="mt-5 text-sm leading-7 text-neutral-700">{{ product.description }}</p>
 
@@ -193,7 +274,8 @@ async function handleAdd(mode: "cart" | "buy") {
 
         <p v-if="feedback" class="mt-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ feedback }}</p>
 
-        <div class="mt-8 flex gap-3">
+        <!-- 데스크탑: 인라인 구매 버튼 (모바일에선 sticky bottom bar 사용) -->
+        <div class="mt-8 hidden gap-3 lg:flex">
           <button
             type="button"
             :disabled="pending"
@@ -211,6 +293,28 @@ async function handleAdd(mode: "cart" | "buy") {
             {{ pending ? "처리 중…" : "바로 구매하기" }}
           </button>
         </div>
+
+        <!-- 모바일 sticky 하단 구매 바 -->
+        <div class="lg:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-neutral-200 bg-white/95 px-4 py-3 backdrop-blur-md">
+          <div class="mx-auto flex max-w-7xl items-center gap-2">
+            <div class="flex flex-1 flex-col">
+              <span class="text-[10px] text-neutral-500">최저가</span>
+              <span class="font-display text-lg text-neutral-900">{{ formatPrice(unitPrice) }}</span>
+            </div>
+            <button
+              type="button"
+              :disabled="pending"
+              class="rounded-full border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 hover:bg-neutral-50 disabled:opacity-60"
+              @click="handleAdd('cart')"
+            >🛒</button>
+            <button
+              type="button"
+              :disabled="pending"
+              class="flex-1 rounded-full bg-neutral-900 px-4 py-3 text-sm text-white hover:bg-neutral-700 disabled:opacity-60"
+              @click="handleAdd('buy')"
+            >{{ pending ? "처리 중…" : "바로 구매" }}</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -218,6 +322,124 @@ async function handleAdd(mode: "cart" | "buy") {
       <h2 class="font-display text-xl text-neutral-900">상품 상세 안내</h2>
       <div class="mt-4 whitespace-pre-line rounded-3xl border border-neutral-100 bg-white p-6 text-sm leading-7 text-neutral-700">
         {{ product.longDescription }}
+      </div>
+    </section>
+
+    <section v-if="faqs.length > 0" class="mt-12">
+      <h2 class="font-display text-xl text-neutral-900">자주 묻는 질문</h2>
+      <div class="mt-4 divide-y divide-neutral-100 rounded-3xl border border-neutral-100 bg-white">
+        <details v-for="(f, i) in faqs" :key="i" class="group p-5">
+          <summary class="flex cursor-pointer list-none items-center justify-between text-sm text-neutral-900">
+            <span class="pr-3">{{ f.q }}</span>
+            <span class="text-neutral-400 transition group-open:rotate-180">▾</span>
+          </summary>
+          <p class="mt-3 text-sm leading-7 text-neutral-600 whitespace-pre-line">{{ f.a }}</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- 이 상품 실제 구매자 후기 (DB 승인 리뷰만) -->
+    <section
+      v-if="productReviews.length > 0"
+      id="product-reviews"
+      class="mt-12"
+    >
+      <div class="flex items-end justify-between">
+        <div>
+          <p class="text-xs uppercase tracking-widest text-amber-600">VERIFIED REVIEWS</p>
+          <h2 class="mt-1 font-display text-xl text-neutral-900">
+            실제 구매자 후기
+            <span class="text-amber-500">★ {{ productRating.toFixed(1) }}</span>
+            <span class="text-sm text-neutral-500">({{ productReviewCount.toLocaleString("ko-KR") }}건)</span>
+          </h2>
+        </div>
+        <NuxtLink to="/reviews" class="hidden text-xs text-neutral-500 hover:text-neutral-900 sm:inline">전체 후기 보기 →</NuxtLink>
+      </div>
+      <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <article
+          v-for="r in productReviews.slice(0, 6)"
+          :key="r.id"
+          class="rounded-2xl border border-neutral-100 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-md"
+        >
+          <div class="flex items-center justify-between">
+            <span class="text-amber-500">{{ "★".repeat(r.rating) }}<span class="text-neutral-200">{{ "★".repeat(5 - r.rating) }}</span></span>
+            <span class="text-[10px] text-neutral-400">{{ r.date }}</span>
+          </div>
+          <p class="mt-2 whitespace-pre-line text-[13px] leading-6 text-neutral-700">"{{ r.content }}"</p>
+          <p class="mt-3 text-[11px] text-neutral-500">— {{ r.author }} · <span class="rounded-full bg-emerald-50 px-1.5 py-0.5 text-emerald-700">✓ 구매자</span></p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 같은 카테고리 인기 상품 -->
+    <section v-if="(related?.sameCategory ?? []).length > 0" class="mt-12">
+      <div class="flex items-end justify-between">
+        <div>
+          <p class="text-xs uppercase tracking-widest text-indigo-600">SAME CATEGORY</p>
+          <h2 class="mt-1 font-display text-xl text-neutral-900">같은 카테고리 인기 상품</h2>
+        </div>
+        <NuxtLink
+          v-if="product?.category"
+          :to="`/sns/${product.category.slug.split('-')[0]}`"
+          class="hidden text-xs text-neutral-500 hover:text-neutral-900 sm:inline"
+        >전체 보기 →</NuxtLink>
+      </div>
+      <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+        <ProductCard
+          v-for="p in related?.sameCategory ?? []"
+          :key="p.id"
+          :slug="p.slug"
+          :name="p.name"
+          :base-price="p.basePrice"
+          :badge="p.badge"
+          :rating="p.rating"
+          :sales-count="p.salesCount"
+          :category-name="p.category.name"
+          :icon-key="platformKeyFor(p.category.slug)"
+          :option-count="p._count?.options"
+        />
+      </div>
+    </section>
+
+    <!-- 함께 보면 좋은 상품 (같은 플랫폼 다른 카테고리) -->
+    <section v-if="(related?.samePlatform ?? []).length > 0" class="mt-12">
+      <div class="flex items-end justify-between">
+        <div>
+          <p class="text-xs uppercase tracking-widest text-pink-600">YOU MAY ALSO LIKE</p>
+          <h2 class="mt-1 font-display text-xl text-neutral-900">함께 보면 좋은 상품</h2>
+        </div>
+      </div>
+      <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+        <ProductCard
+          v-for="p in related?.samePlatform ?? []"
+          :key="p.id"
+          :slug="p.slug"
+          :name="p.name"
+          :base-price="p.basePrice"
+          :badge="p.badge"
+          :rating="p.rating"
+          :sales-count="p.salesCount"
+          :category-name="p.category.name"
+          :icon-key="platformKeyFor(p.category.slug)"
+          :option-count="p._count?.options"
+        />
+      </div>
+    </section>
+
+    <section class="mt-12 rounded-3xl bg-gradient-to-br from-sky-500 to-blue-600 px-6 py-8 text-center text-white sm:px-10">
+      <p class="font-display text-xl">더 궁금한 점이 있으신가요?</p>
+      <p class="mt-2 text-sm text-sky-100">텔레그램으로 1:1 상담 받으실 수 있어요. 평균 응답 30분 이내.</p>
+      <div class="mt-5 flex flex-wrap items-center justify-center gap-2">
+        <a
+          :href="CONTACT.telegram.url"
+          target="_blank"
+          rel="noopener"
+          class="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm text-blue-700 hover:bg-sky-50"
+        >
+          <TelegramIcon :size="20" />
+          텔레그램 상담
+        </a>
+        <NuxtLink to="/faq" class="inline-block rounded-full border border-white/40 px-5 py-3 text-sm text-white hover:bg-white/10">전체 FAQ 보기 →</NuxtLink>
       </div>
     </section>
   </div>

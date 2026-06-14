@@ -52,12 +52,68 @@ model User {
   phone        String?
   role         Role     @default(USER)
   points       Int      @default(0)
+  // 회원 탈퇴 처리 — 전자상거래법상 거래기록 5년 보관 의무 때문에 hard delete 대신 soft delete + PII 익명화
+  isDeleted    Boolean  @default(false)
+  deletedAt    DateTime?
+  deleteReason String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   orders    Order[]
   cartItems CartItem[]
   reviews   Review[]
+  charges   Charge[]
+  taxInvoiceRequests TaxInvoiceRequest[]
+}
+
+enum ChargeStatus {
+  PENDING   // 사용자 신청 직후 — 입금 대기
+  APPROVED  // 입금 매칭 + 포인트 적립 완료
+  REJECTED  // 관리자 반려
+  EXPIRED   // 만료 (24시간 내 입금 안 됨)
+}
+
+enum TaxInvoiceStatus {
+  REQUESTED  // 신청 완료 — 관리자 발행 대기
+  ISSUED     // 홈택스/기타 시스템에서 발행 완료
+  REJECTED   // 발행 거절
+}
+
+model Charge {
+  id              String       @id @default(cuid())
+  chargeNumber    String       @unique  // 사용자 표시용 (CHG-yyMMdd-XXXX)
+  userId          String
+  user            User         @relation(fields: [userId], references: [id])
+  amount          Int          // 정확히 일치해야 매칭됨
+  depositorName   String       // 사용자가 입력 — SMS 매칭 키
+  status          ChargeStatus @default(PENDING)
+  bankReceivedAt  DateTime?    // 은행 입금 SMS 수신 시각
+  approvedAt      DateTime?    // 승인 (자동/수동) 시각
+  rejectedAt      DateTime?
+  rejectReason    String?
+  matchedSmsId    String?      // 매칭된 SMS id (감사 추적)
+  expiresAt       DateTime     // 24시간 후 자동 만료
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([userId, status])
+  // SMS 매칭 시 가장 빈번한 조회 — (status, amount, depositorName) 복합 인덱스
+  @@index([status, amount, depositorName])
+}
+
+// 은행에서 받은 입금 SMS 원본 + 파싱 결과 로그 (감사·디버깅용)
+model BankSms {
+  id              String   @id @default(cuid())
+  sender          String?  // SMS 발신자 (예: "1577-XXXX")
+  rawMessage      String   // 원본 SMS 본문 (UTF-8)
+  parsedBank      String?  // 파싱된 은행명
+  parsedAmount    Int?
+  parsedDepositor String?
+  matchedChargeId String?  // 매칭된 charge ID (있으면 자동 승인됨)
+  receivedAt      DateTime @default(now())
+
+  @@index([receivedAt])
+  @@index([matchedChargeId])
 }
 
 model Category {
@@ -89,6 +145,10 @@ model Product {
   badge        Badge?
   deliveryInfo String?
   guaranteeInfo String?
+  // FAQ — [{q: "...", a: "..."}] 구조. JSON-LD FAQPage 마크업으로도 사용됨
+  faqs         Json?
+  // 콘텐츠 보강용 — 메인 키워드 SEO 강조
+  keywords     String?  // 쉼표 구분 키워드 (예: "인스타 팔로워, 한국인 팔로워")
   minQty       Int      @default(1)
   isActive     Boolean  @default(true)
   isFeatured   Boolean  @default(false)
@@ -111,6 +171,10 @@ model ProductOption {
   quantity  Int
   price     Int
   sortOrder Int     @default(0)
+
+  // 외부 SMM 패널 자동 발주용 (urpanel 등)
+  externalProvider  String? // "urpanel" (확장 가능)
+  externalServiceId Int?    // urpanel 서비스 ID — NULL이면 수동 처리
 
   orderItems OrderItem[]
   cartItems  CartItem[]
@@ -143,6 +207,10 @@ model Order {
   finalAmount   Int           @default(0) // 실 결제 금액 = totalAmount - pointsUsed
   paymentMethod PaymentMethod?
   paymentKey    String?
+  // ⓘ 계좌이체 SMS 자동매칭용
+  depositorName String?       // 입금자명 (TRANSFER 결제 시 필수)
+  expiresAt     DateTime?     // 24시간 후 자동 만료
+  matchedSmsId  String?       // 매칭된 SMS id (감사 추적)
   buyerName     String
   buyerPhone    String
   buyerEmail    String
@@ -152,6 +220,41 @@ model Order {
   completedAt   DateTime?
 
   items OrderItem[]
+  taxInvoiceRequest TaxInvoiceRequest?
+  review            Review?
+
+  // SMS 매칭 시 자주 쓰는 복합 인덱스
+  @@index([status, finalAmount, depositorName])
+}
+
+// 세금계산서 신청 — 1주문 = 1신청. 사업자 회원이 PAID/COMPLETED 주문에 대해 신청
+model TaxInvoiceRequest {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  orderId      String   @unique
+  order        Order    @relation(fields: [orderId], references: [id])
+
+  // 사업자 정보 (사용자 입력)
+  companyName  String   // 상호
+  bizRegNo     String   // 사업자등록번호 (000-00-00000)
+  ceoName      String   // 대표자명
+  address      String   // 사업장 주소
+  businessType String?  // 업태 (선택)
+  businessItem String?  // 종목 (선택)
+  taxEmail     String   // 세금계산서 수신 이메일
+
+  status       TaxInvoiceStatus @default(REQUESTED)
+  requestedAt  DateTime @default(now())
+  issuedAt     DateTime?
+  rejectReason String?
+  adminMemo    String?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
 }
 
 model OrderItem {
@@ -169,16 +272,45 @@ model OrderItem {
   totalPrice    Int
   targetUrl     String?
   memo          String?
+
+  // 외부 SMM 패널 발주 추적
+  externalProvider  String?   // "urpanel" 등
+  externalServiceId Int?      // 스냅샷 (매핑 변경 후에도 추적 가능)
+  externalOrderId   String?   // 외부 패널의 주문 ID
+  externalStatus    String?   // Pending|In progress|Processing|Completed|Partial|Cancelled
+  externalCharge    Float?    // 원가 (USD)
+  startCount        Int?      // 발주 시점 카운트 (urpanel start_count)
+  remainsCount      Int?      // 남은 작업량 (urpanel remains)
+  dispatchedAt      DateTime? // 발주 성공 시각
+  dispatchedAttempts Int      @default(0) // 발주 시도 횟수 (재시도 카운트)
+  dispatchError     String?   // 마지막 실패 메시지
+  lastSyncedAt      DateTime? // 마지막 상태 동기화 시각
+
+  @@index([externalProvider, externalOrderId])
+  @@index([externalStatus])
 }
 
+// 고객 리뷰 — 1주문 1리뷰. 작성 후 관리자 승인(isVerified=true) 거쳐야 공개 노출
 model Review {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  productId String
-  product   Product  @relation(fields: [productId], references: [id])
-  rating    Int
-  content   String
-  isVerified Boolean @default(false)
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id])
+  orderId    String   @unique  // 1 주문 1 리뷰 강제
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  rating     Int      // 1~5
+  content    String   // 본문 (20자 이상)
+  isVerified Boolean  @default(false)  // 관리자 승인 여부
+  rejectedAt DateTime?
+  adminMemo  String?
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // 공개 후기 페이지 — 승인된 리뷰만 최신순
+  @@index([isVerified, createdAt])
+  // 상품 상세 페이지 — 그 상품의 승인된 리뷰
+  @@index([productId, isVerified])
 }

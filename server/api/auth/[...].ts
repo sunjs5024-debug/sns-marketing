@@ -12,6 +12,27 @@ const credSchema = z.object({
   password: z.string().min(8),
 });
 
+// OAuth provider 환경변수 누락 시 provider 자체를 빼는 헬퍼
+function oauthOrNull<T>(id: string | undefined, secret: string | undefined, factory: () => T): T | null {
+  if (!id || !secret) return null;
+  return factory();
+}
+
+const oauthProviders = [
+  oauthOrNull(process.env.KAKAO_CLIENT_ID, process.env.KAKAO_CLIENT_SECRET, () =>
+    // @ts-expect-error sidebase + next-auth v4 default export
+    KakaoProvider.default({ clientId: process.env.KAKAO_CLIENT_ID!, clientSecret: process.env.KAKAO_CLIENT_SECRET! }),
+  ),
+  oauthOrNull(process.env.NAVER_CLIENT_ID, process.env.NAVER_CLIENT_SECRET, () =>
+    // @ts-expect-error
+    NaverProvider.default({ clientId: process.env.NAVER_CLIENT_ID!, clientSecret: process.env.NAVER_CLIENT_SECRET! }),
+  ),
+  oauthOrNull(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, () =>
+    // @ts-expect-error
+    GoogleProvider.default({ clientId: process.env.GOOGLE_CLIENT_ID!, clientSecret: process.env.GOOGLE_CLIENT_SECRET! }),
+  ),
+].filter((p): p is NonNullable<typeof p> => p !== null);
+
 export default NuxtAuthHandler({
   secret: useRuntimeConfig().authSecret,
   pages: { signIn: "/auth/signin" },
@@ -28,6 +49,7 @@ export default NuxtAuthHandler({
         if (!parsed.success) return null;
         const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
         if (!user || !user.passwordHash) return null;
+        if (user.isDeleted) return null; // 탈퇴 회원 차단
         const ok = await bcrypt.compare(parsed.data.password, user.passwordHash);
         if (!ok) return null;
         return {
@@ -39,33 +61,30 @@ export default NuxtAuthHandler({
         };
       },
     }),
-    // @ts-expect-error
-    KakaoProvider.default({
-      clientId: process.env.KAKAO_CLIENT_ID ?? "dummy",
-      clientSecret: process.env.KAKAO_CLIENT_SECRET ?? "dummy",
-    }),
-    // @ts-expect-error
-    NaverProvider.default({
-      clientId: process.env.NAVER_CLIENT_ID ?? "dummy",
-      clientSecret: process.env.NAVER_CLIENT_SECRET ?? "dummy",
-    }),
-    // @ts-expect-error
-    GoogleProvider.default({
-      clientId: process.env.GOOGLE_CLIENT_ID ?? "dummy",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "dummy",
-    }),
+    ...oauthProviders,
   ],
-  session: { strategy: "jwt" },
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30일
+    updateAge: 24 * 60 * 60,   // 매일 토큰 갱신
+  },
   callbacks: {
     async signIn({ user, account }) {
       if (!account || account.provider === "credentials") return true;
-      if (!user.email) return false;
-      const existing = await prisma.user.findUnique({ where: { email: user.email } });
+      // 카카오 등 일부 provider 는 이메일 안 줄 수 있음 (사업자 검수 전).
+      // 그 경우 provider + providerAccountId 로 가짜 이메일 만들어 DB 식별.
+      const fallbackEmail = `${account.provider}_${account.providerAccountId}@${account.provider}.local`;
+      const email = user.email || fallbackEmail;
+      // user 객체에 email 박아서 jwt 콜백에서 매칭 가능하게
+      user.email = email;
+
+      const existing = await prisma.user.findUnique({ where: { email } });
+      if (existing?.isDeleted) return false; // 탈퇴 회원 차단
       if (!existing) {
         await prisma.user.create({
           data: {
-            email: user.email,
-            name: user.name || user.email.split("@")[0],
+            email,
+            name: user.name || `${account.provider}_user`,
             role: "USER",
           },
         });

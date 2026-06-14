@@ -13,9 +13,10 @@ mkdirSync(publicDir, { recursive: true });
 // 여기어때 잘난체로 'S' 그리기 (path 변환)
 const font = opentype.parse(readFileSync(resolve(publicDir, "fonts", "Jalnan.woff")).buffer);
 
-function sPath(size) {
+function sPath(size, ratio = 0.62) {
   // viewBox 기준 size×size, 중앙에 S
-  const fontSize = size * 0.75;
+  // ratio: 글자 크기 비율 (1.0 = 박스 전체, 0.62 = 박스의 62% — 둥근 모서리 안에 안전하게)
+  const fontSize = size * ratio;
   const p = font.getPath("S", 0, 0, fontSize);
   const bb = p.getBoundingBox();
   const w = bb.x2 - bb.x1;
@@ -52,6 +53,8 @@ const SIZES = [
   { px: 180, name: "apple-touch-icon.png", radius: 40 },
   { px: 192, name: "icon-192.png", radius: 42 },
   { px: 512, name: "icon-512.png", radius: 112 },
+  // 카카오·네이버·구글 OAuth 동의 화면용 (큰 사이즈)
+  { px: 1024, name: "kakao-app-icon.png", radius: 220 },
 ];
 
 for (const { px, name, radius } of SIZES) {

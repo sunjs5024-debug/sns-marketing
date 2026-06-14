@@ -40,15 +40,18 @@ function submitSearch() {
   router.replace({ path: "/search", query: q ? { q } : {} });
 }
 
-// 인기 키워드 (검색어 비어있을 때 제안)
+// 인기 키워드 (검색어 비어있을 때 제안) — 활성 카테고리만
 const POPULAR_KEYWORDS = [
   "인스타 팔로워",
+  "인스타 한국인",
   "유튜브 구독자",
-  "틱톡",
-  "카카오톡 채널",
-  "스마트스토어",
-  "네이버 블로그",
-  "네이버 카페",
+  "유튜브 시청시간",
+  "유튜브 쇼츠",
+  "틱톡 팔로워",
+  "X 트위터",
+  "텔레그램 채널",
+  "텔레그램 리액션",
+  "릴스 조회수",
 ];
 </script>
 
@@ -64,7 +67,7 @@ const POPULAR_KEYWORDS = [
           type="search"
           autofocus
           maxlength="50"
-          placeholder="예: 인스타 팔로워, 스마트스토어 구매평…"
+          placeholder="예: 인스타 팔로워, 유튜브 시청시간, 텔레그램 리액션…"
           class="w-full rounded-full border border-neutral-200 bg-white py-4 pl-14 pr-14 text-base focus:border-neutral-900 focus:outline-none"
         />
         <svg class="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

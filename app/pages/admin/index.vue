@@ -59,6 +59,34 @@ const totalRangeRevenue = computed(() =>
 const totalRangeOrders = computed(() =>
   (series.value?.orderCounts ?? []).reduce((s, v) => s + v, 0),
 );
+
+// 상품별 매출 TOP 10 + 최근 활동
+type TopProduct = { productId: string; productName: string; orderCount: number; quantitySum: number; revenue: number };
+type Activity = { type: "order" | "charge" | "signup"; at: string; title: string; detail: string; amount?: number; status?: string; link?: string };
+const { data: topProducts } = await useFetch<TopProduct[]>("/api/admin/top-products");
+const { data: activity } = await useFetch<Activity[]>("/api/admin/recent-activity");
+
+const ACTIVITY_ICON: Record<Activity["type"], string> = {
+  order: "🛒",
+  charge: "💰",
+  signup: "👤",
+};
+const ACTIVITY_COLOR: Record<Activity["type"], string> = {
+  order: "bg-indigo-50 text-indigo-700",
+  charge: "bg-emerald-50 text-emerald-700",
+  signup: "bg-amber-50 text-amber-700",
+};
+
+function relTime(iso: string): string {
+  const ms = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(ms / 60000);
+  if (m < 1) return "방금";
+  if (m < 60) return `${m}분 전`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}시간 전`;
+  const d = Math.floor(h / 24);
+  return `${d}일 전`;
+}
 </script>
 
 <template>
@@ -231,12 +259,76 @@ const totalRangeOrders = computed(() =>
       </div>
     </div>
 
+    <!-- 인기 상품 TOP10 + 최근 활동 -->
+    <div class="grid gap-6 lg:grid-cols-2">
+      <!-- 상품별 매출 TOP 10 -->
+      <div class="rounded-3xl border border-neutral-100 bg-white p-5 sm:p-6">
+        <div class="flex items-center justify-between">
+          <h2 class="font-display text-lg text-neutral-900">상품별 매출 TOP 10</h2>
+          <span class="text-[11px] text-neutral-400">최근 30일</span>
+        </div>
+        <div v-if="(topProducts ?? []).length === 0" class="mt-6 py-8 text-center text-sm text-neutral-500">
+          아직 주문이 없습니다.
+        </div>
+        <ol v-else class="mt-4 space-y-2">
+          <li
+            v-for="(p, i) in topProducts ?? []"
+            :key="p.productId"
+            class="flex items-center gap-3 rounded-xl bg-neutral-50 p-3"
+          >
+            <span :class="['grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-display', i < 3 ? 'bg-amber-400 text-white' : 'bg-neutral-200 text-neutral-600']">
+              {{ i + 1 }}
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-sm text-neutral-900">{{ p.productName }}</p>
+              <p class="text-[11px] text-neutral-500">{{ p.orderCount }}건 · 수량 {{ p.quantitySum.toLocaleString('ko-KR') }}</p>
+            </div>
+            <span class="shrink-0 font-display text-sm text-indigo-700">{{ p.revenue.toLocaleString('ko-KR') }}원</span>
+          </li>
+        </ol>
+      </div>
+
+      <!-- 최근 활동 피드 -->
+      <div class="rounded-3xl border border-neutral-100 bg-white p-5 sm:p-6">
+        <div class="flex items-center justify-between">
+          <h2 class="font-display text-lg text-neutral-900">최근 활동</h2>
+          <span class="text-[11px] text-neutral-400">최신 20건</span>
+        </div>
+        <div v-if="(activity ?? []).length === 0" class="mt-6 py-8 text-center text-sm text-neutral-500">
+          최근 활동이 없습니다.
+        </div>
+        <ul v-else class="mt-4 max-h-[420px] space-y-2 overflow-y-auto pr-1">
+          <li
+            v-for="(a, i) in activity ?? []"
+            :key="i"
+            class="flex items-start gap-3 rounded-xl border border-neutral-100 p-3 hover:bg-neutral-50"
+          >
+            <span :class="['grid h-8 w-8 shrink-0 place-items-center rounded-full text-base', ACTIVITY_COLOR[a.type]]">
+              {{ ACTIVITY_ICON[a.type] }}
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm text-neutral-900">
+                <component :is="a.link ? 'NuxtLink' : 'span'" :to="a.link" class="hover:underline">
+                  {{ a.title }}
+                </component>
+              </p>
+              <p class="text-[11px] text-neutral-500">{{ a.detail }}</p>
+              <p class="mt-0.5 text-[10px] text-neutral-400">{{ relTime(a.at) }}</p>
+            </div>
+            <span v-if="a.amount" class="shrink-0 font-display text-xs text-neutral-700">{{ a.amount.toLocaleString('ko-KR') }}원</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
     <!-- 바로가기 -->
     <div class="rounded-3xl border border-neutral-100 bg-white p-6">
       <h2 class="font-display text-lg text-neutral-900">바로가기</h2>
       <div class="mt-4 flex flex-wrap gap-2">
         <NuxtLink to="/admin/orders" class="rounded-full bg-neutral-900 px-4 py-2 text-sm text-white hover:bg-neutral-700">주문 처리하기</NuxtLink>
-        <NuxtLink to="/admin/payments" class="rounded-full border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-50">결제 내역</NuxtLink>
+        <NuxtLink to="/admin/dispatches" class="rounded-full border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-50">발주 현황</NuxtLink>
+        <NuxtLink to="/admin/charges" class="rounded-full border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-50">충전 관리</NuxtLink>
+        <NuxtLink to="/admin/tax-invoices" class="rounded-full border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-50">세금계산서</NuxtLink>
         <NuxtLink to="/admin/users" class="rounded-full border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-50">회원 관리</NuxtLink>
         <NuxtLink to="/admin/products" class="rounded-full border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-50">상품 관리</NuxtLink>
       </div>

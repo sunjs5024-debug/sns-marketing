@@ -38,8 +38,17 @@ export default defineNuxtConfig({
     identity: {
       type: "Organization",
       name: "SNS소셜팩토리",
+      alternateName: "주식회사 영천기획",
       url: "https://xn--sns-yg9lh0pw9l.kr",
       logo: "https://xn--sns-yg9lh0pw9l.kr/logo.png",
+      email: "dkssudgktka53@gmail.com",
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "에나로77번길 4, 502호",
+        addressLocality: "진주시",
+        addressRegion: "경상남도",
+        addressCountry: "KR",
+      },
     },
   },
 
@@ -94,6 +103,18 @@ export default defineNuxtConfig({
             "인스타·유튜브·틱톡·텔레그램·카카오톡 SNS 마케팅부터 스마트스토어·블로그·카페 상위노출까지. 실계정·안전결제·결과보고서 보장.",
         },
         { name: "theme-color", content: "#a855f7" },
+        // OG 이미지 글로벌 fallback — 모든 페이지에서 SNS 공유 시 이 커버
+        // v2 파일명으로 카카오·페북 캐시 강제 무효화
+        { property: "og:image", content: "https://xn--sns-yg9lh0pw9l.kr/og-cover-v2.png" },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { property: "og:image:type", content: "image/png" },
+        { property: "og:image:alt", content: "SNS소셜팩토리 — SNS 마케팅 & 검색 상위노출 1번지" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:image", content: "https://xn--sns-yg9lh0pw9l.kr/og-cover-v2.png" },
+        // 검색엔진 소유권 확인 (네이버 서치어드바이저 / 구글 Search Console)
+        { name: "naver-site-verification", content: "e32863e2b7babe778820b4898bbcaec727dc604d" },
+        { name: "google-site-verification", content: "v-IYp-1JE-V-cuz71BDBd3gCW6Dah93P3_P52EQ1X-M" },
       ],
       link: [
         // 현대 브라우저 — 벡터 SVG favicon 우선

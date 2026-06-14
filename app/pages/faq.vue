@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { CONTACT } from "#shared/catalog";
+
 useSeoMeta({
   title: "자주묻는질문 (FAQ)",
   description:
@@ -26,7 +28,7 @@ const GROUPS: FaqGroup[] = [
     title: "결제 · 환불",
     items: [
       { q: "결제수단은 무엇이 있나요?", a: "현재는 계좌이체로만 결제 가능합니다. 주문 완료 후 안내되는 계좌번호로 입금해주세요." },
-      { q: "현금영수증·세금계산서 발행 가능한가요?", a: "사업자 회원은 카카오톡 채널로 사업자등록증 제출 시 세금계산서 발급 가능합니다." },
+      { q: "현금영수증·세금계산서 발행 가능한가요?", a: "사업자 회원은 텔레그램(@snssocialfactory)으로 사업자등록증 제출 시 세금계산서 발급 가능합니다." },
       { q: "환불 정책이 어떻게 되나요?", a: "작업 시작 전 100% 환불, 진행 중에는 진행률에 비례한 부분 환불, 완료 후에는 결과보고서를 토대로 협의 환불이 적용됩니다." },
       { q: "주문 후 결제 안 하면 어떻게 되나요?", a: "결제 대기 상태로 24시간 유지 후 자동 취소됩니다. 그 안에 입금하시면 정상 진행됩니다." },
     ],
@@ -34,7 +36,7 @@ const GROUPS: FaqGroup[] = [
   {
     title: "작업 진행",
     items: [
-      { q: "작업은 언제 시작되나요?", a: "결제 확인 후 평균 10분 내 자동 시작됩니다. 대형 상품(월관리·체험단 등)은 영업일 기준 1~3일 내 진행됩니다." },
+      { q: "작업은 언제 시작되나요?", a: "결제 확인 후 평균 10분 내 자동 시작됩니다. 대량 주문은 영업일 기준 1~3일 내 진행됩니다." },
       { q: "작업 도중에 추가 주문해도 되나요?", a: "네, 가능합니다. 진행 중인 주문과 무관하게 새 주문이 같이 처리됩니다." },
       { q: "특정 시간대에 작업해 달라는 요청 가능한가요?", a: "주문 시 \"요청사항\" 칸에 적어주시면 가능한 범위에서 반영합니다." },
       { q: "결과보고서엔 뭐가 들어있나요?", a: "주문 상품/시작·완료 시각/처리 수량/대표 캡처 등이 포함되며, 이메일과 마이페이지에서 동시에 확인할 수 있습니다." },
@@ -53,14 +55,14 @@ const GROUPS: FaqGroup[] = [
     items: [
       { q: "회원가입 안 하고 주문할 수 있나요?", a: "아니요, 주문 내역과 결과보고서 관리를 위해 회원가입이 필요합니다." },
       { q: "포인트는 어떻게 적립되나요?", a: "결제 금액의 2%가 자동 적립됩니다. 적립 즉시 다음 주문에 사용 가능합니다 (사용 기능 곧 오픈)." },
-      { q: "회원탈퇴는 어떻게 하나요?", a: "카카오톡 채널로 요청해주시면 처리됩니다. 진행 중 주문이 있으면 완료 후 처리됩니다." },
+      { q: "회원탈퇴는 어떻게 하나요?", a: "텔레그램(@snssocialfactory)으로 요청해주시면 처리됩니다. 진행 중 주문이 있으면 완료 후 처리됩니다." },
     ],
   },
   {
     title: "기업·대량 주문",
     items: [
-      { q: "기업·대행사 견적 받을 수 있나요?", a: "네, 카카오톡 채널로 문의 주시면 견적과 일정 제안을 드립니다. 월 단위 정기 계약도 가능합니다." },
-      { q: "API 연동도 되나요?", a: "월 100건 이상 대량 주문 고객에 한해 API 키를 발급해드립니다. 카카오톡 채널로 문의해주세요." },
+      { q: "기업·대행사 견적 받을 수 있나요?", a: "네, 텔레그램(@snssocialfactory)으로 문의 주시면 견적과 일정 제안을 드립니다. 월 단위 정기 계약도 가능합니다." },
+      { q: "API 연동도 되나요?", a: "월 100건 이상 대량 주문 고객에 한해 API 키를 발급해드립니다. 텔레그램(@snssocialfactory)으로 문의해주세요." },
     ],
   },
 ];
@@ -100,7 +102,7 @@ useSchemaOrg([
         <h1 class="mt-2 font-display text-3xl text-neutral-900 sm:text-4xl">자주묻는질문</h1>
         <p class="mt-3 text-sm text-neutral-700">
           궁금하신 점을 카테고리별로 정리했습니다. 답이 없는 질문은
-          <a href="#contact" class="text-indigo-600 hover:underline">카카오톡 채널</a>로 문의해주세요.
+          <a href="#contact" class="text-indigo-600 hover:underline">텔레그램</a>으로 문의해주세요.
         </p>
       </div>
     </section>
@@ -118,13 +120,19 @@ useSchemaOrg([
       </div>
     </section>
 
-    <section id="contact" class="mt-12 rounded-3xl bg-yellow-300 px-6 py-8 text-center">
-      <p class="font-display text-xl text-neutral-900">답을 못 찾으셨나요?</p>
-      <p class="mt-2 text-sm text-neutral-800">카카오톡 채널에서 1:1 상담을 받으실 수 있어요.</p>
+    <section id="contact" class="mt-12 rounded-3xl bg-gradient-to-br from-sky-400 to-blue-500 px-6 py-8 text-center text-white">
+      <p class="font-display text-xl">답을 못 찾으셨나요?</p>
+      <p class="mt-2 text-sm text-sky-50">텔레그램으로 1:1 상담을 받으실 수 있어요.</p>
       <a
-        href="#"
-        class="mt-5 inline-flex items-center gap-2 rounded-full bg-neutral-900 px-5 py-3 text-sm text-white hover:bg-neutral-700"
-      >💬 카카오톡 상담하기</a>
+        :href="CONTACT.telegram.url"
+        target="_blank"
+        rel="noopener"
+        class="mt-5 inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm text-blue-700 hover:bg-sky-50"
+      >
+        <TelegramIcon :size="20" />
+        {{ CONTACT.telegram.handle }} 텔레그램 상담
+      </a>
+      <p class="mt-3 text-xs text-sky-100">이메일: {{ CONTACT.email }}</p>
     </section>
   </div>
 </template>

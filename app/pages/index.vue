@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { PLATFORMS, SNS_PLATFORMS, RANK_PLATFORMS, platformKeyFor } from "#shared/catalog";
+import { PLATFORMS, SNS_PLATFORMS, RANK_PLATFORMS, platformKeyFor, CONTACT } from "#shared/catalog";
 
 const { data: featured } = await useFetch("/api/products/featured");
+const { data: live } = await useFetch("/api/live");
 
 // 각 항목별 카드 — 아이콘 SVG path + 그라데이션 컬러
 const WHY_ITEMS = [
@@ -37,19 +38,19 @@ const WHY_ITEMS = [
   },
   {
     icon: "chat",
-    color: "from-yellow-400 to-amber-500",
-    title: "24시간 카톡 상담",
-    desc: "주문 전·후 언제든 카카오톡 채널로 문의 가능. 평일 영업시간 외에도 봇 + 인간 하이브리드로 응대합니다.",
+    color: "from-sky-400 to-blue-500",
+    title: "텔레그램 빠른 상담",
+    desc: "주문 전·후 언제든 텔레그램(@snssocialfactory)으로 문의 가능. 평균 응답 30분 이내 · 글로벌·국내 모두 부담 없이.",
   },
 ] as const;
 
 const REVIEWS = [
   { author: "@de****_yj", tag: "인스타 크리에이터", text: "릴스 조회수랑 같이 팔로워가 늘어서 진짜 자연스러웠어요. 알고리즘이 푸쉬해주는 게 체감됩니다." },
-  { author: "광교**사장님", tag: "네이버카페", text: "타겟 지역 카페에 가입자랑 후기글 같이 올렸더니 매장 검색 노출까지 같이 올라갔어요. 방문 손님이 30% 늘었습니다." },
-  { author: "@vi***_seoul", tag: "스마트스토어 셀러", text: "상품 구매평이 20개 넘어가니까 그 다음부터는 자연 유입이 알아서 늘더라고요. 초기 부스팅용으로 추천!" },
-  { author: "@da***_jiwon", tag: "유튜브", text: "쇼츠 조회수만 살짝 올렸는데 알고리즘이 노출을 늘려줘서 구독자가 따라 늘었어요." },
-  { author: "감성카**오너", tag: "블로그 체험단", text: "체험단 5명 매칭으로 양질의 후기 글이 빠르게 쌓였습니다. 광고 같지 않고 자연스러워요." },
-  { author: "@k_t****er", tag: "틱톡 크리에이터", text: "한국 타겟으로 부탁드렸는데 진짜 한국인 계정이 들어와서 댓글까지 달리더라고요. 만족!" },
+  { author: "@k_b***ty_lab", tag: "인스타 / 한국인", text: "한국 타겟 팔로워 80% 여성으로 받았는데 진짜 정확하게 들어와서 한국인 협찬 문의가 늘었어요." },
+  { author: "@wt***_creator", tag: "유튜브 / 시청시간", text: "수익화 4,000시간 막막했는데 시청시간 옵션으로 한 달 만에 통과했어요. 비현실적이게 빨랐음." },
+  { author: "@da***_jiwon", tag: "유튜브 / 쇼츠", text: "쇼츠 조회수만 살짝 올렸는데 알고리즘이 노출을 늘려줘서 구독자가 따라 늘었어요." },
+  { author: "tg_re***_official", tag: "텔레그램 / 리액션", text: "이모지 리액션 5,000개 옵션 단가 진짜 저렴. 채널 게시물 활성도가 시각적으로 확 살아나요." },
+  { author: "@k_t****er", tag: "틱톡 크리에이터", text: "글로벌 라이브스트림 옵션이 활성도 있는 시청자라 라이브 입장률이 확 늘었어요." },
 ];
 
 const FAQS = [
@@ -65,29 +66,29 @@ const FAQS = [
 // 메인 페이지는 가장 중요한 랜딩. 한국어 검색 핵심 키워드 자연스럽게 포함.
 useSeoMeta({
   // seo-utils 가 자동으로 " | SNS소셜팩토리" 를 뒤에 붙여줌 → title 본문엔 브랜드 제외
-  title: "SNS 마케팅·상위노출 1번지",
+  title: "SNS 마케팅 1번지 — 인스타·유튜브·틱톡·텔레그램",
   description:
-    "인스타 팔로워·좋아요, 유튜브 구독자, 틱톡, 카카오톡, 스마트스토어·네이버 블로그·카페 상위노출까지. 실계정 기반 안전결제, 10분 내 빠른 시작, 결과보고서 보장.",
-  ogTitle: "SNS 마케팅·상위노출 1번지 | SNS소셜팩토리",
+    "인스타 팔로워·좋아요·스토리, 유튜브 구독자·시청시간·쇼츠, 틱톡 팔로워·공유, X 리트윗, 텔레그램 리액션까지. 한국인 실계정·글로벌 가성비 옵션, 10분 내 빠른 시작, 결과보고서 보장.",
+  ogTitle: "SNS 마케팅 1번지 | SNS소셜팩토리",
   ogDescription:
-    "인스타·유튜브·틱톡·카카오톡 SNS 마케팅과 스마트스토어·블로그·카페 상위노출. 실계정·안전결제·결과보고서로 신뢰를 드립니다.",
+    "인스타·유튜브·틱톡·X·텔레그램 SNS 마케팅을 한 곳에서. 한국인 실계정·글로벌 가성비·안전결제·결과보고서로 신뢰를 드립니다.",
   ogType: "website",
   ogLocale: "ko_KR",
   ogSiteName: "SNS소셜팩토리",
-  ogImage: "/og-cover.png",
+  ogImage: "/og-cover-v2.png",
   twitterCard: "summary_large_image",
-  twitterTitle: "SNS 마케팅·상위노출 1번지 | SNS소셜팩토리",
+  twitterTitle: "SNS 마케팅 1번지 | SNS소셜팩토리",
   twitterDescription:
-    "인스타·유튜브·틱톡·카카오톡 SNS 마케팅과 스마트스토어·블로그·카페 상위노출. 실계정·안전결제·결과보고서.",
-  twitterImage: "/og-cover.png",
+    "인스타·유튜브·틱톡·X·텔레그램 SNS 마케팅. 한국인 실계정·글로벌 가성비·안전결제·결과보고서.",
+  twitterImage: "/og-cover-v2.png",
 });
 
 // 구조화 데이터 — WebPage + FAQPage (구글 리치 결과 FAQ 아코디언 노출 유도)
 useSchemaOrg([
   defineWebPage({
-    name: "SNS 마케팅·상위노출 1번지 | SNS소셜팩토리",
+    name: "SNS 마케팅 1번지 | SNS소셜팩토리",
     description:
-      "인스타·유튜브·틱톡·카카오톡 SNS 마케팅과 스마트스토어·블로그·카페 상위노출 전문 서비스.",
+      "인스타·유튜브·틱톡·X·텔레그램 SNS 마케팅 전문 서비스. 한국인 실계정·글로벌 가성비 옵션, 결과보고서 보장.",
   }),
   // FAQPage 는 nuxt-schema-org 에 헬퍼가 없어 raw JSON-LD 로 직접 정의
   {
@@ -102,11 +103,56 @@ useSchemaOrg([
     })),
   },
 ]);
+
+// 회원가입 후 환영 토스트
+const route = useRoute();
+const router = useRouter();
+const showWelcome = ref(false);
+onMounted(() => {
+  if (route.query.welcome === "1") {
+    showWelcome.value = true;
+    // URL 정리 (welcome 쿼리 제거)
+    router.replace({ query: {} });
+    setTimeout(() => { showWelcome.value = false; }, 8000);
+  }
+});
 </script>
 
 <template>
   <div>
+    <!-- 회원가입 환영 토스트 -->
+    <Transition name="welcome">
+      <div
+        v-if="showWelcome"
+        class="fixed left-1/2 top-20 z-50 -translate-x-1/2 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 px-6 py-4 text-white shadow-2xl"
+      >
+        <p class="font-display text-base">🎉 가입을 환영합니다!</p>
+        <p class="mt-1 text-xs text-indigo-100">첫 충전 시 5% 보너스 포인트가 자동 적립됩니다.</p>
+      </div>
+    </Transition>
+
     <Hero />
+
+    <!-- 신뢰 통계 띠 (3분할) -->
+    <section class="border-y border-neutral-100 bg-white">
+      <div class="mx-auto grid max-w-7xl grid-cols-3 divide-x divide-neutral-100 px-4 sm:px-6 lg:px-8">
+        <div class="px-2 py-5 text-center sm:py-6">
+          <p class="font-display text-xl text-neutral-900 sm:text-2xl">
+            {{ (live?.cumulativeOrders ?? 58200).toLocaleString('ko-KR') }}<span class="text-sm text-indigo-600">+</span>
+          </p>
+          <p class="mt-0.5 text-[10px] text-neutral-500 sm:text-xs">누적 주문</p>
+        </div>
+        <div class="px-2 py-5 text-center sm:py-6">
+          <p class="font-display text-xl text-amber-500 sm:text-2xl">★ 4.9<span class="text-sm text-neutral-400">/5</span></p>
+          <p class="mt-0.5 text-[10px] text-neutral-500 sm:text-xs">평균 만족도</p>
+        </div>
+        <div class="px-2 py-5 text-center sm:py-6">
+          <p class="font-display text-xl text-emerald-600 sm:text-2xl">10<span class="text-sm">분</span></p>
+          <p class="mt-0.5 text-[10px] text-neutral-500 sm:text-xs">평균 시작 시간</p>
+        </div>
+      </div>
+    </section>
+
     <LiveOrderTicker />
 
     <section class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
@@ -132,6 +178,7 @@ useSchemaOrg([
             :sales-count="p.salesCount"
             :category-name="p.category.name"
             :icon-key="platformKeyFor(p.category.slug)"
+            :option-count="p._count?.options"
           />
         </div>
       </div>
@@ -198,17 +245,20 @@ useSchemaOrg([
           <div
             v-for="r in REVIEWS"
             :key="r.author"
-            class="rounded-3xl border border-white/60 bg-white/85 p-6 backdrop-blur transition hover:-translate-y-1 hover:shadow-lg"
+            class="group rounded-3xl border border-white/60 bg-white/85 p-6 backdrop-blur transition hover:-translate-y-1 hover:shadow-xl"
           >
-            <div class="flex items-center gap-2 text-amber-500">★★★★★</div>
+            <div class="flex items-center justify-between">
+              <div class="text-amber-500">★★★★★</div>
+              <span class="rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] text-indigo-700">{{ r.tag }}</span>
+            </div>
             <p class="mt-3 text-sm leading-6 text-neutral-700">"{{ r.text }}"</p>
-            <p class="mt-4 text-xs text-neutral-500">— {{ r.author }} · {{ r.tag }}</p>
+            <p class="mt-4 text-xs text-neutral-500">— {{ r.author }}</p>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="mx-auto max-w-3xl px-4 py-20 sm:px-6 lg:px-8">
+    <section class="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
       <SectionTitle eyebrow="FAQ" title="자주 묻는 질문" />
       <div class="mt-8 divide-y divide-neutral-100 rounded-3xl border border-neutral-100">
         <details v-for="f in FAQS" :key="f.q" class="group p-5">
@@ -220,5 +270,98 @@ useSchemaOrg([
         </details>
       </div>
     </section>
+
+    <!-- 최종 CTA — 강력한 마무리 -->
+    <section class="relative overflow-hidden bg-gradient-to-br from-neutral-900 via-indigo-950 to-purple-950 py-16 sm:py-20">
+      <div class="pointer-events-none absolute -left-20 top-10 h-72 w-72 rounded-full bg-indigo-500/20 blur-3xl anim-blob" />
+      <div class="pointer-events-none absolute right-0 bottom-10 h-72 w-72 rounded-full bg-pink-500/20 blur-3xl anim-blob" style="animation-delay: -7s" />
+
+      <div class="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
+        <p class="text-xs uppercase tracking-widest text-indigo-300">START NOW</p>
+        <h2 class="mt-3 font-display text-3xl tracking-tight text-white sm:text-4xl lg:text-5xl">
+          지금 가장 빠르게<br />
+          <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+            SNS 마케팅을 시작하세요
+          </span>
+        </h2>
+        <p class="mx-auto mt-5 max-w-2xl text-sm leading-7 text-neutral-300 sm:text-base">
+          평균 10분 내 작업 시작 · 한국인 실계정 · 30일 유지 보장 · 결과보고서 자동 발송<br />
+          누구나 5분이면 첫 주문이 가능합니다.
+        </p>
+
+        <!-- 3가지 행동 -->
+        <div class="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+          <NuxtLink
+            to="/sns"
+            class="group rounded-2xl bg-white p-5 text-left transition hover:-translate-y-1 hover:shadow-2xl"
+          >
+            <div class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-indigo-500 to-pink-500 text-white">
+              <span class="text-lg">🚀</span>
+            </div>
+            <p class="mt-3 font-display text-base text-neutral-900">상품 둘러보기</p>
+            <p class="mt-1 text-xs text-neutral-500">31개+ SNS 마케팅 상품 카탈로그</p>
+            <p class="mt-3 text-xs text-indigo-600 group-hover:underline">바로가기 →</p>
+          </NuxtLink>
+
+          <NuxtLink
+            to="/auth/signup"
+            class="group rounded-2xl bg-white p-5 text-left transition hover:-translate-y-1 hover:shadow-2xl"
+          >
+            <div class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white">
+              <span class="text-lg">✨</span>
+            </div>
+            <p class="mt-3 font-display text-base text-neutral-900">무료 회원가입</p>
+            <p class="mt-1 text-xs text-neutral-500">1분 가입 · 카카오/네이버/구글</p>
+            <p class="mt-3 text-xs text-emerald-600 group-hover:underline">가입하기 →</p>
+          </NuxtLink>
+
+          <a
+            :href="CONTACT.telegram.url"
+            target="_blank"
+            rel="noopener"
+            class="group rounded-2xl bg-white p-5 text-left transition hover:-translate-y-1 hover:shadow-2xl"
+          >
+            <div class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white">
+              <TelegramIcon :size="22" />
+            </div>
+            <p class="mt-3 font-display text-base text-neutral-900">1:1 텔레그램 상담</p>
+            <p class="mt-1 text-xs text-neutral-500">평균 응답 30분 이내 · 친절 상담</p>
+            <p class="mt-3 text-xs text-blue-600 group-hover:underline">상담 시작 →</p>
+          </a>
+        </div>
+
+        <!-- 추가 안전 신호 -->
+        <div class="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] text-neutral-400 sm:text-xs">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="grid h-4 w-4 place-items-center rounded-full bg-emerald-500/20 text-emerald-400">✓</span>
+            비밀번호 0% 요구
+          </span>
+          <span class="inline-flex items-center gap-1.5">
+            <span class="grid h-4 w-4 place-items-center rounded-full bg-emerald-500/20 text-emerald-400">✓</span>
+            계좌이체 안전결제
+          </span>
+          <span class="inline-flex items-center gap-1.5">
+            <span class="grid h-4 w-4 place-items-center rounded-full bg-emerald-500/20 text-emerald-400">✓</span>
+            30일 유지 보장
+          </span>
+          <span class="inline-flex items-center gap-1.5">
+            <span class="grid h-4 w-4 place-items-center rounded-full bg-emerald-500/20 text-emerald-400">✓</span>
+            세금계산서 발행
+          </span>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
+
+<style scoped>
+.welcome-enter-active,
+.welcome-leave-active {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+}
+.welcome-enter-from,
+.welcome-leave-to {
+  opacity: 0;
+  transform: translate(-50%, -150%);
+}
+</style>

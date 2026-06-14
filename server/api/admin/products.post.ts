@@ -7,6 +7,8 @@ const optionSchema = z.object({
   quantity: z.number().int().min(1),
   price: z.number().int().min(0),
   sortOrder: z.number().int().optional().default(0),
+  externalProvider: z.string().max(20).nullable().optional(),
+  externalServiceId: z.number().int().min(1).nullable().optional(),
 });
 
 const schema = z.object({

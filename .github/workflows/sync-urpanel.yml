@@ -1,0 +1,30 @@
+# urpanel 발주 주문 상태 동기화 (5분 주기)
+# 필요한 secrets:
+#   CRON_SECRET  — .env 의 CRON_SECRET 와 동일한 값
+
+name: Sync urpanel Orders
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: sync-urpanel
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Call sync endpoint
+        env:
+          SITE_URL: https://xn--sns-yg9lh0pw9l.kr
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set +e
+          RESP=$(curl -s -X POST "${SITE_URL}/api/cron/sync-urpanel" \
+            -H "X-CRON-SECRET: ${CRON_SECRET}" \
+            --max-time 60)
+          echo "Response: $RESP"

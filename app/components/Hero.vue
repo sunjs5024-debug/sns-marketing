@@ -2,9 +2,9 @@
 import type { PlatformSlug } from "#shared/catalog";
 
 // 실시간 인원 — /api/live 와 같은 key 공유 → Ticker 와 같은 요청 1번으로 둘 다 채움
-const { data: live } = await useFetch<{ activeUsers: number }>("/api/live", {
+const { data: live } = await useFetch<{ activeUsers: number; cumulativeOrders: number }>("/api/live", {
   key: "live",
-  default: () => ({ activeUsers: 158 }),
+  default: () => ({ activeUsers: 158, cumulativeOrders: 58200 }),
 });
 
 type FloatCardData = {
@@ -20,11 +20,11 @@ type FloatCardData = {
 };
 
 const cards: FloatCardData[] = [
-  { topPx: 0, side: "left", rotate: -5, delay: 0, kind: "instagram", label: "인스타 팔로워", sub: "+1,000 / 한국인", price: "89,000원~", anim: "anim-float-up" },
-  { topPx: 130, side: "right", rotate: 4, delay: 1, kind: "kakaotalk", label: "카톡 채널친구", sub: "+1,000 / 한국인", price: "110,000원~", anim: "anim-float-down" },
-  { topPx: 260, side: "left", rotate: -3, delay: 2, kind: "x", label: "X(트위터) 팔로워", sub: "+1,000 / 한국인", price: "75,000원~", anim: "anim-float-up" },
-  { topPx: 390, side: "right", rotate: 3, delay: 3, kind: "naver-cafe", label: "네이버 카페 가입자", sub: "+50명 / 실계정", price: "39,000원~", anim: "anim-float-down" },
-  { topPx: 520, side: "left", rotate: -2, delay: 4, kind: "tiktok", label: "틱톡 팔로워", sub: "+1,000 / 한국인", price: "99,000원~", anim: "anim-float-up" },
+  { topPx: 0, side: "left", rotate: -5, delay: 0, kind: "instagram", label: "인스타 팔로워", sub: "+1,000 / 한국인 🇰🇷", price: "27,000원~", anim: "anim-float-up" },
+  { topPx: 130, side: "right", rotate: 4, delay: 1, kind: "youtube", label: "유튜브 시청시간", sub: "1000=10시간 보장", price: "8,400원~", anim: "anim-float-down" },
+  { topPx: 260, side: "left", rotate: -3, delay: 2, kind: "x", label: "X(트위터) 팔로워", sub: "+1,000 / 글로벌", price: "27,000원~", anim: "anim-float-up" },
+  { topPx: 390, side: "right", rotate: 3, delay: 3, kind: "telegram", label: "텔레그램 리액션", sub: "+5,000 / 이모지", price: "1,000원~", anim: "anim-float-down" },
+  { topPx: 520, side: "left", rotate: -2, delay: 4, kind: "tiktok", label: "틱톡 팔로워", sub: "+1,000 / 글로벌", price: "12,000원~", anim: "anim-float-up" },
 ];
 </script>
 
@@ -50,7 +50,7 @@ const cards: FloatCardData[] = [
           </div>
 
           <h1 class="mt-5 font-display text-4xl tracking-tight text-neutral-900 sm:text-5xl lg:text-[3.5rem] leading-[1.2] text-balance">
-            SNS 성장과 상위노출
+            SNS 성장,
             <br />
             <span
               class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent anim-gradient-flow"
@@ -59,33 +59,19 @@ const cards: FloatCardData[] = [
           </h1>
 
           <p class="mt-5 text-lg leading-7 text-neutral-700 max-w-xl text-pretty">
-            인스타·유튜브·틱톡·텔레그램·카카오톡 SNS 마케팅부터 스마트스토어·블로그·카페 상위노출까지.
-            실제 사용자 기반으로 안전하게, 결과보고서로 투명하게 진행합니다.
+            인스타·유튜브·틱톡·X(트위터)·텔레그램 SNS 마케팅을 한 곳에서.
+            한국인 실계정 · 글로벌 가성비 옵션까지 — 안전하게, 결과보고서로 투명하게 진행합니다.
           </p>
 
           <div class="mt-7 flex flex-wrap gap-3">
             <NuxtLink to="/sns" class="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-6 py-3 text-sm text-white shadow-lg shadow-neutral-900/20 hover:bg-neutral-700">
               SNS 마케팅 시작하기 <span aria-hidden>→</span>
             </NuxtLink>
-            <NuxtLink to="/rank" class="inline-flex items-center gap-2 rounded-full border border-neutral-300 bg-white px-6 py-3 text-sm text-neutral-900 hover:bg-neutral-50">
-              상위노출 보기
+            <NuxtLink to="/reviews" class="inline-flex items-center gap-2 rounded-full border border-neutral-300 bg-white px-6 py-3 text-sm text-neutral-900 hover:bg-neutral-50">
+              실제 후기 보기
             </NuxtLink>
           </div>
 
-          <dl class="mt-10 grid grid-cols-3 gap-6 border-t border-neutral-200/70 pt-6">
-            <div>
-              <dd class="font-display text-2xl text-neutral-900">58,200+</dd>
-              <dt class="mt-1 text-xs text-neutral-500">누적 주문</dt>
-            </div>
-            <div>
-              <dd class="font-display text-2xl text-neutral-900">4.9 / 5</dd>
-              <dt class="mt-1 text-xs text-neutral-500">평균 만족도</dt>
-            </div>
-            <div>
-              <dd class="font-display text-2xl text-neutral-900">10분 내</dd>
-              <dt class="mt-1 text-xs text-neutral-500">평균 시작</dt>
-            </div>
-          </dl>
         </div>
 
         <div class="relative hidden lg:block">

@@ -21,17 +21,17 @@ useSchemaOrg([
 ]);
 
 // 최종 개정일 — 약관 변경 시 같이 갱신
-const lastUpdated = "2026-05-24";
+const lastUpdated = "2026-05-30";
 
-// 사업자 정보 placeholder — 사업자등록 후 SiteFooter 와 함께 갱신
+// 사업자 정보
 const COMPANY = {
-  name: "SNS소셜팩토리",
-  ceo: "(대표자명)",
-  bizRegNo: "000-00-00000",
-  mailOrderNo: "0000-서울-0000",
-  address: "(주소)",
-  customerCenter: "1588-0000",
-  email: "(고객센터 이메일)",
+  name: "주식회사 영천기획",
+  service: "SNS소셜팩토리", // 서비스 브랜드명
+  ceo: "김선민",
+  bizRegNo: "447-81-03597",
+  mailOrderNo: "제 2026-경남진주-0298 호",
+  address: "경상남도 진주시 에나로77번길 4, 502호",
+  email: "dkssudgktka53@gmail.com",
 };
 </script>
 
@@ -120,12 +120,12 @@ const COMPANY = {
         <h2 class="font-display text-base text-neutral-900">사업자 정보</h2>
         <dl class="mt-3 grid grid-cols-1 gap-1 text-xs text-neutral-600 sm:grid-cols-2">
           <div><dt class="inline text-neutral-500">상호: </dt><dd class="inline">{{ COMPANY.name }}</dd></div>
+          <div><dt class="inline text-neutral-500">서비스명: </dt><dd class="inline">{{ COMPANY.service }}</dd></div>
           <div><dt class="inline text-neutral-500">대표: </dt><dd class="inline">{{ COMPANY.ceo }}</dd></div>
           <div><dt class="inline text-neutral-500">사업자등록번호: </dt><dd class="inline">{{ COMPANY.bizRegNo }}</dd></div>
-          <div><dt class="inline text-neutral-500">통신판매업: </dt><dd class="inline">{{ COMPANY.mailOrderNo }}</dd></div>
+          <div class="sm:col-span-2"><dt class="inline text-neutral-500">통신판매업: </dt><dd class="inline">{{ COMPANY.mailOrderNo }}</dd></div>
           <div class="sm:col-span-2"><dt class="inline text-neutral-500">주소: </dt><dd class="inline">{{ COMPANY.address }}</dd></div>
-          <div><dt class="inline text-neutral-500">고객센터: </dt><dd class="inline">{{ COMPANY.customerCenter }}</dd></div>
-          <div><dt class="inline text-neutral-500">이메일: </dt><dd class="inline">{{ COMPANY.email }}</dd></div>
+          <div class="sm:col-span-2"><dt class="inline text-neutral-500">이메일: </dt><dd class="inline">{{ COMPANY.email }}</dd></div>
         </dl>
       </section>
     </article>

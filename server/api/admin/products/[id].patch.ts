@@ -8,6 +8,8 @@ const optionSchema = z.object({
   quantity: z.number().int().min(1),
   price: z.number().int().min(0),
   sortOrder: z.number().int().optional().default(0),
+  externalProvider: z.string().max(20).nullable().optional(),
+  externalServiceId: z.number().int().min(1).nullable().optional(),
 });
 
 const schema = z.object({
@@ -50,7 +52,14 @@ export default defineEventHandler(async (event) => {
         if (opt.id) {
           await tx.productOption.update({
             where: { id: opt.id },
-            data: { label: opt.label, quantity: opt.quantity, price: opt.price, sortOrder: opt.sortOrder ?? 0 },
+            data: {
+              label: opt.label,
+              quantity: opt.quantity,
+              price: opt.price,
+              sortOrder: opt.sortOrder ?? 0,
+              externalProvider: opt.externalProvider ?? null,
+              externalServiceId: opt.externalServiceId ?? null,
+            },
           });
         } else {
           await tx.productOption.create({
@@ -60,6 +69,8 @@ export default defineEventHandler(async (event) => {
               quantity: opt.quantity,
               price: opt.price,
               sortOrder: opt.sortOrder ?? 0,
+              externalProvider: opt.externalProvider ?? null,
+              externalServiceId: opt.externalServiceId ?? null,
             },
           });
         }

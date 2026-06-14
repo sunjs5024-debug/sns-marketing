@@ -1,4 +1,4 @@
-// public/og-cover.png 생성기
+// public/og-cover-v2.png 생성기
 // 1200×630 (페북/카톡/X 권장 비율 1.91:1)
 // 폰트: 여기어때 잘난체 → opentype.js 로 텍스트→path 변환 (시스템 폰트 의존성 X)
 import sharp from "sharp";
@@ -8,7 +8,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const out = resolve(__dirname, "..", "public", "og-cover.png");
+const out = resolve(__dirname, "..", "public", "og-cover-v2.png");
 mkdirSync(dirname(out), { recursive: true });
 
 // 잘난체 로드 (WOFF)

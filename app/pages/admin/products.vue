@@ -9,6 +9,8 @@ type Option = {
   quantity: number;
   price: number;
   sortOrder?: number;
+  externalProvider?: string | null;
+  externalServiceId?: number | null;
 };
 type Category = { id: string; slug: string; name: string; platform: "SNS" | "RANK" };
 type Product = {
@@ -83,6 +85,31 @@ const editing = ref<FormState | null>(null);
 const saving = ref(false);
 const formError = ref<string | null>(null);
 
+// urpanel 서비스 선택 모달 상태
+const pickerOpen = ref(false);
+const pickerForOptionIndex = ref<number | null>(null);
+function openPicker(i: number) {
+  pickerForOptionIndex.value = i;
+  pickerOpen.value = true;
+}
+function onPickerSelect(svc: { id: number | string; name: string; rate: string; category: string }) {
+  if (pickerForOptionIndex.value === null || !editing.value) return;
+  const opt = editing.value.options[pickerForOptionIndex.value];
+  if (opt) {
+    opt.externalServiceId = Number(svc.id);
+    opt.externalProvider = "urpanel";
+  }
+}
+const pickerInitialQuery = computed(() => {
+  if (pickerForOptionIndex.value === null || !editing.value) return "";
+  // 상품명에서 영문 추출 또는 카테고리 키워드 사용
+  return editing.value.name;
+});
+const pickerQuantity = computed(() => {
+  if (pickerForOptionIndex.value === null || !editing.value) return undefined;
+  return editing.value.options[pickerForOptionIndex.value]?.quantity;
+});
+
 function startCreate() {
   editing.value = emptyForm();
   formError.value = null;
@@ -110,7 +137,14 @@ function cancelEdit() {
 }
 function addOption() {
   if (!editing.value) return;
-  editing.value.options.push({ label: "", quantity: 100, price: 0, sortOrder: editing.value.options.length });
+  editing.value.options.push({
+    label: "",
+    quantity: 100,
+    price: 0,
+    sortOrder: editing.value.options.length,
+    externalProvider: null,
+    externalServiceId: null,
+  });
 }
 function removeOption(i: number) {
   if (!editing.value) return;
@@ -141,6 +175,8 @@ async function saveForm() {
         quantity: Number(o.quantity),
         price: Number(o.price),
         sortOrder: i,
+        externalProvider: o.externalServiceId ? "urpanel" : null,
+        externalServiceId: o.externalServiceId ? Number(o.externalServiceId) : null,
       })),
     };
     if (f.id) {
@@ -346,12 +382,33 @@ async function deleteProduct(p: Product) {
               <div
                 v-for="(opt, i) in editing.options"
                 :key="i"
-                class="grid grid-cols-[1fr_100px_120px_auto] items-center gap-2 rounded-xl bg-white p-2"
+                class="rounded-xl bg-white p-2"
               >
-                <input v-model="opt.label" placeholder="라벨 (예: 500개)" class="rounded border border-neutral-200 px-2 py-1.5 text-sm focus:border-neutral-900 focus:outline-none" />
-                <input v-model.number="opt.quantity" type="number" min="1" placeholder="수량" class="rounded border border-neutral-200 px-2 py-1.5 text-sm focus:border-neutral-900 focus:outline-none" />
-                <input v-model.number="opt.price" type="number" min="0" placeholder="가격" class="rounded border border-neutral-200 px-2 py-1.5 text-sm focus:border-neutral-900 focus:outline-none" />
-                <button type="button" class="rounded border border-rose-200 bg-rose-50 px-2 py-1.5 text-xs text-rose-700 hover:bg-rose-100" @click="removeOption(i)">제거</button>
+                <div class="grid grid-cols-[1fr_90px_110px_180px_auto] items-center gap-2">
+                  <input v-model="opt.label" placeholder="라벨 (예: 500개)" class="rounded border border-neutral-200 px-2 py-1.5 text-sm focus:border-neutral-900 focus:outline-none" />
+                  <input v-model.number="opt.quantity" type="number" min="1" placeholder="수량" class="rounded border border-neutral-200 px-2 py-1.5 text-sm focus:border-neutral-900 focus:outline-none" />
+                  <input v-model.number="opt.price" type="number" min="0" placeholder="판매가" class="rounded border border-neutral-200 px-2 py-1.5 text-sm focus:border-neutral-900 focus:outline-none" />
+                  <div class="flex items-center gap-1">
+                    <input
+                      v-model.number="opt.externalServiceId"
+                      type="number"
+                      min="1"
+                      placeholder="urpanel ID"
+                      class="w-full rounded border border-indigo-200 bg-indigo-50/30 px-2 py-1.5 text-sm focus:border-indigo-500 focus:outline-none"
+                      title="urpanel 서비스 ID"
+                    />
+                    <button
+                      type="button"
+                      class="shrink-0 rounded border border-indigo-300 bg-indigo-100 px-2 py-1.5 text-[11px] text-indigo-700 hover:bg-indigo-200"
+                      title="urpanel 서비스 검색해서 선택"
+                      @click="openPicker(i)"
+                    >🔍</button>
+                  </div>
+                  <button type="button" class="rounded border border-rose-200 bg-rose-50 px-2 py-1.5 text-xs text-rose-700 hover:bg-rose-100" @click="removeOption(i)">제거</button>
+                </div>
+                <p class="mt-1 pl-1 text-[10px] text-neutral-400">
+                  💡 urpanel ID 입력 시 결제 완료 자동 발주 / 비워두면 수동 처리
+                </p>
               </div>
               <p v-if="editing.options.length === 0" class="text-center text-xs text-neutral-400">
                 옵션을 추가하지 않으면 기본가만 사용됩니다.
@@ -371,5 +428,13 @@ async function deleteProduct(p: Product) {
         </div>
       </div>
     </div>
+
+    <!-- urpanel 서비스 선택 모달 -->
+    <UrpanelServicePicker
+      v-model="pickerOpen"
+      :initial-query="pickerInitialQuery"
+      :filter-by-quantity="pickerQuantity"
+      @select="onPickerSelect"
+    />
   </div>
 </template>

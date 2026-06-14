@@ -40,7 +40,10 @@ export default defineEventHandler(async (event) => {
 
   return prisma.product.findMany({
     where,
-    include: { category: true },
+    include: {
+      category: true,
+      _count: { select: { options: true } },
+    },
     orderBy: SORT_MAP[sortKey],
   });
 });

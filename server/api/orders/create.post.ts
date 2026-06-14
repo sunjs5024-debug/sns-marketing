@@ -1,18 +1,15 @@
 import { z } from "zod";
 import { prisma } from "../../utils/prisma";
 import { requireUserId } from "../../utils/session";
-import type { PaymentMethod } from "~~/generated/prisma/enums";
+import { notifyNewOrder } from "../../utils/telegram";
 
-// 포인트 사용 정책 (server-side 강제 — 클라이언트 우회 방지)
-export const POINTS_MAX_RATIO = 0.3; // 결제 금액의 30%까지
-
+// 계좌이체 only — 입금자명으로 SMS 자동 매칭
 const schema = z.object({
   buyerName: z.string().min(1),
   buyerPhone: z.string().min(1),
   buyerEmail: z.string().email(),
   memo: z.string().nullable().optional(),
-  paymentMethod: z.enum(["CARD", "TRANSFER", "KAKAOPAY", "NAVERPAY", "TOSS"]).default("TRANSFER"),
-  pointsToUse: z.number().int().min(0).optional().default(0),
+  depositorName: z.string().min(1).max(20).trim(),
 });
 
 function generateOrderNumber() {
@@ -29,25 +26,43 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: parsed.error.issues[0]?.message });
   }
 
-  const [items, user] = await Promise.all([
-    prisma.cartItem.findMany({
-      where: { userId },
-      include: { product: true, option: true },
-    }),
-    prisma.user.findUnique({ where: { id: userId }, select: { points: true } }),
-  ]);
+  const items = await prisma.cartItem.findMany({
+    where: { userId },
+    include: { product: true, option: true },
+  });
   if (items.length === 0) throw createError({ statusCode: 400, statusMessage: "장바구니가 비어 있어요." });
-  if (!user) throw createError({ statusCode: 404, statusMessage: "사용자 없음" });
 
   const totalAmount = items.reduce(
     (sum, it) => sum + (it.option?.price ?? it.product.basePrice) * it.quantity,
     0,
   );
 
-  // 포인트 사용 검증 — 클라이언트 값 신뢰하지 않음
-  const maxByPolicy = Math.floor(totalAmount * POINTS_MAX_RATIO);
-  const requestedPoints = Math.max(0, Math.min(parsed.data.pointsToUse, user.points, maxByPolicy));
-  const finalAmount = totalAmount - requestedPoints;
+  // 동일 입금자명 + 동일 금액으로 PENDING 충전/주문 있으면 매칭 충돌 → 사용자에게 다른 이름 요구
+  const [conflictCharge, conflictOrder] = await Promise.all([
+    prisma.charge.count({
+      where: {
+        status: "PENDING",
+        amount: totalAmount,
+        depositorName: parsed.data.depositorName,
+        expiresAt: { gt: new Date() },
+      },
+    }),
+    prisma.order.count({
+      where: {
+        status: "PENDING",
+        finalAmount: totalAmount,
+        depositorName: parsed.data.depositorName,
+        paymentMethod: "TRANSFER",
+        expiresAt: { gt: new Date() },
+      },
+    }),
+  ]);
+  if (conflictCharge + conflictOrder > 0) {
+    throw createError({
+      statusCode: 409,
+      statusMessage: "동일한 금액·입금자명으로 대기 중인 신청이 있습니다. 입금자명을 조금 다르게 (예: 홍길동1) 입력해주세요.",
+    });
+  }
 
   const orderNumber = generateOrderNumber();
 
@@ -57,9 +72,11 @@ export default defineEventHandler(async (event) => {
       userId,
       status: "PENDING",
       totalAmount,
-      pointsUsed: requestedPoints,
-      finalAmount,
-      paymentMethod: parsed.data.paymentMethod as PaymentMethod,
+      pointsUsed: 0,
+      finalAmount: totalAmount,
+      paymentMethod: "TRANSFER",
+      depositorName: parsed.data.depositorName,
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24시간 후 자동 만료
       buyerName: parsed.data.buyerName,
       buyerPhone: parsed.data.buyerPhone,
       buyerEmail: parsed.data.buyerEmail,
@@ -80,5 +97,15 @@ export default defineEventHandler(async (event) => {
     },
   });
 
-  return { orderNumber: order.orderNumber, pointsUsed: requestedPoints, finalAmount };
+  // 어드민 텔레그램 알림 (fail-silent)
+  notifyNewOrder({
+    orderNumber: order.orderNumber,
+    buyerName: parsed.data.buyerName,
+    finalAmount: totalAmount,
+    depositorName: parsed.data.depositorName,
+    itemCount: items.length,
+    firstProductName: items[0]?.product.name ?? "(상품)",
+  }).catch(() => {});
+
+  return { orderNumber: order.orderNumber, finalAmount: totalAmount };
 });

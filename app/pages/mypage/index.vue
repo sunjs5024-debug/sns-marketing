@@ -50,6 +50,20 @@ type MyData = {
 const { data } = await useFetch<MyData>("/api/me");
 if (!data.value) throw createError({ statusCode: 401, statusMessage: "로그인이 필요합니다." });
 
+// 후기 작성 가능한 완료된 주문 (아직 리뷰 안 쓴 것)
+type ReviewableOrder = {
+  orderId: string;
+  orderNumber: string;
+  completedAt: string | null;
+  productId: string;
+  productName: string;
+  productSlug: string;
+  categoryName: string;
+};
+const { data: reviewable } = await useFetch<ReviewableOrder[]>("/api/me/reviewable-orders", {
+  default: () => [],
+});
+
 async function onSignOut() {
   try {
     const csrf = await $fetch<{ csrfToken: string }>("/api/auth/csrf");
@@ -93,6 +107,10 @@ async function onSignOut() {
           </div>
 
           <div class="flex items-center gap-2">
+            <NuxtLink
+              to="/mypage/settings"
+              class="rounded-full border border-neutral-300 px-4 py-2 text-xs text-neutral-700 hover:bg-neutral-50"
+            >설정</NuxtLink>
             <button
               type="button"
               class="rounded-full border border-neutral-300 px-4 py-2 text-xs text-neutral-700 hover:bg-neutral-50"
@@ -103,12 +121,19 @@ async function onSignOut() {
 
         <!-- 포인트 + 누적 결제 -->
         <div class="mt-6 grid gap-3 sm:grid-cols-2">
-          <div class="rounded-2xl border border-indigo-100 bg-indigo-50 p-4">
-            <p class="text-xs text-indigo-700">보유 포인트</p>
+          <!-- 보유 포인트 + 충전 버튼 -->
+          <NuxtLink
+            to="/mypage/charge"
+            class="group rounded-2xl border border-indigo-100 bg-indigo-50 p-4 transition hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <div class="flex items-start justify-between">
+              <p class="text-xs text-indigo-700">보유 포인트</p>
+              <span class="rounded-full bg-indigo-600 px-2.5 py-0.5 text-[10px] text-white">+ 충전</span>
+            </div>
             <p class="mt-1 font-display text-2xl text-indigo-900">
               {{ data.user.points.toLocaleString("ko-KR") }}<span class="ml-0.5 text-base">P</span>
             </p>
-          </div>
+          </NuxtLink>
           <div class="rounded-2xl border border-neutral-100 bg-neutral-50 p-4">
             <p class="text-xs text-neutral-500">누적 결제 금액</p>
             <p class="mt-1 font-display text-2xl text-neutral-900">{{ formatPrice(data.totalSpent) }}</p>
@@ -189,10 +214,47 @@ async function onSignOut() {
       </div>
     </section>
 
+    <!-- 후기 작성 가능 주문 (완료 + 미작성) -->
+    <section v-if="reviewable && reviewable.length > 0" class="mt-8">
+      <div class="flex items-center justify-between">
+        <h2 class="font-display text-lg text-neutral-900">⭐ 후기 작성 가능</h2>
+        <span class="text-xs text-neutral-500">{{ reviewable.length }}건</span>
+      </div>
+      <p class="mt-1 text-xs text-neutral-500">완료된 주문에 후기를 남기고 다음 분들에게 도움을 주세요.</p>
+      <div class="mt-4 grid gap-3 sm:grid-cols-2">
+        <NuxtLink
+          v-for="o in reviewable"
+          :key="o.orderId"
+          :to="`/reviews/write/${o.orderNumber}`"
+          class="group rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 p-4 transition hover:-translate-y-0.5 hover:shadow-md"
+        >
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0 flex-1">
+              <p class="text-[10px] text-amber-700">{{ o.categoryName }}</p>
+              <p class="mt-1 truncate text-sm font-medium text-neutral-900">{{ o.productName }}</p>
+              <p class="mt-1 text-[11px] text-neutral-500">
+                완료 · {{ o.completedAt ? new Date(o.completedAt).toLocaleDateString("ko-KR") : "—" }}
+              </p>
+            </div>
+            <span class="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700 group-hover:bg-amber-200">
+              ✍️ 작성
+            </span>
+          </div>
+        </NuxtLink>
+      </div>
+    </section>
+
     <!-- 빠른 액션 -->
     <section class="mt-8">
       <h2 class="font-display text-lg text-neutral-900">바로가기</h2>
       <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <NuxtLink
+          to="/mypage/charge"
+          class="group flex items-center gap-3 rounded-2xl border border-indigo-200 bg-indigo-50 p-4 transition hover:-translate-y-0.5 hover:shadow-md"
+        >
+          <span class="text-2xl">💰</span>
+          <span class="text-sm text-indigo-900">포인트 충전</span>
+        </NuxtLink>
         <NuxtLink
           to="/cart"
           class="group flex items-center gap-3 rounded-2xl border border-neutral-100 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-md"
@@ -229,6 +291,13 @@ async function onSignOut() {
         >
           <span class="text-2xl">💬</span>
           <span class="text-sm text-neutral-900">자주묻는질문</span>
+        </NuxtLink>
+        <NuxtLink
+          to="/mypage/settings"
+          class="group flex items-center gap-3 rounded-2xl border border-neutral-100 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-md"
+        >
+          <span class="text-2xl">👤</span>
+          <span class="text-sm text-neutral-900">회원 정보 관리</span>
         </NuxtLink>
       </div>
     </section>

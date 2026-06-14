@@ -3,11 +3,17 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "nuxt prepare && prisma generate && nuxt build",
+    "build": "nuxt prepare && prisma generate && nuxt build && node scripts/patch-nitro.mjs",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare && prisma generate"
+    "postinstall": "nuxt prepare && prisma generate",
+    "start": "pm2 start ecosystem.config.cjs",
+    "stop": "pm2 stop sns-factory",
+    "restart": "pm2 restart sns-factory --update-env",
+    "logs": "pm2 logs sns-factory",
+    "status": "pm2 status",
+    "deploy": "npm run build && pm2 restart sns-factory --update-env"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
@@ -16,6 +22,7 @@
     "@sidebase/nuxt-auth": "^1.2.0",
     "@tailwindcss/vite": "^4.3.0",
     "bcryptjs": "^3.0.3",
+    "dotenv": "^17.4.2",
     "next-auth": "^4.21.1",
     "nuxt": "^4.4.6",
     "prisma": "^7.8.0",

@@ -52,13 +52,33 @@
 
 - **도메인**: `xn--sns-yg9lh0pw9l.kr` (퓨니코드, 한글 도메인)
 - **Apache 설정**: `C:\xampp\apache\conf\extra\httpd-vhosts.conf` 에 `ProxyPass / http://127.0.0.1:3000/`
-- **Nuxt 띄우는 법** (PC 켤 때마다 필요):
-  ```powershell
-  cd C:\Users\admin\Desktop\sns-marketing-nuxt
-  npx nuxt dev --host 127.0.0.1 --port 3000
-  ```
-- ⚠️ **반드시 `--host 127.0.0.1`** — 안 하면 IPv6(`::1`)에만 바인딩돼서 Apache가 못 닿아 503 뜸.
-- 창 닫으면 사이트 다운. 백그라운드로 띄우려면 PM2 또는 Windows 서비스로 등록 검토.
+- **PM2 자동 시작 운영 중** — Windows 시작프로그램 폴더에 `SNSFactory.vbs` 가 등록되어 있어
+  로그온 시 `pm2 resurrect` 가 자동 실행됨. PC 재부팅해도 사이트 자동 복구.
+
+### PM2 명령
+```powershell
+cd C:\Users\admin\Desktop\sns-marketing-nuxt
+npm run status     # 상태 확인 (pm2 status)
+npm run logs       # 실시간 로그 (Ctrl+C로 빠져나옴)
+npm run restart    # 재시작 (env 갱신)
+npm run stop       # 중지
+npm run start      # 시작 (ecosystem.config.cjs 로드)
+npm run deploy     # 빌드 + 재시작 한방
+```
+
+### 빌드 후 자동 패치
+`npm run build` 가 자동으로:
+1. `nuxt prepare`
+2. `prisma generate`
+3. `nuxt build`
+4. `scripts/patch-nitro.mjs` — Prisma 7 + Node 24 호환 패치 (globalThis.__dirname → process.cwd())
+
+### 수동 띄우기 (PM2 안 쓸 때)
+```powershell
+cd C:\Users\admin\Desktop\sns-marketing-nuxt
+node .output/server/index.mjs
+```
+⚠️ 직접 띄우면 콘솔 닫으면 죽음. PM2 안 쓰는 이유가 있을 때만.
 
 ## 스택
 - Nuxt 4.4.6 + Vue 3 + Tailwind 4 + TypeScript

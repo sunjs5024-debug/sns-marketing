@@ -1,5 +1,16 @@
 import type { Platform } from "~~/generated/prisma/enums";
 
+// 고객 문의 채널 — 한 곳에서 관리. 텔레그램 1:1 다이렉트 채팅
+export const CONTACT = {
+  telegram: {
+    handle: "@snssocialfactory",
+    url: "https://t.me/snssocialfactory",
+    label: "텔레그램 상담",
+    iconText: "✈",
+  },
+  email: "dkssudgktka53@gmail.com",
+} as const;
+
 export type PlatformSlug =
   | "instagram"
   | "youtube"
@@ -131,15 +142,16 @@ export const PLATFORMS: Record<PlatformSlug, PlatformMeta> = {
   },
 };
 
+// 활성 플랫폼만 노출 — urpanel 매핑이 가능한 플랫폼 위주
+// 카카오톡 / 네이버 (스마트스토어/블로그/카페) 는 urpanel 미지원이라 일시 비활성 (별도 패널 도입 시 복원)
 export const SNS_PLATFORMS: PlatformSlug[] = [
   "instagram",
   "youtube",
   "tiktok",
-  "kakaotalk",
   "x",
   "telegram",
 ];
-export const RANK_PLATFORMS: PlatformSlug[] = ["smartstore", "naver-blog", "naver-cafe"];
+export const RANK_PLATFORMS: PlatformSlug[] = [];
 
 export function isValidPlatformSlug(slug: string): slug is PlatformSlug {
   return slug in PLATFORMS;
