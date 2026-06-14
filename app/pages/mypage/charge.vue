@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { formatPrice } from "#shared/catalog";
 
-definePageMeta({ middleware: ["auth"] });
+// 포인트 충전 비활성화 (2026-06-14) — 계좌이체 전용 운영.
+// 직접 URL 접근해도 마이페이지로 돌려보냄. 되살리려면 아래 redirect 미들웨어 제거.
+definePageMeta({ middleware: ["auth", () => navigateTo("/mypage")] });
 useSeoMeta({ title: "포인트 충전", robots: "noindex, nofollow" });
 
 type Charge = {

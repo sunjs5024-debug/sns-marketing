@@ -121,19 +121,13 @@ async function onSignOut() {
 
         <!-- 포인트 + 누적 결제 -->
         <div class="mt-6 grid gap-3 sm:grid-cols-2">
-          <!-- 보유 포인트 + 충전 버튼 -->
-          <NuxtLink
-            to="/mypage/charge"
-            class="group rounded-2xl border border-indigo-100 bg-indigo-50 p-4 transition hover:-translate-y-0.5 hover:shadow-md"
-          >
-            <div class="flex items-start justify-between">
-              <p class="text-xs text-indigo-700">보유 포인트</p>
-              <span class="rounded-full bg-indigo-600 px-2.5 py-0.5 text-[10px] text-white">+ 충전</span>
-            </div>
+          <!-- 보유 포인트 (충전 비활성화 2026-06-14 — 계좌이체 전용. 충전 링크/버튼 제거, 읽기전용 표시) -->
+          <div class="rounded-2xl border border-indigo-100 bg-indigo-50 p-4">
+            <p class="text-xs text-indigo-700">보유 포인트</p>
             <p class="mt-1 font-display text-2xl text-indigo-900">
               {{ data.user.points.toLocaleString("ko-KR") }}<span class="ml-0.5 text-base">P</span>
             </p>
-          </NuxtLink>
+          </div>
           <div class="rounded-2xl border border-neutral-100 bg-neutral-50 p-4">
             <p class="text-xs text-neutral-500">누적 결제 금액</p>
             <p class="mt-1 font-display text-2xl text-neutral-900">{{ formatPrice(data.totalSpent) }}</p>
@@ -248,13 +242,7 @@ async function onSignOut() {
     <section class="mt-8">
       <h2 class="font-display text-lg text-neutral-900">바로가기</h2>
       <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <NuxtLink
-          to="/mypage/charge"
-          class="group flex items-center gap-3 rounded-2xl border border-indigo-200 bg-indigo-50 p-4 transition hover:-translate-y-0.5 hover:shadow-md"
-        >
-          <span class="text-2xl">💰</span>
-          <span class="text-sm text-indigo-900">포인트 충전</span>
-        </NuxtLink>
+        <!-- 포인트 충전 바로가기 비활성화 (2026-06-14) — 계좌이체 전용 -->
         <NuxtLink
           to="/cart"
           class="group flex items-center gap-3 rounded-2xl border border-neutral-100 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-md"

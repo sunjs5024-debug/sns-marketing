@@ -253,10 +253,7 @@ const rankItems: DropItem[] = RANK_PLATFORMS.map((s) => ({
                     <span class="text-xl">📦</span>
                     <span class="text-sm text-neutral-900">내 주문</span>
                   </NuxtLink>
-                  <NuxtLink to="/mypage/charge" class="flex items-center gap-3 rounded-xl p-3 hover:bg-neutral-50">
-                    <span class="text-xl">💰</span>
-                    <span class="text-sm text-neutral-900">포인트 충전</span>
-                  </NuxtLink>
+                  <!-- 포인트 충전 비활성화 (2026-06-14) — 계좌이체 전용 운영. 되살리려면 아래 블록 복원 -->
                   <NuxtLink to="/mypage/settings" class="flex items-center gap-3 rounded-xl p-3 hover:bg-neutral-50">
                     <span class="text-xl">⚙️</span>
                     <span class="text-sm text-neutral-900">회원 정보 관리</span>

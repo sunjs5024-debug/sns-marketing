@@ -17,6 +17,13 @@ function makeChargeNumber(): string {
 }
 
 export default defineEventHandler(async (event) => {
+  // 포인트 충전 비활성화 (2026-06-14) — 계좌이체 전용 운영.
+  // 직접 API 호출도 차단. 되살리려면 아래 블록 제거.
+  throw createError({
+    statusCode: 403,
+    statusMessage: "포인트 충전 기능이 중단되었습니다. 주문은 계좌이체로 결제해주세요.",
+  });
+
   const userId = await requireUserId(event);
   const body = await readBody(event);
   const parsed = schema.safeParse(body);
