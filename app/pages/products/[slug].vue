@@ -147,9 +147,16 @@ const pending = ref(false);
 
 const unitPrice = computed(() => selectedOption.value?.price ?? product.value?.basePrice ?? 0);
 
+// 발주 매핑(externalServiceId) 없는 상품 = 오픈예정 (아직 주문 불가)
+const isComingSoon = computed(() => {
+  const opts = (product.value?.options ?? []) as Array<{ externalServiceId?: number | null }>;
+  return opts.length > 0 && opts.every((o) => o.externalServiceId == null);
+});
+
 const router = useRouter();
 
 async function handleAdd(mode: "cart" | "buy") {
+  if (isComingSoon.value) { feedback.value = "곧 오픈 예정인 상품입니다."; return; }
   feedback.value = null;
   pending.value = true;
   try {
@@ -274,23 +281,28 @@ async function handleAdd(mode: "cart" | "buy") {
 
         <p v-if="feedback" class="mt-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ feedback }}</p>
 
+        <!-- 오픈 예정 안내 -->
+        <div v-if="isComingSoon" class="mt-8 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          🔜 <b>오픈 예정 상품</b>입니다. 준비 중이며 곧 만나보실 수 있어요.
+        </div>
+
         <!-- 데스크탑: 인라인 구매 버튼 (모바일에선 sticky bottom bar 사용) -->
         <div class="mt-8 hidden gap-3 lg:flex">
           <button
             type="button"
-            :disabled="pending"
-            class="flex-1 rounded-full border border-neutral-300 bg-white py-3 text-sm text-neutral-900 hover:bg-neutral-50 disabled:opacity-60"
+            :disabled="pending || isComingSoon"
+            class="flex-1 rounded-full border border-neutral-300 bg-white py-3 text-sm text-neutral-900 hover:bg-neutral-50 disabled:opacity-60 disabled:cursor-not-allowed"
             @click="handleAdd('cart')"
           >
             장바구니
           </button>
           <button
             type="button"
-            :disabled="pending"
-            class="flex-[2] rounded-full bg-neutral-900 py-3 text-sm text-white hover:bg-neutral-700 disabled:opacity-60"
+            :disabled="pending || isComingSoon"
+            class="flex-[2] rounded-full bg-neutral-900 py-3 text-sm text-white hover:bg-neutral-700 disabled:opacity-60 disabled:cursor-not-allowed"
             @click="handleAdd('buy')"
           >
-            {{ pending ? "처리 중…" : "바로 구매하기" }}
+            {{ isComingSoon ? "오픈 예정" : pending ? "처리 중…" : "바로 구매하기" }}
           </button>
         </div>
 
@@ -303,16 +315,16 @@ async function handleAdd(mode: "cart" | "buy") {
             </div>
             <button
               type="button"
-              :disabled="pending"
-              class="rounded-full border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 hover:bg-neutral-50 disabled:opacity-60"
+              :disabled="pending || isComingSoon"
+              class="rounded-full border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 hover:bg-neutral-50 disabled:opacity-60 disabled:cursor-not-allowed"
               @click="handleAdd('cart')"
             >🛒</button>
             <button
               type="button"
-              :disabled="pending"
-              class="flex-1 rounded-full bg-neutral-900 px-4 py-3 text-sm text-white hover:bg-neutral-700 disabled:opacity-60"
+              :disabled="pending || isComingSoon"
+              class="flex-1 rounded-full bg-neutral-900 px-4 py-3 text-sm text-white hover:bg-neutral-700 disabled:opacity-60 disabled:cursor-not-allowed"
               @click="handleAdd('buy')"
-            >{{ pending ? "처리 중…" : "바로 구매" }}</button>
+            >{{ isComingSoon ? "오픈 예정" : pending ? "처리 중…" : "바로 구매" }}</button>
           </div>
         </div>
       </div>
