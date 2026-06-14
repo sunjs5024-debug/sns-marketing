@@ -18,6 +18,8 @@ export type PlatformSlug =
   | "kakaotalk"
   | "x"
   | "telegram"
+  | "ably"
+  | "tistory"
   | "smartstore"
   | "naver-blog"
   | "naver-cafe";
@@ -105,6 +107,30 @@ export const PLATFORMS: Record<PlatformSlug, PlatformMeta> = {
     tagline: "채널 구독자·그룹 멤버·조회수",
     description: "텔레그램 채널 구독자, 그룹 멤버, 게시물 조회수까지. 글로벌·한국 타겟 모두 지원하며 빠른 처리가 강점입니다.",
   },
+  ably: {
+    slug: "ably",
+    name: "에이블리 마켓 마케팅",
+    shortName: "에이블리",
+    emoji: "🛍️",
+    platform: "SNS",
+    accent: "from-pink-500 to-rose-500",
+    bgGradient: "from-pink-50 via-rose-50 to-fuchsia-50",
+    tagline: "찜·소식받기로 마켓 활성화",
+    description:
+      "에이블리 마켓의 상품 찜과 소식받기(팔로워)를 늘려 인기 마켓처럼 노출되도록 돕습니다. 단골 고객 기반과 구매 전환을 키워보세요.",
+  },
+  tistory: {
+    slug: "tistory",
+    name: "티스토리 블로그 마케팅",
+    shortName: "티스토리",
+    emoji: "✍️",
+    platform: "SNS",
+    accent: "from-orange-500 to-red-500",
+    bgGradient: "from-orange-50 via-amber-50 to-red-50",
+    tagline: "조회수·공감·구독자 부스팅",
+    description:
+      "티스토리 블로그의 조회수, 공감, 구독자를 자연스럽게 늘려 글 노출과 채널 영향력을 키웁니다. 블로그 성장의 첫 단추를 빠르게 채워드립니다.",
+  },
   smartstore: {
     slug: "smartstore",
     name: "스마트스토어 상위노출",
@@ -150,6 +176,8 @@ export const SNS_PLATFORMS: PlatformSlug[] = [
   "tiktok",
   "x",
   "telegram",
+  "tistory",
+  "ably",
 ];
 export const RANK_PLATFORMS: PlatformSlug[] = [];
 
@@ -168,6 +196,8 @@ export function platformKeyFor(categorySlug: string): PlatformSlug | null {
   if (categorySlug.startsWith("kakaotalk")) return "kakaotalk";
   if (categorySlug.startsWith("x-")) return "x";
   if (categorySlug.startsWith("telegram")) return "telegram";
+  if (categorySlug.startsWith("ably")) return "ably";
+  if (categorySlug.startsWith("tistory")) return "tistory";
   if (categorySlug.startsWith("smartstore")) return "smartstore";
   if (categorySlug.startsWith("naver-blog")) return "naver-blog";
   if (categorySlug.startsWith("naver-cafe")) return "naver-cafe";
