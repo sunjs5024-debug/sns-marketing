@@ -84,6 +84,17 @@ const uid = computed(() => `${props.kind}-${props.size}-${Math.random().toString
       />
     </template>
 
+    <template v-else-if="kind === 'ably'">
+      <rect width="32" height="32" rx="9" fill="#FA2D55" />
+      <text x="16" y="22.5" font-size="18" font-weight="800" text-anchor="middle" fill="white" font-family="Arial, Helvetica, sans-serif">a</text>
+    </template>
+
+    <template v-else-if="kind === 'tistory'">
+      <rect width="32" height="32" rx="9" fill="#ED5F26" />
+      <rect x="9" y="9.2" width="14" height="3.3" rx="1.4" fill="white" />
+      <rect x="14.35" y="9.2" width="3.3" height="13.6" rx="1.4" fill="white" />
+    </template>
+
     <template v-else-if="kind === 'smartstore'">
       <path
         d="M7 11h18l-1.6 15a2.4 2.4 0 0 1-2.4 2.2H11a2.4 2.4 0 0 1-2.4-2.2L7 11z"
