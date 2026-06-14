@@ -109,10 +109,13 @@ const route = useRoute();
 const router = useRouter();
 const showWelcome = ref(false);
 onMounted(() => {
-  if (route.query.welcome === "1") {
+  // 이메일 가입 → ?welcome=1 쿼리 / OAuth 가입 → localStorage(snsf_welcome) 둘 다 처리
+  const fromQuery = route.query.welcome === "1";
+  const fromStorage = localStorage.getItem("snsf_welcome") === "1";
+  if (fromQuery || fromStorage) {
     showWelcome.value = true;
-    // URL 정리 (welcome 쿼리 제거) — 새로고침 시 다시 안 뜨게
-    router.replace({ query: {} });
+    localStorage.removeItem("snsf_welcome");
+    if (fromQuery) router.replace({ query: {} }); // URL 정리 — 새로고침 시 다시 안 뜨게
   }
 });
 </script>
