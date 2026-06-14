@@ -69,11 +69,14 @@ export async function dispatchOrderToProviders(orderId: string): Promise<{
     }
 
     // urpanel 발주 시도
+    // ⚠️ urpanel 에 보낼 수량 = 옵션의 실제 작업수량(예: 좋아요 25개) × 구매 묶음수(item.quantity)
+    //    item.quantity 는 "몇 개 묶음을 샀나"라서 그대로 보내면 안 됨 (옵션 수량 곱해야 함)
+    const smmQuantity = (item.option?.quantity ?? 1) * item.quantity;
     try {
       const res = await addUrpanelOrder({
         service: serviceId,
         link: item.targetUrl,
-        quantity: item.quantity,
+        quantity: smmQuantity,
       });
 
       if (typeof res.order === "number" || typeof res.order === "string") {
