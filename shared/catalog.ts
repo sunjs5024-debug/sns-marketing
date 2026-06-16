@@ -20,6 +20,7 @@ export type PlatformSlug =
   | "telegram"
   | "ably"
   | "tistory"
+  | "kmong"
   | "smartstore"
   | "naver-blog"
   | "naver-cafe";
@@ -131,6 +132,18 @@ export const PLATFORMS: Record<PlatformSlug, PlatformMeta> = {
     description:
       "티스토리 블로그의 조회수, 공감, 구독자를 자연스럽게 늘려 글 노출과 채널 영향력을 키웁니다. 블로그 성장의 첫 단추를 빠르게 채워드립니다.",
   },
+  kmong: {
+    slug: "kmong",
+    name: "크몽 전문가 마케팅",
+    shortName: "크몽",
+    emoji: "💼",
+    platform: "SNS",
+    accent: "from-lime-400 to-green-500",
+    bgGradient: "from-lime-50 via-green-50 to-emerald-50",
+    tagline: "찜·팔로워·리뷰로 전문가 노출",
+    description:
+      "크몽 전문가 서비스의 찜(관심), 전문가 팔로워, 구매 리뷰, 서비스 조회수를 자연스럽게 늘려 인기 전문가처럼 상단에 노출되도록 돕습니다. 프리랜서·전문가 마켓에서 신뢰도와 구매 전환을 키워 의뢰 문의를 늘려보세요.",
+  },
   smartstore: {
     slug: "smartstore",
     name: "스마트스토어 상위노출",
@@ -176,10 +189,34 @@ export const SNS_PLATFORMS: PlatformSlug[] = [
   "tiktok",
   "x",
   "telegram",
+];
+// 플랫폼 마케팅 — SNS(소셜미디어)가 아닌 블로그/쇼핑몰 등. SNS 레인과 분리 노출(/marketing)
+// 별도 SMM 패널 연동 예정. 네이버블로그/스마트스토어 추가 시 여기로.
+export const MARKETING_PLATFORMS: PlatformSlug[] = [
   "tistory",
   "ably",
+  "kmong",
 ];
 export const RANK_PLATFORMS: PlatformSlug[] = [];
+
+// 사이트 레인(상단 카테고리 구분) — 라우트 경로 base 와 동일하게 유지
+export type Lane = "sns" | "rank" | "marketing";
+export const LANE_META: Record<Lane, { label: string; path: string }> = {
+  sns: { label: "SNS 마케팅", path: "/sns" },
+  rank: { label: "상위노출", path: "/rank" },
+  marketing: { label: "플랫폼 마케팅", path: "/marketing" },
+};
+
+// 플랫폼/카테고리가 어느 레인에 속하는지 판정 — DB enum이 아닌 catalog 가 단일 출처
+export function laneForPlatform(slug: PlatformSlug): Lane {
+  if (MARKETING_PLATFORMS.includes(slug)) return "marketing";
+  if (PLATFORMS[slug]?.platform === "RANK") return "rank";
+  return "sns";
+}
+export function laneForCategorySlug(categorySlug: string): Lane {
+  const key = platformKeyFor(categorySlug);
+  return key ? laneForPlatform(key) : "sns";
+}
 
 export function isValidPlatformSlug(slug: string): slug is PlatformSlug {
   return slug in PLATFORMS;
@@ -198,6 +235,7 @@ export function platformKeyFor(categorySlug: string): PlatformSlug | null {
   if (categorySlug.startsWith("telegram")) return "telegram";
   if (categorySlug.startsWith("ably")) return "ably";
   if (categorySlug.startsWith("tistory")) return "tistory";
+  if (categorySlug.startsWith("kmong")) return "kmong";
   if (categorySlug.startsWith("smartstore")) return "smartstore";
   if (categorySlug.startsWith("naver-blog")) return "naver-blog";
   if (categorySlug.startsWith("naver-cafe")) return "naver-cafe";

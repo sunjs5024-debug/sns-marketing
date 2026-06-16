@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PLATFORMS, SNS_PLATFORMS, RANK_PLATFORMS, platformKeyFor, CONTACT } from "#shared/catalog";
+import { PLATFORMS, SNS_PLATFORMS, MARKETING_PLATFORMS, RANK_PLATFORMS, platformKeyFor, CONTACT } from "#shared/catalog";
 
 const { data: featured } = await useFetch("/api/products/featured");
 const { data: live } = await useFetch("/api/live");
@@ -66,7 +66,8 @@ const FAQS = [
 // 메인 페이지는 가장 중요한 랜딩. 한국어 검색 핵심 키워드 자연스럽게 포함.
 useSeoMeta({
   // seo-utils 가 자동으로 " | SNS소셜팩토리" 를 뒤에 붙여줌 → title 본문엔 브랜드 제외
-  title: "SNS 마케팅 1번지 — 인스타·유튜브·틱톡·텔레그램",
+  // 검색 핵심 키워드(인스타 팔로워 구매·좋아요)를 앞에 배치 — SERP 클릭·노출 유리
+  title: "인스타 팔로워 구매·좋아요 늘리기 — SNS마케팅 1번지",
   description:
     "인스타 팔로워·좋아요·스토리, 유튜브 구독자·시청시간·쇼츠, 틱톡 팔로워·공유, X 리트윗, 텔레그램 리액션까지. 한국인 실계정·글로벌 가성비 옵션, 10분 내 빠른 시작, 결과보고서 보장.",
   ogTitle: "SNS 마케팅 1번지 | SNS소셜팩토리",
@@ -175,6 +176,7 @@ onMounted(async () => {
       <SectionTitle eyebrow="CATEGORY" title="어떤 마케팅이 필요하신가요?" description="플랫폼별 전문 상품으로 빠르게 시작하세요. 카테고리 클릭 시 상세 상품을 확인할 수 있습니다." />
       <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <PlatformCard v-for="slug in SNS_PLATFORMS" :key="slug" :platform="PLATFORMS[slug]" base="sns" />
+        <PlatformCard v-for="slug in MARKETING_PLATFORMS" :key="slug" :platform="PLATFORMS[slug]" base="marketing" />
         <PlatformCard v-for="slug in RANK_PLATFORMS" :key="slug" :platform="PLATFORMS[slug]" base="rank" />
       </div>
     </section>

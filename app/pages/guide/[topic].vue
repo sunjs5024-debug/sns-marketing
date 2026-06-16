@@ -8,8 +8,12 @@ const guide = getGuide(topic.value);
 if (!guide) throw createError({ statusCode: 404, statusMessage: "가이드를 찾을 수 없습니다." });
 
 // SEO 메타 — 키워드 페이지 최우선
+// 전역 titleTemplate(seo-utils)가 " | SNS소셜팩토리"를 자동으로 덧붙이므로
+// title 본문엔 브랜드를 제외해 중복 브랜딩·길이초과를 막는다. ogTitle엔 브랜드 유지.
+const titleBody = guide.title.replace(/\s*\|\s*SNS소셜팩토리\s*$/, "");
+
 useSeoMeta({
-  title: guide.title,
+  title: titleBody,
   description: guide.metaDescription,
   keywords: guide.keywords,
   ogTitle: guide.title,
@@ -91,8 +95,7 @@ useSchemaOrg([
 
     <!-- header -->
     <header class="mt-4">
-      <p class="text-xs uppercase tracking-widest text-indigo-700">GUIDE · SEO</p>
-      <h1 class="mt-2 font-display text-3xl tracking-tight text-neutral-900 sm:text-4xl lg:text-[2.5rem] text-balance leading-[1.25]">
+      <h1 class="font-display text-3xl tracking-tight text-neutral-900 sm:text-4xl lg:text-[2.5rem] text-balance leading-[1.25]">
         {{ guide.h1 }}
       </h1>
       <p class="mt-4 text-sm leading-7 text-neutral-700 sm:text-base">{{ guide.intro }}</p>

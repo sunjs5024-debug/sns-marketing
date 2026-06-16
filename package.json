@@ -13,6 +13,7 @@
     "restart": "pm2 restart sns-factory --update-env",
     "logs": "pm2 logs sns-factory",
     "status": "pm2 status",
+    "seo:smoke": "node scripts/seo-smoke.mjs",
     "deploy": "npm run build && pm2 restart sns-factory --update-env"
   },
   "dependencies": {

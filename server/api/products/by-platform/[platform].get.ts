@@ -1,6 +1,7 @@
 import type { Prisma } from "~~/generated/prisma/client";
 import type { Badge } from "~~/generated/prisma/enums";
 import { prisma } from "../../../utils/prisma";
+import { isDbUnavailable, throwDbUnavailable } from "../../../utils/db";
 
 // 정렬 키 → Prisma orderBy
 const SORT_MAP: Record<string, Prisma.ProductOrderByWithRelationInput[]> = {
@@ -38,12 +39,18 @@ export default defineEventHandler(async (event) => {
     ...(priceKey ? { basePrice: PRICE_RANGES[priceKey]! } : {}),
   };
 
-  return prisma.product.findMany({
-    where,
-    include: {
-      category: true,
-      _count: { select: { options: true } },
-    },
-    orderBy: SORT_MAP[sortKey],
-  });
+  try {
+    return await prisma.product.findMany({
+      where,
+      include: {
+        category: true,
+        _count: { select: { options: true } },
+      },
+      orderBy: SORT_MAP[sortKey],
+    });
+  } catch (e) {
+    // DB 장애 시 빈 배열(=상품 0개)로 200을 주지 않는다 → 503. 카테고리 페이지가 503을 보존하도록.
+    if (isDbUnavailable(e)) throwDbUnavailable(event, e);
+    throw e;
+  }
 });

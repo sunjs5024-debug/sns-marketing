@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SNS_PLATFORMS, RANK_PLATFORMS, PLATFORMS, type PlatformSlug } from "#shared/catalog";
+import { SNS_PLATFORMS, RANK_PLATFORMS, MARKETING_PLATFORMS, PLATFORMS, type PlatformSlug } from "#shared/catalog";
 
 // sidebase의 useAuth() 는 SSR 중 재귀 이슈가 있어 자체 API로 우회
 const { data: header, refresh: refreshHeader } = await useFetch("/api/header", {
@@ -54,6 +54,12 @@ const rankItems: DropItem[] = RANK_PLATFORMS.map((s) => ({
   slug: s,
   desc: PLATFORMS[s].tagline,
 }));
+const marketingItems: DropItem[] = MARKETING_PLATFORMS.map((s) => ({
+  href: `/marketing/${s}`,
+  label: PLATFORMS[s].shortName,
+  slug: s,
+  desc: PLATFORMS[s].tagline,
+}));
 </script>
 
 <template>
@@ -96,6 +102,31 @@ const rankItems: DropItem[] = RANK_PLATFORMS.map((s) => ({
               <div class="w-80 rounded-2xl border border-neutral-100 bg-white p-2 shadow-xl">
                 <NuxtLink
                   v-for="item in snsItems"
+                  :key="item.href"
+                  :to="item.href"
+                  class="flex items-start gap-3 rounded-xl p-3 hover:bg-neutral-50"
+                >
+                  <BrandIcon :kind="item.slug" :size="32" />
+                  <span class="flex flex-col">
+                    <span class="text-neutral-900">{{ item.label }}</span>
+                    <span class="text-xs text-neutral-500">{{ item.desc }}</span>
+                  </span>
+                </NuxtLink>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="marketingItems.length > 0" class="group relative">
+            <NuxtLink to="/marketing" class="inline-flex items-center gap-1 rounded-md px-3 py-2 hover:bg-neutral-100 whitespace-nowrap">
+              플랫폼 마케팅
+              <svg class="h-3 w-3" viewBox="0 0 12 12" fill="none">
+                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </NuxtLink>
+            <div class="invisible absolute left-0 top-full pt-2 opacity-0 transition-all group-hover:visible group-hover:opacity-100">
+              <div class="w-80 rounded-2xl border border-neutral-100 bg-white p-2 shadow-xl">
+                <NuxtLink
+                  v-for="item in marketingItems"
                   :key="item.href"
                   :to="item.href"
                   class="flex items-start gap-3 rounded-xl p-3 hover:bg-neutral-50"
@@ -226,6 +257,20 @@ const rankItems: DropItem[] = RANK_PLATFORMS.map((s) => ({
                   <BrandIcon :kind="item.slug" :size="28" />
                   <span class="text-sm text-neutral-900">{{ item.label }}</span>
                 </NuxtLink>
+
+                <!-- 플랫폼 마케팅 섹션 -->
+                <template v-if="marketingItems.length > 0">
+                  <p class="mt-4 px-3 pb-2 text-[11px] uppercase tracking-widest text-neutral-400">플랫폼 마케팅</p>
+                  <NuxtLink
+                    v-for="item in marketingItems"
+                    :key="item.href"
+                    :to="item.href"
+                    class="flex items-center gap-3 rounded-xl p-3 hover:bg-neutral-50"
+                  >
+                    <BrandIcon :kind="item.slug" :size="28" />
+                    <span class="text-sm text-neutral-900">{{ item.label }}</span>
+                  </NuxtLink>
+                </template>
 
                 <!-- 일반 메뉴 -->
                 <p class="mt-4 px-3 pb-2 text-[11px] uppercase tracking-widest text-neutral-400">정보</p>

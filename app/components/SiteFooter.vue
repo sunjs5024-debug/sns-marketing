@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { SNS_PLATFORMS, RANK_PLATFORMS, PLATFORMS, CONTACT } from "#shared/catalog";
+import { SNS_PLATFORMS, RANK_PLATFORMS, MARKETING_PLATFORMS, PLATFORMS, CONTACT } from "#shared/catalog";
 
 const snsCol = SNS_PLATFORMS.map((s) => ({ href: `/sns/${s}`, label: PLATFORMS[s].shortName }));
+const marketingCol = MARKETING_PLATFORMS.map((s) => ({ href: `/marketing/${s}`, label: PLATFORMS[s].shortName }));
 const rankCol = RANK_PLATFORMS.map((s) => ({ href: `/rank/${s}`, label: PLATFORMS[s].shortName }));
 const helpCol = [
   { href: "/guide", label: "이용안내" },
@@ -44,6 +45,16 @@ const year = new Date().getFullYear();
           <h4 class="mb-3 text-sm text-neutral-900">SNS 마케팅</h4>
           <ul class="space-y-2 text-sm text-neutral-600">
             <li v-for="i in snsCol" :key="i.href">
+              <NuxtLink :to="i.href" class="inline-block py-0.5 hover:text-neutral-900">{{ i.label }}</NuxtLink>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 플랫폼 마케팅 (있을 때만) -->
+        <div v-if="marketingCol.length > 0">
+          <h4 class="mb-3 text-sm text-neutral-900">플랫폼 마케팅</h4>
+          <ul class="space-y-2 text-sm text-neutral-600">
+            <li v-for="i in marketingCol" :key="i.href">
               <NuxtLink :to="i.href" class="inline-block py-0.5 hover:text-neutral-900">{{ i.label }}</NuxtLink>
             </li>
           </ul>

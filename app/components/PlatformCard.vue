@@ -3,7 +3,7 @@ import type { PlatformMeta } from "#shared/catalog";
 
 defineProps<{
   platform: PlatformMeta;
-  base: "sns" | "rank";
+  base: "sns" | "rank" | "marketing";
 }>();
 </script>
 

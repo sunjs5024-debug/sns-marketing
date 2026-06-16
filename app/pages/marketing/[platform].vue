@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { PLATFORMS, SNS_PLATFORMS, isValidPlatformSlug, platformKeyFor } from "#shared/catalog";
+import { PLATFORMS, MARKETING_PLATFORMS, isValidPlatformSlug, platformKeyFor } from "#shared/catalog";
 
 const route = useRoute();
 const platformParam = computed(() => String(route.params.platform));
 
-if (!isValidPlatformSlug(platformParam.value) || !SNS_PLATFORMS.includes(platformParam.value)) {
+if (!isValidPlatformSlug(platformParam.value) || !MARKETING_PLATFORMS.includes(platformParam.value)) {
   throw createError({ statusCode: 404, statusMessage: "Not Found" });
 }
 
@@ -28,12 +28,12 @@ useSchemaOrg([
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "홈", item: "https://xn--sns-yg9lh0pw9l.kr/" },
-      { "@type": "ListItem", position: 2, name: "SNS 마케팅", item: "https://xn--sns-yg9lh0pw9l.kr/sns" },
+      { "@type": "ListItem", position: 2, name: "플랫폼 마케팅", item: "https://xn--sns-yg9lh0pw9l.kr/marketing" },
       {
         "@type": "ListItem",
         position: 3,
         name: meta.shortName,
-        item: `https://xn--sns-yg9lh0pw9l.kr/sns/${meta.slug}`,
+        item: `https://xn--sns-yg9lh0pw9l.kr/marketing/${meta.slug}`,
       },
     ],
   },
@@ -67,7 +67,6 @@ const { data: products, error: productsError } = await useFetch(
 );
 
 // 카테고리 API가 5xx(DB 장애 등)면 "상품 0개"를 200으로 렌더하지 않고 상태코드를 보존한다.
-// (정상 빈 카테고리는 error 없이 빈 배열이므로 여기 걸리지 않음)
 if (productsError.value) {
   throw createError({
     statusCode: productsError.value.statusCode ?? 503,
@@ -100,7 +99,7 @@ const stats = computed(() => {
             <BrandIcon :kind="meta.slug" :size="56" class="drop-shadow-xl sm:[--size:72px]" />
           </div>
           <div>
-            <p class="text-[10px] uppercase tracking-widest text-neutral-600 sm:text-xs">SNS MARKETING</p>
+            <p class="text-[10px] uppercase tracking-widest text-neutral-600 sm:text-xs">PLATFORM MARKETING</p>
             <h1 class="font-display text-2xl text-neutral-900 sm:text-4xl">{{ meta.name }}</h1>
           </div>
         </div>

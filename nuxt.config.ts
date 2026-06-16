@@ -18,13 +18,15 @@ export default defineNuxtConfig({
 
   // 검색엔진 색인 정책 — 운영 도메인은 색인 허용, 그 외 차단
   robots: {
-    // /admin/*, /cart, /checkout/*, /orders/*, /auth/* 는 크롤링 차단
-    disallow: ["/admin", "/admin/", "/cart", "/checkout", "/checkout/", "/orders", "/orders/", "/auth"],
+    // /admin/*, /cart, /checkout/*, /orders/*, /auth/*, /mypage/* 는 크롤링 차단 (비공개·인증 영역)
+    disallow: ["/admin", "/admin/", "/cart", "/checkout", "/checkout/", "/orders", "/orders/", "/auth", "/mypage"],
   },
 
-  // sitemap.xml 자동 생성 — 비공개 페이지는 제외, 동적 라우트는 sources 로 주입
+  // sitemap.xml 자동 생성 — 비공개·리다이렉트 페이지는 제외, 동적 라우트는 sources 로 주입
+  // /mypage/**(인증 전용)·/rank(/sns 로 301) 는 indexable 200 이 아니므로 사이트맵에서 제외
   sitemap: {
-    exclude: ["/admin/**", "/cart", "/checkout/**", "/orders/**", "/auth/**"],
+    // /search 는 noindex,follow(검색 결과 페이지) → 사이트맵 제외
+    exclude: ["/admin/**", "/cart", "/checkout/**", "/orders/**", "/auth/**", "/mypage/**", "/rank", "/rank/**", "/search"],
     sources: ["/api/__sitemap__/urls"],
   },
 

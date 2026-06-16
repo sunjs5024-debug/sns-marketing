@@ -6,14 +6,9 @@ useSeoMeta({
   robots: "noindex, nofollow",
 });
 
-if (import.meta.server) {
-  // 서버: 301 영구 리다이렉트
-  setResponseStatus(useRequestEvent()!, 301);
-  setResponseHeader(useRequestEvent()!, "Location", "/sns");
-}
-if (import.meta.client) {
-  navigateTo("/sns", { replace: true, redirectCode: 301 });
-}
+// SNS로 301 영구 리다이렉트 — navigateTo는 서버(301 응답)·클라이언트 모두에서 동작.
+// (이전엔 h3 유틸 setResponseHeader를 앱 컨텍스트에서 호출해 "not defined" 500 발생)
+await navigateTo("/sns", { replace: true, redirectCode: 301 });
 </script>
 
 <template>

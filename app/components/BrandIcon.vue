@@ -93,6 +93,11 @@ const uid = computed(() => `${props.kind}-${props.size}-${Math.random().toString
       <image href="/img/tistory-logo.svg" x="0" y="0" width="32" height="32" />
     </template>
 
+    <template v-else-if="kind === 'kmong'">
+      <rect width="32" height="32" rx="9" fill="#92F972" />
+      <text x="16" y="24" font-size="22" font-weight="800" text-anchor="middle" fill="#0A0A0A" font-family="Arial, Helvetica, sans-serif">k</text>
+    </template>
+
     <template v-else-if="kind === 'smartstore'">
       <path
         d="M7 11h18l-1.6 15a2.4 2.4 0 0 1-2.4 2.2H11a2.4 2.4 0 0 1-2.4-2.2L7 11z"

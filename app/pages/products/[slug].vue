@@ -1,11 +1,17 @@
 <script setup lang="ts">
-import { formatPrice, platformKeyFor, CONTACT } from "#shared/catalog";
+import { formatPrice, platformKeyFor, laneForCategorySlug, LANE_META, CONTACT } from "#shared/catalog";
 
 const route = useRoute();
 const slug = computed(() => String(route.params.slug));
 
-const { data: product } = await useFetch(`/api/products/${slug.value}`);
-if (!product.value) throw createError({ statusCode: 404 });
+const { data: product, error } = await useFetch(`/api/products/${slug.value}`);
+// API가 진짜 404(없음/판매중지)일 때만 404. DB 오류 등 5xx는 상태를 보존해야
+// 일시 장애가 soft-404로 검색엔진에 잘못 색인 제거되는 것을 막는다.
+if (error.value) {
+  const code = error.value.statusCode ?? 500;
+  throw createError({ statusCode: code, statusMessage: error.value.statusMessage ?? "오류" });
+}
+if (!product.value) throw createError({ statusCode: 404, statusMessage: "Not found" });
 
 // 관련 상품 (같은 카테고리 + 같은 플랫폼 다른 카테고리)
 type RelatedProduct = {
@@ -52,7 +58,8 @@ const metaDesc = computed(() => {
 });
 
 useSeoMeta({
-  title: `${product.value.name} | SNS소셜팩토리`,
+  // 전역 titleTemplate(seo-utils)가 " | SNS소셜팩토리"를 자동으로 덧붙임 → 본문엔 브랜드 제외(중복 방지)
+  title: product.value.name,
   description: metaDesc.value,
   keywords: product.value.keywords ?? undefined,
   ogTitle: `${product.value.name} | SNS소셜팩토리`,
@@ -63,8 +70,10 @@ useSeoMeta({
 
 // 구조화 데이터 — Product + AggregateRating + Offer + BreadcrumbList
 // → 구글 검색 결과에 별점·가격 리치 스니펫 노출 유도
-const sectionLabel = product.value.category.platform === "SNS" ? "SNS 마케팅" : "상위노출";
-const sectionPath = product.value.category.platform === "SNS" ? "/sns" : "/rank";
+// 레인(SNS/플랫폼 마케팅/상위노출)은 카테고리 슬러그 기준 — DB enum 보다 catalog 가 우선
+const lane = laneForCategorySlug(product.value.category.slug);
+const sectionLabel = LANE_META[lane].label;
+const sectionPath = LANE_META[lane].path;
 
 // FAQ 파싱 — DB Json 필드
 type Faq = { q: string; a: string };
@@ -194,7 +203,7 @@ async function handleAdd(mode: "cart" | "buy") {
   <div v-if="product" class="mx-auto max-w-7xl px-4 py-6 pb-24 sm:px-6 sm:py-10 lg:px-8 lg:pb-10">
     <nav class="mb-6 text-xs text-neutral-500">
       <span>홈</span> <span class="mx-1">/</span>
-      <span>{{ product.category.platform === "SNS" ? "SNS 마케팅" : "상위노출" }}</span>
+      <span>{{ sectionLabel }}</span>
       <span class="mx-1">/</span>
       <span class="text-neutral-900">{{ product.category.name }}</span>
     </nav>
@@ -337,6 +346,9 @@ async function handleAdd(mode: "cart" | "buy") {
       </div>
     </section>
 
+    <!-- 이용 안내 — 진행 방식·주의사항·안전 이용 (플랫폼별 공통 본문) -->
+    <ProductUsageGuide :platform-key="platformKeyFor(product.category.slug)" />
+
     <section v-if="faqs.length > 0" class="mt-12">
       <h2 class="font-display text-xl text-neutral-900">자주 묻는 질문</h2>
       <div class="mt-4 divide-y divide-neutral-100 rounded-3xl border border-neutral-100 bg-white">
@@ -392,7 +404,7 @@ async function handleAdd(mode: "cart" | "buy") {
         </div>
         <NuxtLink
           v-if="product?.category"
-          :to="`/sns/${product.category.slug.split('-')[0]}`"
+          :to="`${sectionPath}/${product.category.slug.split('-')[0]}`"
           class="hidden text-xs text-neutral-500 hover:text-neutral-900 sm:inline"
         >전체 보기 →</NuxtLink>
       </div>
