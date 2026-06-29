@@ -78,7 +78,10 @@ export default defineNuxtConfig({
   // @sidebase/nuxt-auth (Auth.js v5 호환)
   // SSR 시 sidebase 가 /session 무한 루프 → disableServerSideAuth 로 회피
   auth: {
-    baseURL: "/api/auth",
+    // ⚠️ Cloudflare Workers 는 워커 시작(init) 시점에 환경변수(AUTH_ORIGIN)를 읽지 못해
+    // sidebase 가 origin 을 못 찾고 AUTH_NO_ORIGIN 으로 죽는다.
+    // → origin 을 전체 URL 로 코드에 박아 빌드시 포함시킨다 (운영 도메인 고정).
+    baseURL: "https://xn--sns-yg9lh0pw9l.kr/api/auth",
     originEnvKey: "AUTH_ORIGIN",
     disableInternalRouting: true,
     disableServerSideAuth: true,
