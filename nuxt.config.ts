@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineNuxtConfig({
@@ -62,6 +63,11 @@ export default defineNuxtConfig({
       wasm: true,
       // 요청별 DB 클라이언트 캐싱(useEvent)을 위해 필요 — server/utils/prisma.ts 참고
       asyncContext: true,
+    },
+    alias: {
+      // @panva/hkdf 의 default export 가 엣지 번들 interop 에서 함수로 안 잡혀
+      // next-auth JWT 암호화(getDerivedEncryptionKey)가 죽는다 → Web Crypto 기반 shim 으로 교체.
+      "@panva/hkdf": fileURLToPath(new URL("./shims/hkdf.cjs", import.meta.url)),
     },
   },
 
