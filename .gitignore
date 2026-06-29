@@ -8,6 +8,11 @@ node_modules
 !.env.example
 .dev.vars
 .wrangler
+
+# package-lock 제외: Windows에서 생성한 lock 에는 리눅스용 네이티브 모듈(oxc-parser 등)이
+# 빠져 Cloudflare(리눅스) 빌드의 npm ci 가 실패함. lock 없이 npm install 로 빌드시켜
+# 플랫폼에 맞는 바이너리를 받게 한다. (npm bug #4828)
+package-lock.json
 dist
 *.log
 .DS_Store
