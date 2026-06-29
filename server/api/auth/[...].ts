@@ -12,6 +12,13 @@ const credSchema = z.object({
   password: z.string().min(8),
 });
 
+// next-auth v4 provider 는 번들 환경(CJS/ESM)에 따라 실제 함수가 m.default 에 있기도 하고 m 자체이기도 함.
+// node-server 빌드는 m.default, cloudflare ESM 번들은 m 자체 → 둘 다 처리.
+function resolveProvider<T>(m: T): T {
+  const d = (m as { default?: unknown }).default;
+  return (typeof d === "function" ? d : m) as T;
+}
+
 // OAuth provider 환경변수 누락 시 provider 자체를 빼는 헬퍼
 function oauthOrNull<T>(id: string | undefined, secret: string | undefined, factory: () => T): T | null {
   if (!id || !secret) return null;
@@ -20,16 +27,13 @@ function oauthOrNull<T>(id: string | undefined, secret: string | undefined, fact
 
 const oauthProviders = [
   oauthOrNull(process.env.KAKAO_CLIENT_ID, process.env.KAKAO_CLIENT_SECRET, () =>
-    // @ts-expect-error sidebase + next-auth v4 default export
-    KakaoProvider.default({ clientId: process.env.KAKAO_CLIENT_ID!, clientSecret: process.env.KAKAO_CLIENT_SECRET! }),
+    resolveProvider(KakaoProvider)({ clientId: process.env.KAKAO_CLIENT_ID!, clientSecret: process.env.KAKAO_CLIENT_SECRET! }),
   ),
   oauthOrNull(process.env.NAVER_CLIENT_ID, process.env.NAVER_CLIENT_SECRET, () =>
-    // @ts-expect-error
-    NaverProvider.default({ clientId: process.env.NAVER_CLIENT_ID!, clientSecret: process.env.NAVER_CLIENT_SECRET! }),
+    resolveProvider(NaverProvider)({ clientId: process.env.NAVER_CLIENT_ID!, clientSecret: process.env.NAVER_CLIENT_SECRET! }),
   ),
   oauthOrNull(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, () =>
-    // @ts-expect-error
-    GoogleProvider.default({ clientId: process.env.GOOGLE_CLIENT_ID!, clientSecret: process.env.GOOGLE_CLIENT_SECRET! }),
+    resolveProvider(GoogleProvider)({ clientId: process.env.GOOGLE_CLIENT_ID!, clientSecret: process.env.GOOGLE_CLIENT_SECRET! }),
   ),
 ].filter((p): p is NonNullable<typeof p> => p !== null);
 
@@ -37,8 +41,7 @@ export default NuxtAuthHandler({
   secret: useRuntimeConfig().authSecret,
   pages: { signIn: "/auth/signin" },
   providers: [
-    // @ts-expect-error sidebase + next-auth v4 default export
-    CredentialsProvider.default({
+    resolveProvider(CredentialsProvider)({
       name: "credentials",
       credentials: {
         email: { label: "이메일", type: "email" },

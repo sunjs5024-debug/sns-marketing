@@ -54,9 +54,15 @@ export default defineNuxtConfig({
     },
   },
 
-  // 이 PC 의 Apache 리버스 프록시 뒤에서 도는 Node 서버 (production)
+  // Cloudflare Pages 배포 (서버리스). 빌드 산출물은 ./dist/_worker.js
+  // experimental.wasm: Prisma driver adapter 의 query engine wasm(?module import) 번들링 허용
   nitro: {
-    preset: "node-server",
+    preset: "cloudflare_pages",
+    experimental: {
+      wasm: true,
+      // 요청별 DB 클라이언트 캐싱(useEvent)을 위해 필요 — server/utils/prisma.ts 참고
+      asyncContext: true,
+    },
   },
 
   css: ["~/assets/css/main.css"],
