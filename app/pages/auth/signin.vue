@@ -60,37 +60,12 @@ async function onSubmit() {
   }
 }
 
-async function social(provider: "kakao" | "naver" | "google") {
-  // next-auth OAuth 시작: 1) CSRF 받기 → 2) POST signin/{provider} → 3) 응답 url로 이동
-  // GET 으로 직접 호출하면 400. 반드시 POST + csrfToken 필요.
-  error.value = null;
+function social(provider: "kakao" | "naver" | "google") {
+  // 엣지용 수동 OAuth 시작 라우트로 이동 (server/api/oauth/[provider].get.ts).
+  // next-auth 의 OAuth(openid-client)는 Cloudflare 엣지에서 동작하지 않아 직접 처리.
   pending.value = true;
-  try {
-    const csrf = await $fetch<{ csrfToken: string }>("/api/auth/csrf");
-    const result = await $fetch<{ url: string }>(
-      `/api/auth/signin/${provider}?json=true`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          csrfToken: csrf.csrfToken,
-          callbackUrl: callbackUrl.value,
-          json: "true",
-        }).toString(),
-        credentials: "include",
-      },
-    );
-    if (result?.url) {
-      window.location.href = result.url;
-    } else {
-      error.value = "소셜 로그인 시작에 실패했습니다.";
-    }
-  } catch (e: unknown) {
-    console.error("[social signin]", e);
-    error.value = "소셜 로그인 중 오류가 발생했습니다.";
-  } finally {
-    pending.value = false;
-  }
+  const cb = encodeURIComponent(callbackUrl.value);
+  window.location.href = `/api/oauth/${provider}?callbackUrl=${cb}`;
 }
 </script>
 
