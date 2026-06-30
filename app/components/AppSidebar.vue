@@ -71,10 +71,14 @@ const comingSoon = [
       <!-- 로그인 / 회원가입 (또는 로그인 시 유저 정보) -->
       <div class="mb-4">
         <template v-if="header?.isAuthed">
-          <NuxtLink to="/mypage" class="block rounded-2xl bg-gradient-to-br from-indigo-50 to-pink-50 px-4 py-3">
-            <p class="truncate text-sm font-medium text-neutral-900">{{ header?.name }}</p>
-            <p class="mt-0.5 text-xs text-indigo-700">{{ (header?.points ?? 0).toLocaleString("ko-KR") }}P 보유</p>
-          </NuxtLink>
+          <div class="rounded-2xl bg-gradient-to-br from-indigo-50 to-pink-50 px-4 py-3">
+            <NuxtLink to="/mypage" class="flex items-center justify-between gap-2">
+              <span class="truncate text-sm font-medium text-neutral-900">{{ header?.name }}</span>
+              <span class="shrink-0 text-[11px] text-neutral-400">마이페이지 ›</span>
+            </NuxtLink>
+            <p class="mt-2 text-[11px] text-neutral-500">보유 잔액</p>
+            <p class="font-display text-lg text-neutral-900">{{ (header?.points ?? 0).toLocaleString("ko-KR") }}<span class="ml-0.5 text-sm">원</span></p>
+          </div>
           <div class="mt-2 grid grid-cols-2 gap-2">
             <NuxtLink to="/orders" class="rounded-xl border border-neutral-200 py-2 text-center text-xs text-neutral-700 hover:bg-neutral-50">내 주문</NuxtLink>
             <button type="button" class="rounded-xl border border-neutral-200 py-2 text-center text-xs text-neutral-500 hover:bg-neutral-50" @click="onSignOut">로그아웃</button>

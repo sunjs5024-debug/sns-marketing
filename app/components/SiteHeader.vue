@@ -123,7 +123,7 @@ const marketingItems: DropItem[] = MARKETING_PLATFORMS.map((s) => ({
           >
             <span class="max-w-[5rem] sm:max-w-[7rem] truncate">{{ header?.name }}</span>
             <span class="hidden sm:inline text-neutral-400">·</span>
-            <span class="hidden sm:inline text-indigo-600">{{ (header?.points ?? 0).toLocaleString("ko-KR") }}P</span>
+            <span class="hidden sm:inline text-indigo-600">{{ (header?.points ?? 0).toLocaleString("ko-KR") }}원</span>
           </NuxtLink>
           <NuxtLink v-if="header?.role === 'ADMIN'" to="/admin" class="hidden sm:inline-flex rounded-full bg-amber-100 px-3 py-2 text-xs text-amber-800 hover:bg-amber-200 whitespace-nowrap">관리자</NuxtLink>
           <button type="button" class="hidden sm:inline-flex rounded-full px-3 py-2 text-neutral-500 hover:bg-neutral-100 whitespace-nowrap" @click="onSignOut">로그아웃</button>
@@ -171,7 +171,7 @@ const marketingItems: DropItem[] = MARKETING_PLATFORMS.map((s) => ({
               <!-- 사용자 정보 (로그인 시) -->
               <div v-if="header?.isAuthed" class="border-b border-neutral-100 bg-gradient-to-br from-indigo-50 to-pink-50 px-5 py-4">
                 <p class="font-display text-base text-neutral-900">{{ header?.name }}</p>
-                <p class="mt-0.5 text-xs text-indigo-700">{{ (header?.points ?? 0).toLocaleString("ko-KR") }}P 보유</p>
+                <p class="mt-0.5 text-xs text-indigo-700">보유 잔액 {{ (header?.points ?? 0).toLocaleString("ko-KR") }}원</p>
               </div>
 
               <!-- 메뉴 -->
