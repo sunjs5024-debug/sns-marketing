@@ -166,6 +166,7 @@ function onOAuthSignIn(provider: "kakao" | "naver" | "google") {
       <label class="block">
         <span class="text-sm text-neutral-700">비밀번호</span>
         <input v-model="password" type="password" required minlength="8" autocomplete="new-password" placeholder="8자 이상" class="mt-1 block w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm focus:border-neutral-900 focus:outline-none" />
+        <p class="mt-1 text-[11px] text-neutral-400">비밀번호는 <b>8자 이상</b> 입력해주세요. (영문·숫자 조합 권장)</p>
         <!-- 비밀번호 강도 표시 -->
         <div v-if="password.length > 0" class="mt-1.5 flex items-center gap-2">
           <div class="flex flex-1 gap-1">
@@ -208,6 +209,10 @@ function onOAuthSignIn(provider: "kakao" | "naver" | "google") {
       <button type="submit" :disabled="!canSubmit" class="mt-3 w-full rounded-xl bg-neutral-900 py-3 text-sm text-white hover:bg-neutral-700 disabled:cursor-not-allowed disabled:opacity-40">
         {{ pending ? "가입 처리 중…" : "가입하고 시작하기" }}
       </button>
+      <!-- 버튼이 비활성일 때 이유 안내 -->
+      <p v-if="!canSubmit && !pending" class="text-center text-[11px] text-neutral-400">
+        {{ password.length < 8 ? "비밀번호를 8자 이상 입력하면 가입 버튼이 활성화돼요." : "필수 약관(이용약관·개인정보)에 동의해주세요." }}
+      </p>
     </form>
 
     <p class="mt-6 text-sm text-neutral-600">

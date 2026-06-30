@@ -10,6 +10,24 @@ const password = ref("");
 const error = ref<string | null>(null);
 const pending = ref(false);
 
+// 로그인 에러코드 → 한글 안내. (소셜 로그인 실패 시 /auth/signin?error=코드 로 돌아옴)
+const ERROR_MESSAGES: Record<string, string> = {
+  CredentialsSignin: "이메일 또는 비밀번호가 올바르지 않습니다.",
+  OAuthState: "로그인 요청이 만료됐어요. 다시 시도해주세요.",
+  OAuthCallback: "소셜 로그인 처리 중 문제가 생겼어요. 다시 시도해주세요.",
+  OAuthSignin: "소셜 로그인을 시작할 수 없어요. 잠시 후 다시 시도해주세요.",
+  AccountDeleted: "탈퇴 처리된 계정이에요. 고객센터로 문의해주세요.",
+  OAuthAccountNotLinked: "이미 다른 방법으로 가입된 이메일이에요.",
+  AccessDenied: "접근 권한이 없어요.",
+  Configuration: "로그인 설정에 문제가 있어요. 관리자에게 알려주세요.",
+  default: "로그인 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.",
+};
+// 페이지 진입 시 쿼리의 에러코드를 한글로 표시
+const initialError = route.query.error;
+if (typeof initialError === "string" && initialError) {
+  error.value = ERROR_MESSAGES[initialError] ?? ERROR_MESSAGES.default;
+}
+
 const callbackUrl = computed(() => {
   const cb = route.query.callbackUrl;
   return typeof cb === "string" && cb.startsWith("/") ? cb : "/";
