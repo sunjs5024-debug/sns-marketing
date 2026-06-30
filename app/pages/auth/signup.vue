@@ -2,7 +2,6 @@
 useSeoMeta({ title: "회원가입", robots: "noindex, nofollow" });
 
 const route = useRoute();
-const { signIn } = useAuth();
 
 const email = ref("");
 const name = ref("");
@@ -65,17 +64,30 @@ async function onSubmit() {
         phone: phone.value || null,
       },
     });
-    const result = await signIn("credentials", {
-      email: email.value,
-      password: password.value,
-      redirect: false,
-    });
-    const err = (result as { error?: string } | undefined)?.error;
-    if (err) {
+    // 자동 로그인 — sidebase useAuth().signIn 은 엣지에서 provider 경로(/providers)를
+    // 잘못 찾아 404 가 나므로 next-auth credentials 콜백을 직접 호출 (signin.vue 와 동일).
+    const csrf = await $fetch<{ csrfToken: string }>("/api/auth/csrf", { credentials: "include" });
+    const result = await $fetch<{ url: string }>(
+      "/api/auth/callback/credentials?json=true",
+      {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          csrfToken: csrf.csrfToken,
+          email: email.value,
+          password: password.value,
+          callbackUrl: callbackUrl.value,
+          json: "true",
+        }).toString(),
+      },
+    );
+    const url = result?.url ?? "";
+    if (url.includes("error=") || url.includes("csrf=true") || url.includes("/api/auth/signin")) {
       error.value = "가입은 완료됐지만 자동 로그인에 실패했어요.";
       return;
     }
-    await navigateTo(callbackUrl.value);
+    window.location.href = callbackUrl.value;
   } catch (e: unknown) {
     const err = e as { data?: { statusMessage?: string }; statusMessage?: string };
     error.value = err.data?.statusMessage ?? err.statusMessage ?? "회원가입 실패";
@@ -84,9 +96,10 @@ async function onSubmit() {
   }
 }
 
-async function onOAuthSignIn(provider: "kakao" | "naver" | "google") {
-  // 환영 모달은 홈에서 서버(hasSeenWelcome)로 판단하므로 여기선 표시 안 남겨도 됨
-  await signIn(provider, { callbackUrl: callbackUrl.value });
+function onOAuthSignIn(provider: "kakao" | "naver" | "google") {
+  // 엣지용 수동 OAuth 시작 라우트로 이동 (signin.vue 와 동일)
+  pending.value = true;
+  window.location.href = `/api/oauth/${provider}?callbackUrl=${encodeURIComponent(callbackUrl.value)}`;
 }
 </script>
 
