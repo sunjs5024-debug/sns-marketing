@@ -1,0 +1,96 @@
+<script setup lang="ts">
+// 전역 왼쪽 사이드바 (데스크탑) — channelup 스타일.
+// 모든 상품을 미리 로드해 카테고리 클릭 시 로딩 없이 즉시 세부상품을 펼친다. 가격 미표시.
+import { SNS_PLATFORMS, MARKETING_PLATFORMS, PLATFORMS, platformKeyFor, type PlatformSlug } from "#shared/catalog";
+
+type NavProd = { slug: string; name: string; featured: boolean; categorySlug: string };
+
+// SSR 에서 미리 로드 → 초기 HTML 에 포함 → 펼칠 때 즉시 표시 (로딩 없음)
+const { data: navProducts } = await useFetch<NavProd[]>("/api/products/nav", {
+  key: "nav-products",
+  default: () => [],
+});
+
+// 플랫폼별 그룹핑
+const byPlatform = computed(() => {
+  const m: Record<string, { slug: string; name: string; featured: boolean }[]> = {};
+  for (const p of navProducts.value ?? []) {
+    const key = platformKeyFor(p.categorySlug);
+    if (!key) continue;
+    (m[key] ??= []).push({ slug: p.slug, name: p.name, featured: p.featured });
+  }
+  return m;
+});
+
+const groups = [
+  { label: "SNS 마케팅", slugs: SNS_PLATFORMS },
+  { label: "플랫폼 마케팅", slugs: MARKETING_PLATFORMS },
+].filter((g) => g.slugs.length > 0);
+
+function baseFor(slug: PlatformSlug): string {
+  return MARKETING_PLATFORMS.includes(slug) ? "marketing" : "sns";
+}
+
+// 기본으로 첫 SNS 플랫폼 1개 펼쳐둠 (여러 개 동시 펼침 허용)
+const open = ref<Set<string>>(new Set(SNS_PLATFORMS.length ? [SNS_PLATFORMS[0] as string] : []));
+function toggle(slug: PlatformSlug) {
+  const s = new Set(open.value);
+  s.has(slug) ? s.delete(slug) : s.add(slug);
+  open.value = s;
+}
+</script>
+
+<template>
+  <aside class="hidden lg:flex w-64 shrink-0 flex-col border-r border-neutral-100 bg-white">
+    <div class="sticky top-16 max-h-[calc(100vh-4rem)] overflow-y-auto px-3 py-4">
+      <template v-for="(g, gi) in groups" :key="g.label">
+        <p
+          class="px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-widest text-neutral-400"
+          :class="gi > 0 ? 'mt-4' : ''"
+        >
+          {{ g.label }}
+        </p>
+
+        <div v-for="slug in g.slugs" :key="slug">
+          <!-- 카테고리(플랫폼) -->
+          <button
+            type="button"
+            class="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition hover:bg-neutral-50"
+            :class="open.has(slug) ? 'bg-indigo-50/60' : ''"
+            @click="toggle(slug)"
+          >
+            <BrandIcon :kind="slug" :size="24" />
+            <span class="flex-1 text-sm font-medium text-neutral-900">{{ PLATFORMS[slug].shortName }}</span>
+            <svg
+              class="h-4 w-4 shrink-0 text-neutral-400 transition-transform"
+              :class="open.has(slug) ? 'rotate-180 text-indigo-600' : ''"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            >
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+
+          <!-- 세부상품 (즉시 표시) -->
+          <div v-show="open.has(slug)" class="mb-1 ml-4 border-l border-neutral-100 pl-2">
+            <NuxtLink
+              v-for="p in byPlatform[slug] ?? []"
+              :key="p.slug"
+              :to="`/products/${p.slug}`"
+              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px] text-neutral-600 transition hover:bg-neutral-50 hover:text-indigo-600"
+            >
+              <span class="min-w-0 flex-1 truncate">{{ p.name }}</span>
+              <span v-if="p.featured" class="shrink-0 rounded bg-rose-100 px-1 text-[9px] font-medium text-rose-600">인기</span>
+            </NuxtLink>
+            <p v-if="(byPlatform[slug] ?? []).length === 0" class="px-3 py-1.5 text-xs text-neutral-400">준비 중</p>
+            <NuxtLink
+              :to="`/${baseFor(slug)}/${slug}`"
+              class="block rounded-lg px-3 py-1.5 text-xs font-medium text-indigo-600 hover:bg-neutral-50"
+            >
+              전체 보기 →
+            </NuxtLink>
+          </div>
+        </div>
+      </template>
+    </div>
+  </aside>
+</template>

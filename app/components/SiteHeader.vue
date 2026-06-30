@@ -89,11 +89,9 @@ const marketingItems: DropItem[] = MARKETING_PLATFORMS.map((s) => ({
           <span>SNS소셜팩토리</span>
         </NuxtLink>
 
-        <!-- 데스크탑 네비게이션 — 드롭다운 없이 바로 클릭되는 직접 링크 (channelup 스타일) -->
+        <!-- 데스크탑 네비게이션 — 카테고리는 좌측 사이드바로 이동. 헤더엔 보조 메뉴만. -->
         <nav class="hidden lg:flex items-center gap-0.5 text-sm font-medium text-neutral-700 whitespace-nowrap">
-          <NuxtLink to="/sns" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">SNS 마케팅</NuxtLink>
-          <NuxtLink v-if="marketingItems.length > 0" to="/marketing" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">플랫폼 마케팅</NuxtLink>
-          <NuxtLink v-if="rankItems.length > 0" to="/rank" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">상위노출</NuxtLink>
+          <NuxtLink to="/sns" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">전체 상품</NuxtLink>
           <NuxtLink to="/reviews" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">후기</NuxtLink>
           <NuxtLink to="/guide" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">이용안내</NuxtLink>
         </nav>
