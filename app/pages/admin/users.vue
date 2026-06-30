@@ -88,7 +88,7 @@ async function toggleRole(u: User) {
             <th class="px-4 py-3 text-left">이메일</th>
             <th class="px-4 py-3 text-left">전화</th>
             <th class="px-4 py-3 text-left">주문</th>
-            <th class="px-4 py-3 text-left">포인트</th>
+            <th class="px-4 py-3 text-left">잔액</th>
             <th class="px-4 py-3 text-left">역할</th>
             <th class="px-4 py-3 text-right">관리</th>
           </tr>
@@ -112,7 +112,7 @@ async function toggleRole(u: User) {
                 />
               </template>
               <template v-else>
-                <span class="text-indigo-600">{{ u.points.toLocaleString("ko-KR") }}P</span>
+                <span class="text-indigo-600">{{ u.points.toLocaleString("ko-KR") }}원</span>
               </template>
             </td>
             <td class="px-4 py-3">
@@ -145,7 +145,7 @@ async function toggleRole(u: User) {
                     type="button"
                     class="rounded-full border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-50"
                     @click="startEdit(u)"
-                  >포인트</button>
+                  >잔액</button>
                   <button
                     type="button"
                     class="rounded-full border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-50"

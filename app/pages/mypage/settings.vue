@@ -231,7 +231,7 @@ async function submitWithdraw() {
       <ul class="mt-3 space-y-1 text-xs text-rose-700">
         <li>• 진행 중 주문/충전 신청이 있으면 탈퇴 불가</li>
         <li>• 거래 기록(주문)은 전자상거래법에 따라 5년간 보관됩니다</li>
-        <li>• 보유 포인트는 모두 소멸됩니다 (현재 {{ user.points.toLocaleString('ko-KR') }}P)</li>
+        <li>• 보유 잔액은 모두 소멸됩니다 (현재 {{ user.points.toLocaleString('ko-KR') }}원)</li>
         <li>• 동일 이메일로 재가입은 즉시 가능합니다 (신규 계정)</li>
       </ul>
 

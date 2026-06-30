@@ -119,13 +119,13 @@ async function onSignOut() {
           </div>
         </div>
 
-        <!-- 포인트 + 누적 결제 -->
+        <!-- 보유 잔액 + 누적 결제 -->
         <div class="mt-6 grid gap-3 sm:grid-cols-2">
-          <!-- 보유 포인트 (충전 비활성화 2026-06-14 — 계좌이체 전용. 충전 링크/버튼 제거, 읽기전용 표시) -->
+          <!-- 보유 잔액 (계좌이체 전용 운영 — 읽기전용 표시) -->
           <div class="rounded-2xl border border-indigo-100 bg-indigo-50 p-4">
-            <p class="text-xs text-indigo-700">보유 포인트</p>
+            <p class="text-xs text-indigo-700">보유 잔액</p>
             <p class="mt-1 font-display text-2xl text-indigo-900">
-              {{ data.user.points.toLocaleString("ko-KR") }}<span class="ml-0.5 text-base">P</span>
+              {{ data.user.points.toLocaleString("ko-KR") }}<span class="ml-0.5 text-base">원</span>
             </p>
           </div>
           <div class="rounded-2xl border border-neutral-100 bg-neutral-50 p-4">

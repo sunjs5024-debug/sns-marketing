@@ -193,8 +193,8 @@ function printPage() {
             <dd class="font-mono text-neutral-900">{{ formatPrice(order.totalAmount) }}</dd>
           </div>
           <div v-if="order.pointsUsed > 0" class="flex justify-between text-rose-600">
-            <dt>포인트 사용</dt>
-            <dd class="font-mono">−{{ order.pointsUsed.toLocaleString('ko-KR') }}P</dd>
+            <dt>잔액 사용</dt>
+            <dd class="font-mono">−{{ order.pointsUsed.toLocaleString('ko-KR') }}원</dd>
           </div>
           <div class="flex justify-between border-t border-neutral-300 pt-2">
             <dt class="text-neutral-500">공급가액 (VAT 별도)</dt>

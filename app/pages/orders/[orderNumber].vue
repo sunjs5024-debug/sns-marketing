@@ -132,8 +132,8 @@ if (!order.value) throw createError({ statusCode: 404 });
         <dt class="text-neutral-500">상품 금액</dt>
         <dd>{{ formatPrice(order.totalAmount) }}</dd>
         <template v-if="order.pointsUsed > 0">
-          <dt class="text-rose-500">포인트 사용</dt>
-          <dd class="text-rose-600">−{{ order.pointsUsed.toLocaleString("ko-KR") }}P</dd>
+          <dt class="text-rose-500">잔액 사용</dt>
+          <dd class="text-rose-600">−{{ order.pointsUsed.toLocaleString("ko-KR") }}원</dd>
         </template>
         <dt class="text-neutral-900">실 결제 금액</dt>
         <dd class="font-display text-neutral-900">{{ formatPrice(order.finalAmount || order.totalAmount) }}</dd>

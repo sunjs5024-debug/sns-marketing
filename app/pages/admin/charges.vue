@@ -64,7 +64,7 @@ const counts = computed(() => {
 });
 
 async function approve(id: string) {
-  if (!confirm("이 충전 신청을 승인하시겠습니까? (사용자에게 포인트 즉시 적립)")) return;
+  if (!confirm("이 충전 신청을 승인하시겠습니까? (사용자 잔액 즉시 반영)")) return;
   await $fetch(`/api/admin/charges/${id}/approve`, { method: "POST" });
   await refresh();
 }
@@ -129,7 +129,7 @@ async function reject(id: string) {
                 <span class="ml-3 text-neutral-500">입금자명: <b class="text-neutral-900">{{ c.depositorName }}</b></span>
               </p>
               <p class="mt-1 text-xs text-neutral-500">
-                회원: {{ c.user.name }} ({{ c.user.email }}) · 현재 포인트: {{ c.user.points.toLocaleString("ko-KR") }}P
+                회원: {{ c.user.name }} ({{ c.user.email }}) · 현재 잔액: {{ c.user.points.toLocaleString("ko-KR") }}원
               </p>
               <p v-if="c.status === 'APPROVED' && c.approvedAt" class="mt-1 text-xs text-emerald-700">
                 ✓ {{ new Date(c.approvedAt).toLocaleString("ko-KR") }} 승인 ·
