@@ -4,7 +4,9 @@
 // JWT(__Secure-next-auth.session-token)로 발급해 기존 세션 로직(server/utils/session.ts,
 // next-auth /api/auth/session)이 그대로 읽도록 한다.
 
+import type { H3Event } from "h3";
 import { encode } from "next-auth/jwt";
+import { prisma } from "./prisma";
 
 // 운영 도메인 (OAuth redirect_uri 는 각 콘솔에 등록된 값과 정확히 일치해야 함)
 export const SITE_ORIGIN = "https://xn--sns-yg9lh0pw9l.kr";
@@ -169,6 +171,58 @@ export async function fetchProfile(p: ProviderConfig, accessToken: string) {
 }
 
 // next-auth 호환 세션 JWT 발급
+// OAuth 콜백 공용 처리 — provider 별 파일(callback/kakao.get.ts 등)에서 호출.
+// ⚠️ next-auth catch-all 의 credentials 콜백과 충돌하지 않도록 [provider] 와일드카드 대신
+//    provider 명시 파일에서만 호출한다.
+export async function handleOAuthCallback(event: H3Event, provider: ProviderId) {
+  const p = PROVIDERS[provider];
+  const q = getQuery(event);
+  const code = typeof q.code === "string" ? q.code : "";
+  const stateParam = typeof q.state === "string" ? q.state : "";
+
+  const { ok, callbackUrl } = await verifyState(stateParam);
+  if (!code || !ok) {
+    return sendRedirect(event, "/auth/signin?error=OAuthState", 302);
+  }
+
+  try {
+    const accessToken = await exchangeCodeForToken(p, code, stateParam);
+    const profile = await fetchProfile(p, accessToken);
+
+    const email = profile.email || `${provider}_${profile.providerAccountId}@${provider}.local`;
+    const name = profile.name || `${provider}_user`;
+
+    let user = await prisma.user.findUnique({ where: { email } });
+    if (user?.isDeleted) {
+      return sendRedirect(event, "/auth/signin?error=AccountDeleted", 302);
+    }
+    if (!user) {
+      user = await prisma.user.create({ data: { email, name, role: "USER" } });
+    }
+
+    const token = await encodeSessionToken({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      points: user.points,
+    });
+
+    setCookie(event, sessionCookieName(), token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 30 * 24 * 60 * 60,
+    });
+
+    return sendRedirect(event, callbackUrl, 302);
+  } catch (e: unknown) {
+    console.error(`[oauth callback ${provider}]`, e instanceof Error ? e.message : e);
+    return sendRedirect(event, "/auth/signin?error=OAuthCallback", 302);
+  }
+}
+
 export async function encodeSessionToken(payload: {
   id: string;
   email: string;
