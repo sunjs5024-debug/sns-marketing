@@ -59,9 +59,10 @@ function toggle(key: string) {
 }
 
 // 준비중(곧 출시) — 아직 상품/API 없음. 시각적 자리만 표시.
+// kind 는 BrandIcon 로고 종류 (카카오맵 전용 로고는 없어 카카오 로고 공용 사용)
 const comingSoon = [
-  { name: "카카오톡 채널", emoji: "💬", items: ["채널 친구 수 늘리기", "게시글 좋아요 늘리기", "게시글 공유 늘리기"] },
-  { name: "카카오맵", emoji: "📍", items: ["리뷰 늘리기", "저장수 늘리기", "검색 트래픽"] },
+  { name: "카카오톡 채널", kind: "kakaotalk", items: ["채널 친구 수 늘리기", "게시글 좋아요 늘리기", "게시글 공유 늘리기"] },
+  { name: "카카오맵", kind: "kakaotalk", items: ["리뷰 늘리기", "저장수 늘리기", "검색 트래픽"] },
 ];
 </script>
 
@@ -102,15 +103,15 @@ const comingSoon = [
           {{ g.label }}
         </p>
 
-        <div v-for="slug in g.slugs" :key="slug">
+        <div v-for="slug in g.slugs" :key="slug" class="mt-1.5">
           <!-- 카테고리(플랫폼) -->
           <button
             type="button"
-            class="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition hover:bg-neutral-50"
+            class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition hover:bg-neutral-50"
             :class="open.has(slug) ? 'bg-indigo-50/60' : ''"
             @click="toggle(slug)"
           >
-            <BrandIcon :kind="slug" :size="24" />
+            <BrandIcon :kind="slug" :size="30" />
             <span class="flex-1 text-sm font-medium text-neutral-900">{{ PLATFORMS[slug].shortName }}</span>
             <svg
               class="h-4 w-4 shrink-0 text-neutral-400 transition-transform"
@@ -145,13 +146,13 @@ const comingSoon = [
 
       <!-- 곧 출시 (준비중) -->
       <p class="mt-4 px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-widest text-neutral-400">곧 출시</p>
-      <div v-for="c in comingSoon" :key="c.name">
+      <div v-for="c in comingSoon" :key="c.name" class="mt-1.5">
         <button
           type="button"
-          class="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition hover:bg-neutral-50"
+          class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition hover:bg-neutral-50"
           @click="toggle(c.name)"
         >
-          <span class="grid h-6 w-6 place-items-center text-base">{{ c.emoji }}</span>
+          <BrandIcon :kind="(c.kind as any)" :size="30" />
           <span class="flex-1 text-sm font-medium text-neutral-500">{{ c.name }}</span>
           <span class="rounded bg-neutral-100 px-1.5 py-0.5 text-[9px] font-medium text-neutral-400">준비중</span>
           <svg
