@@ -70,11 +70,63 @@ export function redirectUri(provider: ProviderId): string {
   return `${SITE_ORIGIN}/api/auth/callback/${provider}`;
 }
 
-// 세션 쿠키 이름 — 운영(HTTPS)은 __Secure- 접두사 (next-auth 기본과 동일)
+// 세션 쿠키 이름 — 운영은 항상 HTTPS 라 next-auth 와 동일하게 __Secure- 접두사 고정.
+// (런타임 process.env.NODE_ENV 가 비어있을 수 있어 그에 의존하지 않음)
 export function sessionCookieName(): string {
-  return process.env.NODE_ENV === "production"
-    ? "__Secure-next-auth.session-token"
-    : "next-auth.session-token";
+  return "__Secure-next-auth.session-token";
+}
+
+// ── 무상태(stateless) OAuth state ──────────────────────────────────────────
+// 쿠키가 크로스사이트 리다이렉트에서 유실되는 문제를 피하려고 state 자체를 HMAC 서명한다.
+// state = base64url(payload) + "." + base64url(HMAC-SHA256(payload, authSecret))
+// payload = `${nonce}|${callbackUrl}|${exp(ms)}`
+function b64urlFromBytes(bytes: Uint8Array): string {
+  let bin = "";
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function b64urlToBytes(s: string): Uint8Array {
+  const b = s.replace(/-/g, "+").replace(/_/g, "/");
+  const bin = atob(b + "=".repeat((4 - (b.length % 4)) % 4));
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+async function hmacSign(data: string): Promise<string> {
+  const secret = useRuntimeConfig().authSecret as string;
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(data));
+  return b64urlFromBytes(new Uint8Array(sig));
+}
+
+export async function signState(callbackUrl: string): Promise<string> {
+  const nonce = crypto.randomUUID();
+  const exp = Date.now() + 10 * 60 * 1000; // 10분
+  const payload = `${nonce}|${callbackUrl}|${exp}`;
+  const sig = await hmacSign(payload);
+  return `${b64urlFromBytes(new TextEncoder().encode(payload))}.${sig}`;
+}
+
+export async function verifyState(state: string): Promise<{ ok: boolean; callbackUrl: string }> {
+  try {
+    const [payloadB64, sig] = state.split(".");
+    if (!payloadB64 || !sig) return { ok: false, callbackUrl: "/" };
+    const payload = new TextDecoder().decode(b64urlToBytes(payloadB64));
+    const expected = await hmacSign(payload);
+    if (sig !== expected) return { ok: false, callbackUrl: "/" };
+    const [, callbackUrl, expStr] = payload.split("|");
+    if (Number(expStr) < Date.now()) return { ok: false, callbackUrl: "/" };
+    const cb = callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : "/";
+    return { ok: true, callbackUrl: cb };
+  } catch {
+    return { ok: false, callbackUrl: "/" };
+  }
 }
 
 // 토큰 교환 (authorization_code → access_token)
