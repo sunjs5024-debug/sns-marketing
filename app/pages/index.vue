@@ -199,32 +199,36 @@ onMounted(async () => {
 
     <LiveOrderTicker />
 
+    <!-- 카테고리 사이드바 + 인기 상품 -->
     <section class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-      <SectionTitle eyebrow="CATEGORY" title="어떤 마케팅이 필요하신가요?" description="플랫폼별 전문 상품으로 빠르게 시작하세요. 카테고리 클릭 시 상세 상품을 확인할 수 있습니다." />
-      <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <PlatformCard v-for="slug in SNS_PLATFORMS" :key="slug" :platform="PLATFORMS[slug]" base="sns" />
-        <PlatformCard v-for="slug in MARKETING_PLATFORMS" :key="slug" :platform="PLATFORMS[slug]" base="marketing" />
-        <PlatformCard v-for="slug in RANK_PLATFORMS" :key="slug" :platform="PLATFORMS[slug]" base="rank" />
-      </div>
-    </section>
+      <SectionTitle eyebrow="CATEGORY" title="어떤 마케팅이 필요하신가요?" description="왼쪽에서 플랫폼을 누르면 세부 상품이 바로 펼쳐집니다." />
+      <div class="mt-8 grid gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
+        <!-- 왼쪽 세로 카테고리 사이드바 -->
+        <aside class="lg:sticky lg:top-20 lg:self-start">
+          <CategoryAccordion />
+        </aside>
 
-    <section class="bg-neutral-50/60 py-16">
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <SectionTitle eyebrow="BEST" title="시선집중! 가장 많이 찾는 상품" description="이번 주 가장 많이 판매된 BEST 상품을 모았습니다." more-href="/sns" />
-        <div class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          <ProductCard
-            v-for="p in featured ?? []"
-            :key="p.id"
-            :slug="p.slug"
-            :name="p.name"
-            :base-price="p.basePrice"
-            :badge="p.badge"
-            :rating="p.rating"
-            :sales-count="p.salesCount"
-            :category-name="p.category.name"
-            :icon-key="platformKeyFor(p.category.slug)"
-            :option-count="p._count?.options"
-          />
+        <!-- 오른쪽: 인기 상품 -->
+        <div>
+          <div class="mb-4 flex items-end justify-between">
+            <h3 class="font-display text-lg text-neutral-900">🔥 가장 많이 찾는 상품</h3>
+            <NuxtLink to="/sns" class="text-sm text-neutral-500 hover:text-neutral-900">전체보기 →</NuxtLink>
+          </div>
+          <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+            <ProductCard
+              v-for="p in featured ?? []"
+              :key="p.id"
+              :slug="p.slug"
+              :name="p.name"
+              :base-price="p.basePrice"
+              :badge="p.badge"
+              :rating="p.rating"
+              :sales-count="p.salesCount"
+              :category-name="p.category.name"
+              :icon-key="platformKeyFor(p.category.slug)"
+              :option-count="p._count?.options"
+            />
+          </div>
         </div>
       </div>
     </section>
