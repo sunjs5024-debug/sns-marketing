@@ -89,85 +89,13 @@ const marketingItems: DropItem[] = MARKETING_PLATFORMS.map((s) => ({
           <span>SNS소셜팩토리</span>
         </NuxtLink>
 
-        <!-- 데스크탑 네비게이션 -->
-        <nav class="hidden lg:flex items-center gap-1 text-sm font-medium text-neutral-700 whitespace-nowrap">
-          <div class="group relative">
-            <NuxtLink to="/sns" class="inline-flex items-center gap-1 rounded-md px-3 py-2 hover:bg-neutral-100 whitespace-nowrap">
-              SNS 마케팅
-              <svg class="h-3 w-3" viewBox="0 0 12 12" fill="none">
-                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </NuxtLink>
-            <div class="invisible absolute left-0 top-full pt-2 opacity-0 transition-all group-hover:visible group-hover:opacity-100">
-              <div class="w-80 rounded-2xl border border-neutral-100 bg-white p-2 shadow-xl">
-                <NuxtLink
-                  v-for="item in snsItems"
-                  :key="item.href"
-                  :to="item.href"
-                  class="flex items-start gap-3 rounded-xl p-3 hover:bg-neutral-50"
-                >
-                  <BrandIcon :kind="item.slug" :size="32" />
-                  <span class="flex flex-col">
-                    <span class="text-neutral-900">{{ item.label }}</span>
-                    <span class="text-xs text-neutral-500">{{ item.desc }}</span>
-                  </span>
-                </NuxtLink>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="marketingItems.length > 0" class="group relative">
-            <NuxtLink to="/marketing" class="inline-flex items-center gap-1 rounded-md px-3 py-2 hover:bg-neutral-100 whitespace-nowrap">
-              플랫폼 마케팅
-              <svg class="h-3 w-3" viewBox="0 0 12 12" fill="none">
-                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </NuxtLink>
-            <div class="invisible absolute left-0 top-full pt-2 opacity-0 transition-all group-hover:visible group-hover:opacity-100">
-              <div class="w-80 rounded-2xl border border-neutral-100 bg-white p-2 shadow-xl">
-                <NuxtLink
-                  v-for="item in marketingItems"
-                  :key="item.href"
-                  :to="item.href"
-                  class="flex items-start gap-3 rounded-xl p-3 hover:bg-neutral-50"
-                >
-                  <BrandIcon :kind="item.slug" :size="32" />
-                  <span class="flex flex-col">
-                    <span class="text-neutral-900">{{ item.label }}</span>
-                    <span class="text-xs text-neutral-500">{{ item.desc }}</span>
-                  </span>
-                </NuxtLink>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="rankItems.length > 0" class="group relative">
-            <NuxtLink to="/rank" class="inline-flex items-center gap-1 rounded-md px-3 py-2 hover:bg-neutral-100 whitespace-nowrap">
-              상위노출
-              <svg class="h-3 w-3" viewBox="0 0 12 12" fill="none">
-                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </NuxtLink>
-            <div class="invisible absolute left-0 top-full pt-2 opacity-0 transition-all group-hover:visible group-hover:opacity-100">
-              <div class="w-80 rounded-2xl border border-neutral-100 bg-white p-2 shadow-xl">
-                <NuxtLink
-                  v-for="item in rankItems"
-                  :key="item.href"
-                  :to="item.href"
-                  class="flex items-start gap-3 rounded-xl p-3 hover:bg-neutral-50"
-                >
-                  <BrandIcon :kind="item.slug" :size="32" />
-                  <span class="flex flex-col">
-                    <span class="text-neutral-900">{{ item.label }}</span>
-                    <span class="text-xs text-neutral-500">{{ item.desc }}</span>
-                  </span>
-                </NuxtLink>
-              </div>
-            </div>
-          </div>
-
-          <NuxtLink to="/reviews" class="rounded-md px-3 py-2 hover:bg-neutral-100 whitespace-nowrap">후기</NuxtLink>
-          <NuxtLink to="/guide" class="rounded-md px-3 py-2 hover:bg-neutral-100 whitespace-nowrap">이용안내</NuxtLink>
+        <!-- 데스크탑 네비게이션 — 드롭다운 없이 바로 클릭되는 직접 링크 (channelup 스타일) -->
+        <nav class="hidden lg:flex items-center gap-0.5 text-sm font-medium text-neutral-700 whitespace-nowrap">
+          <NuxtLink to="/sns" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">SNS 마케팅</NuxtLink>
+          <NuxtLink v-if="marketingItems.length > 0" to="/marketing" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">플랫폼 마케팅</NuxtLink>
+          <NuxtLink v-if="rankItems.length > 0" to="/rank" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">상위노출</NuxtLink>
+          <NuxtLink to="/reviews" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">후기</NuxtLink>
+          <NuxtLink to="/guide" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">이용안내</NuxtLink>
         </nav>
       </div>
 
