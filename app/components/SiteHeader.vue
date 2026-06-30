@@ -64,9 +64,9 @@ const marketingItems: DropItem[] = MARKETING_PLATFORMS.map((s) => ({
 
 <template>
   <header class="sticky top-0 z-40 w-full border-b border-neutral-100 bg-white/85 backdrop-blur-md">
-    <div class="mx-auto flex h-16 max-w-7xl flex-nowrap items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6 lg:px-8">
-      <!-- 좌측: 로고 + (lg+) 네비게이션 -->
-      <div class="flex shrink-0 items-center gap-3 lg:gap-8">
+    <div class="flex h-16 flex-nowrap items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6 lg:px-8">
+      <!-- 좌측: 로고 (사이드바 폭에 맞춰 정렬) -->
+      <div class="flex shrink-0 items-center gap-3 lg:w-60">
         <!-- 모바일: 햄버거 -->
         <button
           type="button"
@@ -89,13 +89,14 @@ const marketingItems: DropItem[] = MARKETING_PLATFORMS.map((s) => ({
           <span>SNS소셜팩토리</span>
         </NuxtLink>
 
-        <!-- 데스크탑 네비게이션 — 카테고리는 좌측 사이드바로 이동. 헤더엔 보조 메뉴만. -->
-        <nav class="hidden lg:flex items-center gap-0.5 text-sm font-medium text-neutral-700 whitespace-nowrap">
-          <NuxtLink to="/sns" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">전체 상품</NuxtLink>
-          <NuxtLink to="/reviews" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">후기</NuxtLink>
-          <NuxtLink to="/guide" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">이용안내</NuxtLink>
-        </nav>
       </div>
+
+      <!-- 중앙: 보조 메뉴 -->
+      <nav class="hidden lg:flex flex-1 items-center justify-center gap-1 text-sm font-medium text-neutral-700 whitespace-nowrap">
+        <NuxtLink to="/sns" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">전체 상품</NuxtLink>
+        <NuxtLink to="/reviews" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">후기</NuxtLink>
+        <NuxtLink to="/guide" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">이용안내</NuxtLink>
+      </nav>
 
       <!-- 우측: 검색 + 사용자 + 카트 -->
       <div class="flex shrink-0 items-center gap-1 sm:gap-2 text-sm whitespace-nowrap">

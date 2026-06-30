@@ -52,11 +52,17 @@ function baseFor(slug: PlatformSlug): string {
 
 // 기본으로 첫 SNS 플랫폼 1개 펼쳐둠 (여러 개 동시 펼침 허용)
 const open = ref<Set<string>>(new Set(SNS_PLATFORMS.length ? [SNS_PLATFORMS[0] as string] : []));
-function toggle(slug: PlatformSlug) {
+function toggle(key: string) {
   const s = new Set(open.value);
-  s.has(slug) ? s.delete(slug) : s.add(slug);
+  s.has(key) ? s.delete(key) : s.add(key);
   open.value = s;
 }
+
+// 준비중(곧 출시) — 아직 상품/API 없음. 시각적 자리만 표시.
+const comingSoon = [
+  { name: "카카오톡 채널", emoji: "💬", items: ["채널 친구 수 늘리기", "게시글 좋아요 늘리기", "게시글 공유 늘리기"] },
+  { name: "카카오맵", emoji: "📍", items: ["리뷰 늘리기", "저장수 늘리기", "검색 트래픽"] },
+];
 </script>
 
 <template>
@@ -132,6 +138,37 @@ function toggle(slug: PlatformSlug) {
           </div>
         </div>
       </template>
+
+      <!-- 곧 출시 (준비중) -->
+      <p class="mt-4 px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-widest text-neutral-400">곧 출시</p>
+      <div v-for="c in comingSoon" :key="c.name">
+        <button
+          type="button"
+          class="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition hover:bg-neutral-50"
+          @click="toggle(c.name)"
+        >
+          <span class="grid h-6 w-6 place-items-center text-base">{{ c.emoji }}</span>
+          <span class="flex-1 text-sm font-medium text-neutral-500">{{ c.name }}</span>
+          <span class="rounded bg-neutral-100 px-1.5 py-0.5 text-[9px] font-medium text-neutral-400">준비중</span>
+          <svg
+            class="h-4 w-4 shrink-0 text-neutral-300 transition-transform"
+            :class="open.has(c.name) ? 'rotate-180' : ''"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          >
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </button>
+        <div v-show="open.has(c.name)" class="mb-1 ml-4 border-l border-neutral-100 pl-2">
+          <div
+            v-for="it in c.items"
+            :key="it"
+            class="flex items-center justify-between gap-2 px-3 py-2 text-[13px] text-neutral-400"
+          >
+            <span class="min-w-0 flex-1 truncate">{{ it }}</span>
+            <span class="shrink-0 rounded bg-neutral-100 px-1 text-[9px]">준비중</span>
+          </div>
+        </div>
+      </div>
     </div>
   </aside>
 </template>
