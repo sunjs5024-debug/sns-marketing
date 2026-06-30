@@ -11,6 +11,25 @@ const { data: navProducts } = await useFetch<NavProd[]>("/api/products/nav", {
   default: () => [],
 });
 
+// 로그인 상태 (SiteHeader 와 동일 key 라 중복 호출 없음)
+const { data: header } = await useFetch("/api/header", {
+  key: "header",
+  default: () => ({ isAuthed: false, role: null, cartCount: 0, name: null, points: 0 }),
+});
+async function onSignOut() {
+  try {
+    const csrf = await $fetch<{ csrfToken: string }>("/api/auth/csrf");
+    await $fetch("/api/auth/signout", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ csrfToken: csrf.csrfToken, callbackUrl: "/" }).toString(),
+    });
+  } catch {
+    // 무시
+  }
+  if (import.meta.client) window.location.href = "/";
+}
+
 // 플랫폼별 그룹핑
 const byPlatform = computed(() => {
   const m: Record<string, { slug: string; name: string; featured: boolean }[]> = {};
@@ -43,6 +62,28 @@ function toggle(slug: PlatformSlug) {
 <template>
   <aside class="hidden lg:flex w-64 shrink-0 flex-col border-r border-neutral-100 bg-white">
     <div class="sticky top-16 max-h-[calc(100vh-4rem)] overflow-y-auto px-3 py-4">
+      <!-- 로그인 / 회원가입 (또는 로그인 시 유저 정보) -->
+      <div class="mb-4">
+        <template v-if="header?.isAuthed">
+          <NuxtLink to="/mypage" class="block rounded-2xl bg-gradient-to-br from-indigo-50 to-pink-50 px-4 py-3">
+            <p class="truncate text-sm font-medium text-neutral-900">{{ header?.name }}</p>
+            <p class="mt-0.5 text-xs text-indigo-700">{{ (header?.points ?? 0).toLocaleString("ko-KR") }}P 보유</p>
+          </NuxtLink>
+          <div class="mt-2 grid grid-cols-2 gap-2">
+            <NuxtLink to="/orders" class="rounded-xl border border-neutral-200 py-2 text-center text-xs text-neutral-700 hover:bg-neutral-50">내 주문</NuxtLink>
+            <button type="button" class="rounded-xl border border-neutral-200 py-2 text-center text-xs text-neutral-500 hover:bg-neutral-50" @click="onSignOut">로그아웃</button>
+          </div>
+          <NuxtLink v-if="header?.role === 'ADMIN'" to="/admin" class="mt-2 block rounded-xl bg-amber-100 py-2 text-center text-xs text-amber-800 hover:bg-amber-200">관리자 콘솔</NuxtLink>
+        </template>
+        <NuxtLink
+          v-else
+          to="/auth/signin"
+          class="block rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-4 py-3 text-center text-sm font-medium text-white shadow-md transition hover:brightness-105"
+        >
+          로그인 / 회원가입
+        </NuxtLink>
+      </div>
+
       <template v-for="(g, gi) in groups" :key="g.label">
         <p
           class="px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-widest text-neutral-400"

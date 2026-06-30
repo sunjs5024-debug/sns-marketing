@@ -111,6 +111,8 @@ const marketingItems: DropItem[] = MARKETING_PLATFORMS.map((s) => ({
           </svg>
         </NuxtLink>
 
+        <!-- 로그인/유저: 데스크탑은 좌측 사이드바로 이동 → 헤더에선 모바일만 표시 -->
+        <div class="contents lg:hidden">
         <template v-if="header?.isAuthed">
           <NuxtLink to="/orders" class="hidden lg:inline-flex rounded-full px-3 py-2 text-neutral-700 hover:bg-neutral-100 whitespace-nowrap">내 주문</NuxtLink>
           <!-- 모바일에서도 사용자 뱃지 표시 (간소화) -->
@@ -129,6 +131,7 @@ const marketingItems: DropItem[] = MARKETING_PLATFORMS.map((s) => ({
           <NuxtLink to="/auth/signin" class="inline-flex items-center rounded-full px-2.5 sm:px-3 py-2 text-xs sm:text-sm text-neutral-700 hover:bg-neutral-100 whitespace-nowrap">로그인</NuxtLink>
           <NuxtLink to="/auth/signup" class="hidden sm:inline-flex rounded-full bg-neutral-900 px-4 py-2 text-white hover:bg-neutral-700 whitespace-nowrap">회원가입</NuxtLink>
         </template>
+        </div>
         <NuxtLink to="/cart" class="relative grid h-10 w-10 shrink-0 place-items-center rounded-full text-neutral-700 hover:bg-neutral-100" aria-label="장바구니">
           🛒
           <span v-if="(header?.cartCount ?? 0) > 0" class="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-rose-500 px-1 text-[10px] text-white">
