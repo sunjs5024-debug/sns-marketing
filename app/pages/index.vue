@@ -44,6 +44,33 @@ const WHY_ITEMS = [
   },
 ] as const;
 
+// 이용 3단계
+const STEPS = [
+  {
+    title: "주문 · 결제",
+    desc: "원하는 상품을 고르고 공개 URL·닉네임만 입력. 비밀번호 없이 안전하게, 계좌이체로 간편 결제.",
+  },
+  {
+    title: "즉시 작업 시작",
+    desc: "결제 확인 후 평균 10분 내 실계정 기반으로 작업이 시작돼요. 진행률은 실시간으로 확인 가능.",
+  },
+  {
+    title: "완료 · 결과보고서",
+    desc: "작업 완료 시 결과보고서가 자동 발송됩니다. 30일 유지 보장 — 이탈 시 자동 리필.",
+  },
+] as const;
+
+// 비교표 (직접 / 일반 업체 / SNS소셜팩토리)
+const COMPARE = [
+  { label: "가격", self: "광고비 과다", etc: "천차만별", us: "100원부터 합리적" },
+  { label: "계정 안전", self: "피로·위험", etc: "비번 요구 잦음", us: "비밀번호 0% 요구" },
+  { label: "시작 속도", self: "며칠~몇 주", etc: "수 시간", us: "평균 10분" },
+  { label: "실계정 여부", self: "직접 불가", etc: "봇 혼재", us: "실계정 기반" },
+  { label: "유지 · 리필", self: "없음", etc: "보장 약함", us: "30일 보장·자동 리필" },
+  { label: "결과보고서", self: "없음", etc: "없음", us: "완료 시 자동 발송" },
+  { label: "상담", self: "—", etc: "느림", us: "텔레그램 30분 내" },
+] as const;
+
 const REVIEWS = [
   { author: "@de****_yj", tag: "인스타 크리에이터", text: "릴스 조회수랑 같이 팔로워가 늘어서 진짜 자연스러웠어요. 알고리즘이 푸쉬해주는 게 체감됩니다." },
   { author: "@k_b***ty_lab", tag: "인스타 / 한국인", text: "한국 타겟 팔로워 80% 여성으로 받았는데 진짜 정확하게 들어와서 한국인 협찬 문의가 늘었어요." },
@@ -202,6 +229,26 @@ onMounted(async () => {
       </div>
     </section>
 
+    <!-- 이용 3단계 -->
+    <section class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <SectionTitle eyebrow="HOW IT WORKS" title="이렇게 진행돼요" description="복잡한 절차 없이 3단계면 끝. 결제 후 평균 10분 내 작업이 시작됩니다." />
+      <div class="relative mt-12 grid gap-6 sm:grid-cols-3">
+        <!-- 데스크탑 연결선 -->
+        <div class="pointer-events-none absolute inset-x-0 top-7 hidden h-px bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 sm:block" />
+        <div
+          v-for="(s, i) in STEPS"
+          :key="s.title"
+          class="relative rounded-3xl border border-neutral-100 bg-white p-6 text-center transition hover:-translate-y-1 hover:shadow-xl"
+        >
+          <div class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 font-display text-xl text-white shadow-md">
+            {{ i + 1 }}
+          </div>
+          <h3 class="mt-5 font-display text-lg text-neutral-900">{{ s.title }}</h3>
+          <p class="mt-2 text-sm leading-6 text-neutral-600">{{ s.desc }}</p>
+        </div>
+      </div>
+    </section>
+
     <section class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
       <SectionTitle eyebrow="WHY US" title="왜 SNS소셜팩토리를 선택할까요?" />
       <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -251,6 +298,36 @@ onMounted(async () => {
           <h3 class="mt-5 font-display text-lg text-neutral-900">{{ w.title }}</h3>
           <p class="mt-2 text-sm leading-6 text-neutral-600">{{ w.desc }}</p>
         </div>
+      </div>
+    </section>
+
+    <!-- 비교표: 직접 / 일반 업체 / SNS소셜팩토리 -->
+    <section class="bg-neutral-50/60 py-20">
+      <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <SectionTitle eyebrow="COMPARE" title="왜 직접 하지 않고 맡길까요?" description="직접 늘리기·일반 업체와 비교해보세요. 같은 비용이면 더 안전하고 빠릅니다." />
+        <div class="mt-8 overflow-x-auto rounded-3xl border border-neutral-200 bg-white">
+          <table class="w-full min-w-[520px] text-center text-sm">
+            <thead>
+              <tr class="border-b border-neutral-100 bg-neutral-50/80 text-xs text-neutral-500">
+                <th class="px-3 py-4 text-left font-medium">비교 항목</th>
+                <th class="px-3 py-4 font-medium">직접 늘리기</th>
+                <th class="px-3 py-4 font-medium">일반 업체</th>
+                <th class="px-2 py-4">
+                  <span class="inline-block rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-3 py-1 text-xs text-white">SNS소셜팩토리</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-100">
+              <tr v-for="row in COMPARE" :key="row.label">
+                <td class="px-3 py-4 text-left text-neutral-700">{{ row.label }}</td>
+                <td class="px-3 py-4 text-neutral-400">{{ row.self }}</td>
+                <td class="px-3 py-4 text-neutral-500">{{ row.etc }}</td>
+                <td class="bg-indigo-50/50 px-3 py-4 font-medium text-indigo-700">{{ row.us }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="mt-4 text-center text-xs text-neutral-400">* 실계정 기반 · 30일 유지 보장 · 결과보고서까지 한 번에 제공합니다.</p>
       </div>
     </section>
 
