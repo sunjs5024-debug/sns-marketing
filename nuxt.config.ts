@@ -69,6 +69,15 @@ export default defineNuxtConfig({
       // next-auth JWT 암호화(getDerivedEncryptionKey)가 죽는다 → Web Crypto 기반 shim 으로 교체.
       "@panva/hkdf": fileURLToPath(new URL("./shims/hkdf.cjs", import.meta.url)),
     },
+    // 공개 상품 페이지·카탈로그 API 를 엣지에서 SWR 캐싱 → 재방문 시 DB 안 거치고 즉시 로드.
+    // (개인화 데이터인 /api/header·/api/me·/api/cart·/api/orders 등은 캐시 대상 아님)
+    routeRules: {
+      "/products/**": { swr: 600 },
+      "/sns/**": { swr: 600 },
+      "/marketing/**": { swr: 600 },
+      "/api/products/**": { swr: 600 },
+      "/api/reviews": { swr: 120 },
+    },
   },
 
   css: ["~/assets/css/main.css"],
