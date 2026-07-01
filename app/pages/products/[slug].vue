@@ -26,7 +26,8 @@ type RelatedProduct = {
   _count: { options: number };
 };
 type Related = { sameCategory: RelatedProduct[]; samePlatform: RelatedProduct[] };
-const { data: related } = await useFetch<Related>(`/api/products/${slug.value}/related`);
+// 관련 상품은 페이지 진입을 막지 않도록 lazy 로 뒤이어 로드 (체감 속도 개선)
+const { data: related } = useFetch<Related>(`/api/products/${slug.value}/related`, { lazy: true });
 
 // 이 상품의 실제 승인된 리뷰
 type ProductReview = {
@@ -36,9 +37,10 @@ type ProductReview = {
   date: string;
   author: string;
 };
-const { data: reviewsData } = await useFetch<{ reviews: ProductReview[]; avgRating: number; totalCount: number }>(
+// 후기도 lazy — 상품 본문이 먼저 뜨고 후기는 뒤이어 채워짐 (별점 aggregateRating 은 상품 데이터로 유지)
+const { data: reviewsData } = useFetch<{ reviews: ProductReview[]; avgRating: number; totalCount: number }>(
   () => `/api/reviews?productId=${product.value!.id}&limit=8`,
-  { default: () => ({ reviews: [], avgRating: 5.0, totalCount: 0 }) },
+  { lazy: true, default: () => ({ reviews: [], avgRating: 5.0, totalCount: 0 }) },
 );
 const productReviews = computed(() => reviewsData.value?.reviews ?? []);
 const productRating = computed(() =>
