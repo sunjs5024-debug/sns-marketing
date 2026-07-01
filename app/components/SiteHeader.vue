@@ -96,6 +96,7 @@ const marketingItems: DropItem[] = MARKETING_PLATFORMS.map((s) => ({
         <NuxtLink to="/sns" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">전체 상품</NuxtLink>
         <NuxtLink to="/reviews" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">후기</NuxtLink>
         <NuxtLink to="/guide" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">이용안내</NuxtLink>
+        <NuxtLink to="/support" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">고객센터</NuxtLink>
       </nav>
 
       <!-- 우측: 검색 + 사용자 + 카트 -->

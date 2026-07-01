@@ -5,6 +5,8 @@ const snsCol = SNS_PLATFORMS.map((s) => ({ href: `/sns/${s}`, label: PLATFORMS[s
 const marketingCol = MARKETING_PLATFORMS.map((s) => ({ href: `/marketing/${s}`, label: PLATFORMS[s].shortName }));
 const rankCol = RANK_PLATFORMS.map((s) => ({ href: `/rank/${s}`, label: PLATFORMS[s].shortName }));
 const helpCol = [
+  { href: "/support", label: "고객센터" },
+  { href: "/notice", label: "공지사항" },
   { href: "/guide", label: "이용안내" },
   { href: "/faq", label: "자주묻는질문" },
   { href: "/reviews", label: "고객후기" },
