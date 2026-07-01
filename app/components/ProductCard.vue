@@ -1,9 +1,14 @@
+<script lang="ts">
+// 모듈 스코프 — 같은 상품 중복 prefetch 방지 (모든 카드가 공유)
+const prefetchedSlugs = new Set<string>();
+</script>
+
 <script setup lang="ts">
 import type { PlatformSlug } from "#shared/catalog";
 import { formatPrice } from "#shared/catalog";
 import type { Badge } from "~~/generated/prisma/enums";
 
-defineProps<{
+const props = defineProps<{
   slug: string;
   name: string;
   basePrice: number;
@@ -14,12 +19,44 @@ defineProps<{
   iconKey: PlatformSlug | null;
   optionCount?: number;
 }>();
+
+// 클릭 전에 상품 데이터를 미리 불러와 엣지 캐시를 데워둠 → 클릭 시 즉시 열림
+const root = ref<HTMLElement | null>(null);
+function warm() {
+  if (import.meta.server || prefetchedSlugs.has(props.slug)) return;
+  prefetchedSlugs.add(props.slug);
+  // 상품 상세 + 관련상품을 병렬로 미리 로드 (실패는 무시)
+  $fetch(`/api/products/${props.slug}`).catch(() => {});
+}
+
+onMounted(() => {
+  // NuxtLink 컴포넌트 ref → 실제 DOM 요소는 $el
+  const el = ((root.value as unknown as { $el?: Element })?.$el ?? root.value) as Element | null;
+  if (!el || typeof IntersectionObserver === "undefined") return;
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          warm();
+          io.disconnect();
+          break;
+        }
+      }
+    },
+    { rootMargin: "300px" },
+  );
+  io.observe(el);
+  onBeforeUnmount(() => io.disconnect());
+});
 </script>
 
 <template>
   <NuxtLink
+    ref="root"
     :to="`/products/${slug}`"
     class="group relative flex flex-col overflow-hidden rounded-2xl border border-neutral-100 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-neutral-200 hover:shadow-xl sm:rounded-3xl"
+    @mouseenter="warm"
+    @pointerdown="warm"
   >
     <!-- 그라데이션 글로우 (호버 시) -->
     <div class="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
