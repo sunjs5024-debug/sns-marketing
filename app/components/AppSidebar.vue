@@ -62,7 +62,7 @@ function toggle(key: string) {
 // kind 는 BrandIcon 로고 종류 (카카오맵 전용 로고는 없어 카카오 로고 공용 사용)
 const comingSoon = [
   { name: "카카오톡 채널", kind: "kakaotalk", items: ["채널 친구 수 늘리기", "게시글 좋아요 늘리기", "게시글 공유 늘리기"] },
-  { name: "카카오맵", kind: "kakaotalk", items: ["리뷰 늘리기", "저장수 늘리기", "검색 트래픽"] },
+  { name: "카카오맵", kind: "kakaomap", items: ["리뷰 늘리기", "저장수 늘리기", "검색 트래픽"] },
 ];
 </script>
 

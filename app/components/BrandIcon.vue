@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import type { PlatformSlug } from "#shared/catalog";
-
 const props = withDefaults(
   defineProps<{
-    kind: PlatformSlug;
+    kind: string;
     size?: number;
   }>(),
   { size: 32 },
@@ -54,11 +52,13 @@ const uid = computed(() => `${props.kind}-${props.size}-${Math.random().toString
     </template>
 
     <template v-else-if="kind === 'kakaotalk'">
-      <rect width="32" height="32" rx="9" fill="#FAE100" />
-      <path
-        d="M16 7c-5.4 0-9.8 3.4-9.8 7.6 0 2.7 1.9 5.1 4.7 6.4l-1 3.6c-.1.4.4.7.7.5l4.2-2.5c.4 0 .8.1 1.2.1 5.4 0 9.8-3.4 9.8-7.6S21.4 7 16 7z"
-        fill="#3C1E1E"
-      />
+      <clipPath :id="`kk-${uid}`"><rect width="32" height="32" rx="9" /></clipPath>
+      <image href="/img/kakao-real.webp" x="0" y="0" width="32" height="32" :clip-path="`url(#kk-${uid})`" preserveAspectRatio="xMidYMid slice" />
+    </template>
+
+    <template v-else-if="kind === 'kakaomap'">
+      <clipPath :id="`km-${uid}`"><rect width="32" height="32" rx="9" /></clipPath>
+      <image href="/img/kakaomap-icon.webp" x="0" y="0" width="32" height="32" :clip-path="`url(#km-${uid})`" preserveAspectRatio="xMidYMid slice" />
     </template>
 
     <template v-else-if="kind === 'x'">
