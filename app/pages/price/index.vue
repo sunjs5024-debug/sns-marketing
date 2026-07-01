@@ -48,17 +48,17 @@ useSeoMeta({
       subtitle="모든 상품 가격을 한눈에. 표시 가격은 최저가 기준이며, 수량 옵션에 따라 달라집니다."
     >
       <div class="mx-auto grid max-w-lg grid-cols-3 gap-2 sm:gap-3">
-        <div class="rounded-2xl bg-white/15 px-3 py-3 backdrop-blur-sm">
-          <p class="font-display text-xl sm:text-2xl">{{ totalCount }}</p>
-          <p class="text-[11px] text-white/75">전체 상품</p>
+        <div class="rounded-2xl border border-neutral-100 bg-white/70 px-3 py-3 backdrop-blur-sm">
+          <p class="font-display text-xl text-neutral-900 sm:text-2xl">{{ totalCount }}</p>
+          <p class="text-[11px] text-neutral-500">전체 상품</p>
         </div>
-        <div class="rounded-2xl bg-white/15 px-3 py-3 backdrop-blur-sm">
-          <p class="font-display text-xl sm:text-2xl">{{ platformCount }}</p>
-          <p class="text-[11px] text-white/75">플랫폼</p>
+        <div class="rounded-2xl border border-neutral-100 bg-white/70 px-3 py-3 backdrop-blur-sm">
+          <p class="font-display text-xl text-neutral-900 sm:text-2xl">{{ platformCount }}</p>
+          <p class="text-[11px] text-neutral-500">플랫폼</p>
         </div>
-        <div class="rounded-2xl bg-white/15 px-3 py-3 backdrop-blur-sm">
-          <p class="font-display text-xl sm:text-2xl">{{ formatPrice(minPrice) }}~</p>
-          <p class="text-[11px] text-white/75">최저가</p>
+        <div class="rounded-2xl border border-neutral-100 bg-white/70 px-3 py-3 backdrop-blur-sm">
+          <p class="font-display text-xl text-indigo-700 sm:text-2xl">{{ formatPrice(minPrice) }}~</p>
+          <p class="text-[11px] text-neutral-500">최저가</p>
         </div>
       </div>
     </PageHero>

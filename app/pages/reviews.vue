@@ -135,11 +135,11 @@ useSchemaOrg([
   <div>
     <PageHero eyebrow="CUSTOMER REVIEWS" title="실제 고객 후기" subtitle="실계정 기반 처리 · 결과보고서로 검증된 실제 이용 후기입니다.">
       <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm">
-        <span class="font-display text-2xl text-amber-300">★ {{ avgRating.toFixed(1) }}</span>
-        <span class="text-white/75">전체 평점</span>
-        <span class="text-white/50">·</span>
-        <span class="text-white/75">총 {{ REVIEWS.length }}건</span>
-        <span v-if="dbReviews.length > 0" class="rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-medium text-white">✓ 실제 구매자 {{ dbReviews.length }}건 포함</span>
+        <span class="font-display text-2xl text-amber-500">★ {{ avgRating.toFixed(1) }}</span>
+        <span class="text-neutral-600">전체 평점</span>
+        <span class="text-neutral-300">·</span>
+        <span class="text-neutral-600">총 {{ REVIEWS.length }}건</span>
+        <span v-if="dbReviews.length > 0" class="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-700">✓ 실제 구매자 {{ dbReviews.length }}건 포함</span>
       </div>
     </PageHero>
     <div class="mx-auto max-w-5xl px-4 pt-6 pb-16 sm:px-6 sm:pt-10 lg:px-8">
