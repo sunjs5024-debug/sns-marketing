@@ -44,12 +44,9 @@ const TAG_COLOR: Record<string, string> = {
 </script>
 
 <template>
-  <div class="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-    <header class="text-center">
-      <p class="text-xs uppercase tracking-widest text-indigo-600">NOTICE</p>
-      <h1 class="mt-2 font-display text-3xl text-neutral-900">공지사항</h1>
-      <p class="mt-3 text-sm text-neutral-500">서비스 안내와 정책, 업데이트 소식을 알려드립니다.</p>
-    </header>
+  <div>
+    <PageHero eyebrow="NOTICE" title="공지사항" subtitle="서비스 안내와 정책, 업데이트 소식을 알려드립니다." />
+    <div class="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
 
     <div class="mt-10 divide-y divide-neutral-100 overflow-hidden rounded-3xl border border-neutral-100 bg-white">
       <details v-for="(n, i) in notices" :key="i" class="group p-5 sm:p-6" :open="i === 0">
@@ -68,6 +65,7 @@ const TAG_COLOR: Record<string, string> = {
     <div class="mt-8 rounded-3xl bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 px-6 py-6 text-center">
       <p class="text-sm text-neutral-700">더 궁금한 점이 있으신가요?</p>
       <NuxtLink to="/support" class="mt-3 inline-block rounded-full bg-neutral-900 px-5 py-2.5 text-sm text-white hover:bg-neutral-700">고객센터 바로가기 →</NuxtLink>
+    </div>
     </div>
   </div>
 </template>

@@ -34,20 +34,7 @@ const { data: products } = await useFetch("/api/products/by-section", {
 
 <template>
   <div>
-    <section class="relative overflow-hidden bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50">
-      <div class="pointer-events-none absolute -left-10 top-0 h-80 w-80 bg-pink-300/30 blur-3xl anim-blob" />
-      <div class="pointer-events-none absolute right-0 bottom-0 h-72 w-72 bg-indigo-300/30 blur-3xl anim-blob" style="animation-delay: -6s" />
-      <div class="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <p class="text-xs uppercase tracking-widest text-pink-600">SNS MARKETING</p>
-        <h1 class="mt-2 font-display text-3xl tracking-tight text-neutral-900 sm:text-4xl lg:text-5xl leading-tight">
-          팔로워부터 조회수까지, <br class="sm:hidden" />
-          <span
-            class="bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent anim-gradient-flow"
-            style="background-size: 200% 200%"
-          >SNS 채널 성장의 모든 것</span>
-        </h1>
-      </div>
-    </section>
+    <PageHero eyebrow="SNS MARKETING" title="전체 상품" subtitle="팔로워·좋아요·조회수·구독자까지 — SNS 채널 성장에 필요한 모든 상품을 한 곳에서." />
 
     <section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       <SectionTitle title="플랫폼 선택" />

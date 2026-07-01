@@ -18,12 +18,9 @@ const helpLinks = [
 </script>
 
 <template>
-  <div class="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-    <header class="text-center">
-      <p class="text-xs uppercase tracking-widest text-indigo-600">SUPPORT</p>
-      <h1 class="mt-2 font-display text-3xl text-neutral-900">고객센터</h1>
-      <p class="mt-3 text-sm text-neutral-500">궁금한 점이 있으면 언제든 문의해 주세요. 빠르게 도와드리겠습니다.</p>
-    </header>
+  <div>
+    <PageHero eyebrow="SUPPORT" title="고객센터" subtitle="궁금한 점이 있으면 언제든 문의해 주세요. 빠르게 도와드리겠습니다." />
+    <div class="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
 
     <!-- 문의 채널 -->
     <div class="mt-10 grid gap-4 sm:grid-cols-2">
@@ -90,5 +87,6 @@ const helpLinks = [
         결제는 계좌이체로 진행되며, 입금 확인 즉시 작업이 자동으로 시작됩니다.
       </p>
     </section>
+    </div>
   </div>
 </template>

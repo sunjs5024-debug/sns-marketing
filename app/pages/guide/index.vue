@@ -82,15 +82,9 @@ useSchemaOrg([
 </script>
 
 <template>
-  <div class="mx-auto max-w-4xl px-4 pt-8 pb-16 sm:px-6 sm:pt-10 lg:px-8">
-    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 px-8 py-10 sm:px-12 sm:py-14">
-      <div class="pointer-events-none absolute -right-10 -top-10 h-60 w-60 bg-emerald-300/30 blur-3xl anim-blob" />
-      <div class="relative">
-        <p class="text-xs uppercase tracking-widest text-emerald-700">HOW IT WORKS</p>
-        <h1 class="mt-2 font-display text-3xl text-neutral-900 sm:text-4xl">이용안내</h1>
-        <p class="mt-3 text-sm text-neutral-700">결제부터 작업 완료까지 — SNS소셜팩토리 이용 방법을 한눈에 확인하세요.</p>
-      </div>
-    </section>
+  <div>
+    <PageHero eyebrow="HOW IT WORKS" title="이용안내" subtitle="결제부터 작업 완료까지 — SNS소셜팩토리 이용 방법을 한눈에 확인하세요." />
+    <div class="mx-auto max-w-4xl px-4 pt-8 pb-16 sm:px-6 sm:pt-10 lg:px-8">
 
     <section class="mt-12">
       <h2 class="font-display text-2xl text-neutral-900">진행 절차</h2>
@@ -183,5 +177,6 @@ useSchemaOrg([
         {{ CONTACT.telegram.handle }} 텔레그램 상담
       </a>
     </section>
+    </div>
   </div>
 </template>

@@ -93,18 +93,9 @@ useSchemaOrg([
 </script>
 
 <template>
-  <div class="mx-auto max-w-4xl px-4 pt-8 pb-16 sm:px-6 sm:pt-10 lg:px-8">
-    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 px-8 py-10 sm:px-12 sm:py-14">
-      <div class="pointer-events-none absolute -right-10 -top-10 h-60 w-60 bg-indigo-300/30 blur-3xl anim-blob" />
-      <div class="relative">
-        <p class="text-xs uppercase tracking-widest text-indigo-700">FAQ</p>
-        <h1 class="mt-2 font-display text-3xl text-neutral-900 sm:text-4xl">자주묻는질문</h1>
-        <p class="mt-3 text-sm text-neutral-700">
-          궁금하신 점을 카테고리별로 정리했습니다. 답이 없는 질문은
-          <a href="#contact" class="text-indigo-600 hover:underline">텔레그램</a>으로 문의해주세요.
-        </p>
-      </div>
-    </section>
+  <div>
+    <PageHero eyebrow="FAQ" title="자주묻는질문" subtitle="궁금하신 점을 카테고리별로 정리했습니다. 답이 없는 질문은 텔레그램으로 문의해주세요." />
+    <div class="mx-auto max-w-4xl px-4 pt-8 pb-16 sm:px-6 sm:pt-10 lg:px-8">
 
     <section v-for="g in GROUPS" :key="g.title" class="mt-10">
       <h2 class="font-display text-xl text-neutral-900">{{ g.title }}</h2>
@@ -133,5 +124,6 @@ useSchemaOrg([
       </a>
       <p class="mt-3 text-xs text-sky-100">이메일: {{ CONTACT.email }}</p>
     </section>
+    </div>
   </div>
 </template>

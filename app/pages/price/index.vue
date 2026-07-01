@@ -42,33 +42,26 @@ useSeoMeta({
 
 <template>
   <div class="pb-16">
-    <!-- 히어로 -->
-    <section class="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600">
-      <div class="pointer-events-none absolute -left-16 -top-10 h-72 w-72 rounded-full bg-white/20 blur-3xl anim-blob" />
-      <div class="pointer-events-none absolute -right-10 bottom-0 h-72 w-72 rounded-full bg-white/10 blur-3xl anim-blob" style="animation-delay: -6s" />
-      <div class="relative mx-auto max-w-5xl px-4 py-12 text-center text-white sm:px-6 sm:py-16 lg:px-8">
-        <p class="text-xs uppercase tracking-[0.2em] text-white/80">PRICE LIST</p>
-        <h1 class="mt-2 font-display text-3xl tracking-tight sm:text-4xl">전체 가격표</h1>
-        <p class="mx-auto mt-3 max-w-xl text-sm leading-6 text-white/85">
-          모든 상품 가격을 한눈에. 표시 가격은 최저가 기준이며, 수량 옵션에 따라 달라집니다.
-        </p>
-        <!-- 요약 스탯 -->
-        <div class="mx-auto mt-7 grid max-w-lg grid-cols-3 gap-2 sm:gap-3">
-          <div class="rounded-2xl bg-white/15 px-3 py-3 backdrop-blur-sm">
-            <p class="font-display text-xl sm:text-2xl">{{ totalCount }}</p>
-            <p class="text-[11px] text-white/75">전체 상품</p>
-          </div>
-          <div class="rounded-2xl bg-white/15 px-3 py-3 backdrop-blur-sm">
-            <p class="font-display text-xl sm:text-2xl">{{ platformCount }}</p>
-            <p class="text-[11px] text-white/75">플랫폼</p>
-          </div>
-          <div class="rounded-2xl bg-white/15 px-3 py-3 backdrop-blur-sm">
-            <p class="font-display text-xl sm:text-2xl">{{ formatPrice(minPrice) }}~</p>
-            <p class="text-[11px] text-white/75">최저가</p>
-          </div>
+    <PageHero
+      eyebrow="PRICE LIST"
+      title="전체 가격표"
+      subtitle="모든 상품 가격을 한눈에. 표시 가격은 최저가 기준이며, 수량 옵션에 따라 달라집니다."
+    >
+      <div class="mx-auto grid max-w-lg grid-cols-3 gap-2 sm:gap-3">
+        <div class="rounded-2xl bg-white/15 px-3 py-3 backdrop-blur-sm">
+          <p class="font-display text-xl sm:text-2xl">{{ totalCount }}</p>
+          <p class="text-[11px] text-white/75">전체 상품</p>
+        </div>
+        <div class="rounded-2xl bg-white/15 px-3 py-3 backdrop-blur-sm">
+          <p class="font-display text-xl sm:text-2xl">{{ platformCount }}</p>
+          <p class="text-[11px] text-white/75">플랫폼</p>
+        </div>
+        <div class="rounded-2xl bg-white/15 px-3 py-3 backdrop-blur-sm">
+          <p class="font-display text-xl sm:text-2xl">{{ formatPrice(minPrice) }}~</p>
+          <p class="text-[11px] text-white/75">최저가</p>
         </div>
       </div>
-    </section>
+    </PageHero>
 
     <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
       <!-- 플랫폼 점프 -->

@@ -132,23 +132,17 @@ useSchemaOrg([
 </script>
 
 <template>
-  <div class="mx-auto max-w-5xl px-4 pt-6 pb-16 sm:px-6 sm:pt-10 lg:px-8">
-    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 px-5 py-8 sm:px-12 sm:py-14">
-      <div class="pointer-events-none absolute -left-10 -top-10 h-60 w-60 bg-indigo-300/30 blur-3xl anim-blob" />
-      <div class="pointer-events-none absolute -right-10 -bottom-10 h-60 w-60 bg-pink-300/30 blur-3xl anim-blob" style="animation-delay: -7s" />
-
-      <div class="relative">
-        <p class="text-[10px] uppercase tracking-widest text-indigo-700 sm:text-xs">CUSTOMER REVIEWS</p>
-        <h1 class="mt-2 font-display text-2xl text-neutral-900 sm:text-4xl">실제 고객 후기</h1>
-        <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:gap-4 sm:text-sm">
-          <span class="font-display text-xl text-amber-500 sm:text-2xl">★ {{ avgRating.toFixed(1) }}</span>
-          <span class="text-neutral-600">전체 평점</span>
-          <span class="text-neutral-400">·</span>
-          <span class="text-neutral-600">총 {{ REVIEWS.length }}건</span>
-          <span v-if="dbReviews.length > 0" class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-700">✓ 실제 구매자 {{ dbReviews.length }}건 포함</span>
-        </div>
+  <div>
+    <PageHero eyebrow="CUSTOMER REVIEWS" title="실제 고객 후기" subtitle="실계정 기반 처리 · 결과보고서로 검증된 실제 이용 후기입니다.">
+      <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm">
+        <span class="font-display text-2xl text-amber-300">★ {{ avgRating.toFixed(1) }}</span>
+        <span class="text-white/75">전체 평점</span>
+        <span class="text-white/50">·</span>
+        <span class="text-white/75">총 {{ REVIEWS.length }}건</span>
+        <span v-if="dbReviews.length > 0" class="rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-medium text-white">✓ 실제 구매자 {{ dbReviews.length }}건 포함</span>
       </div>
-    </section>
+    </PageHero>
+    <div class="mx-auto max-w-5xl px-4 pt-6 pb-16 sm:px-6 sm:pt-10 lg:px-8">
 
     <section class="mt-6 grid gap-3 sm:mt-10 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
       <article
@@ -171,5 +165,6 @@ useSchemaOrg([
     <p class="mt-8 text-center text-[11px] text-neutral-400 sm:mt-10 sm:text-xs">
       * 일부 후기는 개인정보 보호를 위해 닉네임이 부분 마스킹되어 표시됩니다.
     </p>
+    </div>
   </div>
 </template>
