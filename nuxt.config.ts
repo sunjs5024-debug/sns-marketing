@@ -75,6 +75,7 @@ export default defineNuxtConfig({
       "/products/**": { swr: 600 },
       "/sns/**": { swr: 600 },
       "/marketing/**": { swr: 600 },
+      "/price": { swr: 600 },
       "/api/products/**": { swr: 600 },
       "/api/reviews": { swr: 120 },
     },

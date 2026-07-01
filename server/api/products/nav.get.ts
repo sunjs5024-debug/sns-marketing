@@ -11,6 +11,7 @@ export default defineEventHandler(async () => {
         slug: true,
         name: true,
         isFeatured: true,
+        basePrice: true,
         category: { select: { slug: true } },
       },
       orderBy: [{ isFeatured: "desc" }, { salesCount: "desc" }],
@@ -19,6 +20,7 @@ export default defineEventHandler(async () => {
       slug: r.slug,
       name: r.name,
       featured: r.isFeatured,
+      basePrice: r.basePrice,
       categorySlug: r.category.slug,
     }));
   } catch (e) {

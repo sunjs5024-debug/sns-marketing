@@ -94,6 +94,7 @@ const marketingItems: DropItem[] = MARKETING_PLATFORMS.map((s) => ({
       <!-- 중앙: 보조 메뉴 -->
       <nav class="hidden lg:flex flex-1 items-center justify-center gap-1 text-sm font-medium text-neutral-700 whitespace-nowrap">
         <NuxtLink to="/sns" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">전체 상품</NuxtLink>
+        <NuxtLink to="/price" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">가격표</NuxtLink>
         <NuxtLink to="/reviews" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">후기</NuxtLink>
         <NuxtLink to="/guide" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">이용안내</NuxtLink>
         <NuxtLink to="/support" class="rounded-md px-3 py-2 transition hover:bg-neutral-100 hover:text-indigo-600">고객센터</NuxtLink>
