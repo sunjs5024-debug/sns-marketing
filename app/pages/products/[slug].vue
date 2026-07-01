@@ -349,6 +349,29 @@ async function handleAdd(mode: "cart" | "buy") {
     <!-- 이용 안내 — 진행 방식·주의사항·안전 이용 (플랫폼별 공통 본문) -->
     <ProductUsageGuide :platform-key="platformKeyFor(product.category.slug)" />
 
+    <!-- 추천 대상 + 안심 보장 (모든 상품 공통 안내) -->
+    <section class="mt-12 grid gap-4 lg:grid-cols-2">
+      <div class="rounded-3xl border border-neutral-100 bg-white p-6">
+        <h2 class="font-display text-lg text-neutral-900">이런 분께 추천해요</h2>
+        <ul class="mt-4 space-y-3 text-sm leading-6 text-neutral-700">
+          <li class="flex gap-2"><span class="text-indigo-500">✅</span><span>새 계정·신규 채널을 빠르게 키우고 싶은 분</span></li>
+          <li class="flex gap-2"><span class="text-indigo-500">✅</span><span>광고·협찬 전에 계정 신뢰도(팔로워·좋아요·후기)를 올리고 싶은 분</span></li>
+          <li class="flex gap-2"><span class="text-indigo-500">✅</span><span>알고리즘 노출·자연 유입의 초기 부스팅이 필요한 분</span></li>
+          <li class="flex gap-2"><span class="text-indigo-500">✅</span><span>소상공인·브랜드·크리에이터로 마케팅 효율을 높이고 싶은 분</span></li>
+        </ul>
+      </div>
+      <div class="rounded-3xl border border-neutral-100 bg-white p-6">
+        <h2 class="font-display text-lg text-neutral-900">안심하고 이용하세요</h2>
+        <ul class="mt-4 space-y-3 text-sm leading-6 text-neutral-700">
+          <li class="flex gap-2"><span>🔒</span><span><b>비밀번호 요구 없음</b> — 공개 URL·닉네임만으로 진행돼 계정이 안전해요.</span></li>
+          <li class="flex gap-2"><span>👥</span><span><b>실계정 기반</b> 처리로 자연스럽게 녹아드는 부스팅.</span></li>
+          <li class="flex gap-2"><span>🛡️</span><span><b>30일 유지 보장</b> — 보장 기간 내 이탈 시 자동 리필.</span></li>
+          <li class="flex gap-2"><span>📄</span><span>완료 시 <b>결과보고서 자동 발송</b> · 세금계산서 발행 가능.</span></li>
+          <li class="flex gap-2"><span>↩️</span><span>작업 시작 전에는 <b>100% 환불</b> 가능.</span></li>
+        </ul>
+      </div>
+    </section>
+
     <section v-if="faqs.length > 0" class="mt-12">
       <h2 class="font-display text-xl text-neutral-900">자주 묻는 질문</h2>
       <div class="mt-4 divide-y divide-neutral-100 rounded-3xl border border-neutral-100 bg-white">
