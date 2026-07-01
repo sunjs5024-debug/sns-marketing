@@ -128,10 +128,10 @@ const comingSoon = [
               v-for="p in byPlatform[slug] ?? []"
               :key="p.slug"
               :to="`/products/${p.slug}`"
-              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px] text-neutral-600 transition hover:bg-neutral-50 hover:text-indigo-600"
+              class="flex items-start gap-1.5 rounded-lg px-3 py-2 text-[13px] text-neutral-600 transition hover:bg-neutral-50 hover:text-indigo-600"
             >
-              <span class="min-w-0 flex-1 truncate">{{ p.name }}</span>
-              <span v-if="p.featured" class="shrink-0 rounded bg-rose-100 px-1 text-[9px] font-medium text-rose-600">인기</span>
+              <span class="min-w-0 flex-1 break-keep leading-snug">{{ p.name }}</span>
+              <span v-if="p.featured" class="mt-0.5 shrink-0 rounded bg-rose-100 px-1 text-[9px] font-medium text-rose-600">인기</span>
             </NuxtLink>
             <p v-if="(byPlatform[slug] ?? []).length === 0" class="px-3 py-1.5 text-xs text-neutral-400">준비 중</p>
             <NuxtLink
@@ -153,7 +153,7 @@ const comingSoon = [
           @click="toggle(c.name)"
         >
           <BrandIcon :kind="(c.kind as any)" :size="30" />
-          <span class="flex-1 text-sm font-medium text-neutral-500">{{ c.name }}</span>
+          <span class="flex-1 break-keep text-sm font-medium leading-snug text-neutral-500">{{ c.name }}</span>
           <span class="rounded bg-neutral-100 px-1.5 py-0.5 text-[9px] font-medium text-neutral-400">준비중</span>
           <svg
             class="h-4 w-4 shrink-0 text-neutral-300 transition-transform"
@@ -167,10 +167,10 @@ const comingSoon = [
           <div
             v-for="it in c.items"
             :key="it"
-            class="flex items-center justify-between gap-2 px-3 py-2 text-[13px] text-neutral-400"
+            class="flex items-start justify-between gap-2 px-3 py-2 text-[13px] text-neutral-400"
           >
-            <span class="min-w-0 flex-1 truncate">{{ it }}</span>
-            <span class="shrink-0 rounded bg-neutral-100 px-1 text-[9px]">준비중</span>
+            <span class="min-w-0 flex-1 break-keep leading-snug">{{ it }}</span>
+            <span class="mt-0.5 shrink-0 rounded bg-neutral-100 px-1 text-[9px]">준비중</span>
           </div>
         </div>
       </div>
