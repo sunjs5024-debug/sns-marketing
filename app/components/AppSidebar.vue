@@ -97,7 +97,7 @@ const comingSoon = [
 
       <template v-for="(g, gi) in groups" :key="g.label">
         <p
-          class="px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-widest text-neutral-400"
+          class="px-3 pb-1.5 text-xs font-bold tracking-wide text-neutral-700"
           :class="gi > 0 ? 'mt-4' : ''"
         >
           {{ g.label }}
@@ -145,7 +145,7 @@ const comingSoon = [
       </template>
 
       <!-- 곧 출시 (준비중) -->
-      <p class="mt-4 px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-widest text-neutral-400">곧 출시</p>
+      <p class="mt-4 px-3 pb-1.5 text-xs font-bold tracking-wide text-neutral-700">곧 출시</p>
       <div v-for="c in comingSoon" :key="c.name" class="mt-1.5">
         <button
           type="button"
