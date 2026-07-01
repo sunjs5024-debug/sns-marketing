@@ -175,5 +175,8 @@ const stats = computed(() => {
 
     <!-- SEO 본문 — 플랫폼 설명 콘텐츠 + 관련 가이드 내부링크 -->
     <CategoryLongContent :platform-key="meta.slug" />
+
+    <!-- 마케팅 랜딩 하단 — 이용안내·추천대상·안심보장·상담 CTA -->
+    <PlatformLandingExtras :platform-key="meta.slug" />
   </div>
 </template>
