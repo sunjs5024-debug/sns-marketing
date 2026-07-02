@@ -66,7 +66,7 @@ const marketingItems: DropItem[] = MARKETING_PLATFORMS.map((s) => ({
   <header class="sticky top-0 z-40 w-full border-b border-neutral-100 bg-white/85 backdrop-blur-md">
     <div class="flex h-16 flex-nowrap items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6 lg:px-8">
       <!-- 좌측: 로고 (사이드바 폭에 맞춰 정렬) -->
-      <div class="flex shrink-0 items-center gap-3 lg:w-60">
+      <div class="flex shrink-0 items-center gap-3 lg:w-72">
         <!-- 모바일: 햄버거 -->
         <button
           type="button"

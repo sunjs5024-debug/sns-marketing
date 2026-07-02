@@ -50,6 +50,11 @@ function baseFor(slug: PlatformSlug): string {
   return MARKETING_PLATFORMS.includes(slug) ? "marketing" : "sns";
 }
 
+// 사이드바용 짧은 이름 — 괄호 설명·군더더기 제거 (예: "인스타 한국 좋아요 (80% 여성 · HQ)" → "인스타 한국 좋아요")
+function short(name: string): string {
+  return name.split("(")[0].replace(/\s*[·|-]\s*$/, "").trim();
+}
+
 // 기본으로 첫 SNS 플랫폼 1개 펼쳐둠 (여러 개 동시 펼침 허용)
 const open = ref<Set<string>>(new Set(SNS_PLATFORMS.length ? [SNS_PLATFORMS[0] as string] : []));
 function toggle(key: string) {
@@ -67,7 +72,7 @@ const comingSoon = [
 </script>
 
 <template>
-  <aside class="hidden lg:flex w-64 shrink-0 flex-col border-r border-neutral-100 bg-white">
+  <aside class="hidden lg:flex w-72 shrink-0 flex-col border-r border-neutral-100 bg-white">
     <div class="sticky top-16 max-h-[calc(100vh-4rem)] overflow-y-auto px-3 py-4">
       <!-- 로그인 / 회원가입 (또는 로그인 시 유저 정보) -->
       <div class="mb-4">
@@ -128,10 +133,10 @@ const comingSoon = [
               v-for="p in byPlatform[slug] ?? []"
               :key="p.slug"
               :to="`/products/${p.slug}`"
-              class="flex items-start gap-1.5 rounded-lg px-3 py-2 text-[13px] text-neutral-600 transition hover:bg-neutral-50 hover:text-indigo-600"
+              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px] text-neutral-600 transition hover:bg-neutral-50 hover:text-indigo-600"
             >
-              <span class="min-w-0 flex-1 break-keep leading-snug">{{ p.name }}</span>
-              <span v-if="p.featured" class="mt-0.5 shrink-0 rounded bg-rose-100 px-1 text-[9px] font-medium text-rose-600">인기</span>
+              <span class="min-w-0 flex-1 truncate">{{ short(p.name) }}</span>
+              <span v-if="p.featured" class="shrink-0 rounded bg-rose-100 px-1 text-[9px] font-medium text-rose-600">인기</span>
             </NuxtLink>
             <p v-if="(byPlatform[slug] ?? []).length === 0" class="px-3 py-1.5 text-xs text-neutral-400">준비 중</p>
             <NuxtLink
