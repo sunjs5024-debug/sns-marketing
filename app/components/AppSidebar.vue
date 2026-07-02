@@ -50,9 +50,11 @@ function baseFor(slug: PlatformSlug): string {
   return MARKETING_PLATFORMS.includes(slug) ? "marketing" : "sns";
 }
 
-// 사이드바용 짧은 이름 — 괄호 설명·군더더기 제거 (예: "인스타 한국 좋아요 (80% 여성 · HQ)" → "인스타 한국 좋아요")
+// 사이드바용 짧은 이름 — 이름 끝의 괄호 설명만 제거.
+// 예: "인스타 한국 좋아요 (80% 여성 · HQ)" → "인스타 한국 좋아요"
+// ⚠️ "X(트위터) 좋아요 (글로벌)" 처럼 중간 괄호는 유지해야 하므로 끝 괄호만 자른다.
 function short(name: string): string {
-  return name.split("(")[0].replace(/\s*[·|-]\s*$/, "").trim();
+  return name.replace(/\s*\([^)]*\)\s*$/, "").replace(/\s*[·|-]\s*$/, "").trim();
 }
 
 // 기본으로 첫 SNS 플랫폼 1개 펼쳐둠 (여러 개 동시 펼침 허용)
