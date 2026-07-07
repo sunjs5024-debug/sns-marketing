@@ -40,24 +40,26 @@ function parseBankSms(raw: string): { bank: string | null; amount: number | null
 
   // 입금자명 — 한국 주요 은행 SMS 패턴 (여러 시도)
   //   "김선민\n입금"(KB 압축형), "입금 홍길동", "홍길동님", "[홍길동]", "홍길동 잔액"
+  //   ⚠️ 영문 입금자명("Next" 등)도 있어 한글 전용으로 두면 매칭 실패 → 영문·숫자 혼합 허용
   const patterns: RegExp[] = [
-    /([가-힣]{2,5})\s*[\r\n]+\s*입금/, // 이름이 "입금" 윗줄 (KB 압축형)
+    /([가-힣A-Za-z0-9]{2,12})\s*[\r\n]+\s*입금/, // 이름이 "입금" 윗줄 (KB 압축형) — 영문·숫자 포함
     /(?:입금|이체|타행이체)\s+([가-힣A-Za-z]{2,10})/,
-    /([가-힣]{2,5})\s*님/,
-    /([가-힣A-Za-z]{2,10})\s+잔액/,
-    /\(([가-힣A-Za-z]{2,10})\)/,
-    /\[([가-힣A-Za-z]{2,10})\]\s+(?:입금|이체)/,
+    /([가-힣A-Za-z]{2,10})\s*님/,
+    /([가-힣A-Za-z0-9]{2,12})\s+잔액/,
+    /\(([가-힣A-Za-z0-9]{2,12})\)/,
+    /\[([가-힣A-Za-z0-9]{2,12})\]\s+(?:입금|이체)/,
   ];
+  const BANNED = ["입금", "이체", "출금", "잔액", "예금", "통장", "Web발신"];
   let depositor: string | null = null;
   for (const p of patterns) {
     const m = raw.match(p);
     if (m?.[1]) {
       const candidate = m[1].trim();
-      // 은행명 / 의미 없는 단어 제외
-      if (!["입금", "이체", "출금", "잔액", "예금", "통장"].includes(candidate)) {
-        depositor = candidate;
-        break;
-      }
+      // 은행명·의미 없는 단어 제외 + 숫자/기호 뿐인 조각(계좌번호·금액) 배제
+      if (BANNED.includes(candidate)) continue;
+      if (/^[\d,.\-*]+$/.test(candidate)) continue;
+      depositor = candidate;
+      break;
     }
   }
 
@@ -118,7 +120,8 @@ export default defineEventHandler(async (event) => {
       where: {
         status: "PENDING",
         amount,
-        depositorName: depositor,
+        // 영문 입금자명 대비 대소문자 무시 매칭 (Next / NEXT / next 동일 처리)
+        depositorName: { equals: depositor, mode: "insensitive" },
         expiresAt: { gt: new Date() },
       },
       orderBy: { createdAt: "asc" },
@@ -163,7 +166,8 @@ export default defineEventHandler(async (event) => {
         status: "PENDING",
         paymentMethod: "TRANSFER",
         finalAmount: amount,
-        depositorName: depositor,
+        // 영문 입금자명 대비 대소문자 무시 매칭
+        depositorName: { equals: depositor, mode: "insensitive" },
         expiresAt: { gt: new Date() },
       },
       orderBy: { createdAt: "asc" },
