@@ -51,15 +51,29 @@ function parseBankSms(raw: string): { bank: string | null; amount: number | null
   ];
   const BANNED = ["입금", "이체", "출금", "잔액", "예금", "통장", "Web발신"];
   let depositor: string | null = null;
-  for (const p of patterns) {
-    const m = raw.match(p);
-    if (m?.[1]) {
-      const candidate = m[1].trim();
-      // 은행명·의미 없는 단어 제외 + 숫자/기호 뿐인 조각(계좌번호·금액) 배제
-      if (BANNED.includes(candidate)) continue;
-      if (/^[\d,.\-*]+$/.test(candidate)) continue;
-      depositor = candidate;
-      break;
+
+  // 0순위 — KB 압축형: "입금" 단독 줄의 바로 윗줄 전체를 이름으로.
+  // 정규식 문자클래스에 안 걸리는 특수문자·공백 이름((주)영천, J.KIM, KIM JI SU 등)까지 통째로 커버.
+  const lines = raw.split(/\r?\n/).map((l) => l.trim());
+  const depositIdx = lines.findIndex((l) => /^입금$/.test(l));
+  if (depositIdx > 0) {
+    const cand = lines[depositIdx - 1]!;
+    if (cand && cand.length <= 20 && !BANNED.includes(cand) && !/^[\d,.\-*]+$/.test(cand)) {
+      depositor = cand;
+    }
+  }
+
+  if (!depositor) {
+    for (const p of patterns) {
+      const m = raw.match(p);
+      if (m?.[1]) {
+        const candidate = m[1].trim();
+        // 은행명·의미 없는 단어 제외 + 숫자/기호 뿐인 조각(계좌번호·금액) 배제
+        if (BANNED.includes(candidate)) continue;
+        if (/^[\d,.\-*]+$/.test(candidate)) continue;
+        depositor = candidate;
+        break;
+      }
     }
   }
 
@@ -69,6 +83,12 @@ function parseBankSms(raw: string): { bank: string | null; amount: number | null
   }
 
   return { bank, amount, depositor };
+}
+
+// 입금자명 비교용 정규화 — 공백·특수문자 제거 + 소문자화.
+// "(주)영천" vs "주영천", "KIM JI SU" vs "kimjisu", "J.Kim" vs "jkim" 모두 동일 취급.
+function normName(s: string | null | undefined): string {
+  return (s ?? "").toLowerCase().replace(/[^0-9a-z가-힣]/g, "");
 }
 
 export default defineEventHandler(async (event) => {
@@ -116,16 +136,17 @@ export default defineEventHandler(async (event) => {
   // 2) 매칭 시도 — 금액 + 입금자명 둘 다 파싱돼야 시도
   if (amount && depositor) {
     // 2-A) Charge 매칭 (포인트 충전)
-    const chargeCandidate = await prisma.charge.findFirst({
+    // 같은 금액의 대기 건을 모두 가져와 정규화된 이름으로 비교 (특수문자·공백·대소문자 무시)
+    const target = normName(depositor);
+    const chargePendings = await prisma.charge.findMany({
       where: {
         status: "PENDING",
         amount,
-        // 영문 입금자명 대비 대소문자 무시 매칭 (Next / NEXT / next 동일 처리)
-        depositorName: { equals: depositor, mode: "insensitive" },
         expiresAt: { gt: new Date() },
       },
       orderBy: { createdAt: "asc" },
     });
+    const chargeCandidate = target ? (chargePendings.find((c) => normName(c.depositorName) === target) ?? null) : null;
 
     if (chargeCandidate) {
       await prisma.$transaction([
@@ -161,17 +182,16 @@ export default defineEventHandler(async (event) => {
     }
 
     // 2-B) Order 매칭 (주문 직접 결제)
-    const orderCandidate = await prisma.order.findFirst({
+    const orderPendings = await prisma.order.findMany({
       where: {
         status: "PENDING",
         paymentMethod: "TRANSFER",
         finalAmount: amount,
-        // 영문 입금자명 대비 대소문자 무시 매칭
-        depositorName: { equals: depositor, mode: "insensitive" },
         expiresAt: { gt: new Date() },
       },
       orderBy: { createdAt: "asc" },
     });
+    const orderCandidate = target ? (orderPendings.find((o) => normName(o.depositorName) === target) ?? null) : null;
 
     if (orderCandidate) {
       await prisma.$transaction([
