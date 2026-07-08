@@ -71,7 +71,7 @@ export const PLATFORMS: Record<PlatformSlug, PlatformMeta> = {
     accent: "from-slate-800 to-cyan-500",
     bgGradient: "from-slate-50 via-cyan-50 to-fuchsia-50",
     tagline: "팔로워·좋아요·조회수 한 번에",
-    description: "글로벌·한국 타겟 모두 가능. 추천 피드 노출을 위한 초기 부스팅을 안전하게 처리합니다.",
+    description: "틱톡 팔로워 늘리기·좋아요·조회수 부스팅을 한 곳에서. 글로벌·한국 타겟 모두 가능하며, 추천 피드(FYP) 노출을 위한 초기 신호를 안전하게 만들어 드립니다.",
   },
   kakaotalk: {
     slug: "kakaotalk",

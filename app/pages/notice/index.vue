@@ -1,7 +1,7 @@
 <script setup lang="ts">
 useSeoMeta({
   title: "공지사항",
-  description: "SNS소셜팩토리 공지사항 — 서비스 안내, 결제·운영 정책, 업데이트 소식을 확인하세요.",
+  description: "SNS소셜팩토리 공지사항 — 신규 상품 출시, 서비스 점검 안내, 결제·운영 정책 변경, 이벤트·업데이트 소식을 가장 빠르게 확인하세요.",
   ogTitle: "공지사항 | SNS소셜팩토리",
   ogDescription: "SNS소셜팩토리 서비스 안내와 정책, 업데이트 소식.",
   robots: "index, follow",
