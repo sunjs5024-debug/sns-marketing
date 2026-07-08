@@ -77,7 +77,7 @@ const FULL: Array<{
   {
     // '80% 여성' 가짜 수치(이름·설명·본문 3곳) + No Drop 영어용어 제거
     slug: "ig-followers-kr",
-    name: "인스타 한국인 팔로워 (실계정)",
+    name: "인스타그램 한국인 팔로워 (실계정)",
     description: "인스타 팔로워를 한국인 실계정으로. 활동 이력 있는 계정만 써서 자연스럽게 늘어나요.",
     longDescription: `한국에서 활동하는 **실제 사용자 계정**으로 인스타 팔로워를 늘려드립니다. 프로필과 게시물이 살아있는 활성 계정만 사용해 자연스러운 팔로워 그래프를 만들어요.
 
@@ -129,11 +129,12 @@ const FIELD: Array<{ slug: string; fields: Record<string, string> }> = [
   },
   // ── 타이틀 키워드 정조준 (keywords[0] = <title> 선두 정확구문) ──
   //    ①인스타→인스타그램 풀네임(경쟁 상위 전부 풀네임) ②같은 keywords[0] 상품 간 중복 타이틀 해소
-  { slug: "ig-followers-global", fields: { keywords: "인스타그램 해외 팔로워, 인스타 팔로워, 글로벌 팔로워, 가성비 인스타" } },
-  { slug: "ig-likes-kr", fields: { keywords: "인스타그램 좋아요, 인스타 좋아요, 인스타그램 좋아요 늘리기, 한국 좋아요, 게시물 좋아요" } },
-  { slug: "ig-comments-kr", fields: { keywords: "인스타그램 댓글, 인스타 댓글, 커스텀 댓글, 게시물 댓글" } },
-  { slug: "ig-comments-real", fields: { keywords: "인스타그램 댓글 좋아요, 인스타 댓글, 게시물 댓글, 인스타 마케팅" } },
-  { slug: "ig-reels-views", fields: { keywords: "인스타그램 릴스 조회수, 릴스 조회수, 인스타 릴스, 릴스 알고리즘" } },
+  //    name(=H1)도 인스타그램 풀네임으로. ig-followers-global '여성 위주'는 근거 없는 성비 주장 → 제거
+  { slug: "ig-followers-global", fields: { name: "인스타그램 해외 팔로워 (가성비)", description: "해외 실계정 기반 가성비 팔로워. 빠른 처리와 합리적 단가로 부담 없는 첫 부스팅.", keywords: "인스타그램 해외 팔로워, 인스타 팔로워, 글로벌 팔로워, 가성비 인스타" } },
+  { slug: "ig-likes-kr", fields: { name: "인스타그램 게시물 좋아요 (한국인)", keywords: "인스타그램 좋아요, 인스타 좋아요, 인스타그램 좋아요 늘리기, 한국 좋아요, 게시물 좋아요" } },
+  { slug: "ig-comments-kr", fields: { name: "인스타그램 게시물 댓글 (실계정)", keywords: "인스타그램 댓글, 인스타 댓글, 커스텀 댓글, 게시물 댓글" } },
+  { slug: "ig-comments-real", fields: { name: "인스타그램 댓글 + 좋아요 패키지", keywords: "인스타그램 댓글 좋아요, 인스타 댓글, 게시물 댓글, 인스타 마케팅" } },
+  { slug: "ig-reels-views", fields: { name: "인스타그램 릴스 조회수 부스팅", keywords: "인스타그램 릴스 조회수, 릴스 조회수, 인스타 릴스, 릴스 알고리즘" } },
   { slug: "tg-subscribers-global", fields: { keywords: "텔레그램 채널 멤버, 텔레그램 구독자, Telegram Members, 텔레그램 가성비" } }, // '텔레그램 구독자'는 kr(주력)이 소유
   { slug: "tg-bot-start", fields: { keywords: "텔레그램 봇 사용자, 텔레그램 봇, Bot Start, 챗봇" } },
   { slug: "yt-likes-korea", fields: { keywords: "유튜브 한국인 좋아요, 유튜브 좋아요, 한국 유튜브, 유튜브 마케팅" } }, // 기존 '유튜브 한국'→타이틀 어색
@@ -260,6 +261,7 @@ async function main() {
   for (const f of FIELD) {
     if (apply) {
       for (const [k, v] of Object.entries(f.fields)) {
+        if (k === "name") await sql`UPDATE "Product" SET name=${v} WHERE slug=${f.slug}`;
         if (k === "description") await sql`UPDATE "Product" SET description=${v} WHERE slug=${f.slug}`;
         if (k === "keywords") await sql`UPDATE "Product" SET keywords=${v} WHERE slug=${f.slug}`;
       }
