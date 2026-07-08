@@ -59,12 +59,19 @@ const metaDesc = computed(() => {
     : base;
 });
 
+// ★SEO 타이틀 = 구매 검색어 정조준. keywords 첫 항목(정확 핵심키워드) + "구매·늘리기".
+//   기존 title=제품명("텔레그램 채널 구독자 (HQ…)")은 실검색어 "텔레그램 구독자 구매/늘리기"를
+//   놓쳐 2페이지에 묶였음. 경쟁 상위는 전부 풀키워드를 타이틀에 박음 → 온페이지 즉시 갭 해소.
+const seoKeyword = (product.value.keywords ?? "").split(",")[0]?.trim() || product.value.name;
+// 보통 "구매·늘리기"(구매+늘리기 두 검색의도 동시 조준). 단 키워드에 이미 "구매"가 있으면 중복 방지.
+const seoTitle = seoKeyword.includes("구매") ? `${seoKeyword} 늘리기` : `${seoKeyword} 구매·늘리기`;
+
 useSeoMeta({
   // 전역 titleTemplate(seo-utils)가 " | SNS소셜팩토리"를 자동으로 덧붙임 → 본문엔 브랜드 제외(중복 방지)
-  title: product.value.name,
+  title: seoTitle,
   description: metaDesc.value,
   keywords: product.value.keywords ?? undefined,
-  ogTitle: `${product.value.name} | SNS소셜팩토리`,
+  ogTitle: `${seoTitle} | SNS소셜팩토리`,
   ogDescription: metaDesc.value,
   ogType: "product",
   ogLocale: "ko_KR",
@@ -76,6 +83,8 @@ useSeoMeta({
 const lane = laneForCategorySlug(product.value.category.slug);
 const sectionLabel = LANE_META[lane].label;
 const sectionPath = LANE_META[lane].path;
+// 브레드크럼 카테고리 링크 = 플랫폼 목록 페이지(예: /sns/telegram). "전체 보기" 링크(하단)와 동일 규칙.
+const categoryUrl = `${sectionPath}/${product.value.category.slug.split("-")[0]}`;
 
 // FAQ 파싱 — DB Json 필드
 type Faq = { q: string; a: string };
@@ -203,11 +212,13 @@ async function handleAdd(mode: "cart" | "buy") {
 
 <template>
   <div v-if="product" class="mx-auto max-w-7xl px-4 py-6 pb-24 sm:px-6 sm:py-10 lg:px-8 lg:pb-10">
+    <!-- 브레드크럼 = 실제 내부링크(홈·섹션·카테고리). 크롤러가 상위 계층을 따라 크롤. -->
     <nav class="mb-6 text-xs text-neutral-500">
-      <span>홈</span> <span class="mx-1">/</span>
-      <span>{{ sectionLabel }}</span>
+      <NuxtLink to="/" class="hover:text-neutral-900 hover:underline">홈</NuxtLink>
       <span class="mx-1">/</span>
-      <span class="text-neutral-900">{{ product.category.name }}</span>
+      <NuxtLink :to="sectionPath" class="hover:text-neutral-900 hover:underline">{{ sectionLabel }}</NuxtLink>
+      <span class="mx-1">/</span>
+      <NuxtLink :to="categoryUrl" class="text-neutral-900 hover:underline">{{ product.category.name }}</NuxtLink>
     </nav>
 
     <div class="grid gap-6 lg:grid-cols-2 lg:gap-10">
@@ -343,9 +354,8 @@ async function handleAdd(mode: "cart" | "buy") {
 
     <section v-if="product.longDescription" class="mt-16">
       <h2 class="font-display text-xl text-neutral-900">상품 상세 안내</h2>
-      <div class="mt-4 whitespace-pre-line rounded-3xl border border-neutral-100 bg-white p-6 text-sm leading-7 text-neutral-700">
-        {{ product.longDescription }}
-      </div>
+      <!-- mdLite: ## 소제목 · **볼드** · - 불릿 렌더(우리 DB 콘텐츠 전용, 이스케이프 후 안전) -->
+      <div class="mt-4 rounded-3xl border border-neutral-100 bg-white p-6 text-sm text-neutral-700" v-html="mdLite(product.longDescription)" />
     </section>
 
     <!-- 이용 안내 — 진행 방식·주의사항·안전 이용 (플랫폼별 공통 본문) -->
@@ -382,10 +392,15 @@ async function handleAdd(mode: "cart" | "buy") {
             <span class="pr-3">{{ f.q }}</span>
             <span class="text-neutral-400 transition group-open:rotate-180">▾</span>
           </summary>
-          <p class="mt-3 text-sm leading-7 text-neutral-600 whitespace-pre-line">{{ f.a }}</p>
+          <p class="mt-3 text-sm text-neutral-600" v-html="mdLite(f.a)" />
+          <!-- FAQ 답변도 **볼드**/불릿 지원 -->
+
         </details>
       </div>
     </section>
+
+    <!-- 관련 가이드 내부링크 — 미크롤 가이드에 크롤 경로 제공(색인 유도) + 검색자 정보 연결 -->
+    <RelatedGuideLinks :platform-key="iconKey" card />
 
     <!-- 이 상품 실제 구매자 후기 (DB 승인 리뷰만) -->
     <section
