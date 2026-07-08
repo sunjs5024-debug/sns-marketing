@@ -109,7 +109,8 @@ const FULL: Array<{
       { q: "비공개 계정도 가능한가요?", a: "아니요. 공개 계정만 가능합니다. 작업 전에 계정을 공개로 전환해주세요." },
       { q: "작업 시작 후 취소 가능한가요?", a: "작업이 시작된 후에는 취소가 어렵습니다. 시작 전이라면 100% 환불 가능합니다." },
     ],
-    keywords: "인스타 팔로워, 한국인 팔로워, 인스타 한국, 한국 타겟 마케팅, 인스타그램 팔로워 늘리기",
+    // 풀네임 정확구문 선두 — 경쟁 상위 타이틀은 전부 "인스타그램" 풀네임(우리만 축약이었음)
+    keywords: "인스타그램 팔로워, 인스타 팔로워, 한국인 팔로워, 인스타그램 팔로워 늘리기, 한국 타겟 마케팅",
   },
 ];
 
@@ -123,9 +124,23 @@ const FIELD: Array<{ slug: string; fields: Record<string, string> }> = [
     slug: "tg-premium-members",
     fields: {
       description: "텔레그램 프리미엄(⭐) 계정 구독자 · 채널 신뢰도 상승 · 7일 리필.",
-      keywords: "텔레그램 프리미엄, Telegram Premium, 프리미엄 멤버, 텔레그램 채널 신뢰도",
+      keywords: "텔레그램 프리미엄 멤버, 텔레그램 프리미엄, Telegram Premium, 텔레그램 채널 신뢰도",
     },
   },
+  // ── 타이틀 키워드 정조준 (keywords[0] = <title> 선두 정확구문) ──
+  //    ①인스타→인스타그램 풀네임(경쟁 상위 전부 풀네임) ②같은 keywords[0] 상품 간 중복 타이틀 해소
+  { slug: "ig-followers-global", fields: { keywords: "인스타그램 해외 팔로워, 인스타 팔로워, 글로벌 팔로워, 가성비 인스타" } },
+  { slug: "ig-likes-kr", fields: { keywords: "인스타그램 좋아요, 인스타 좋아요, 인스타그램 좋아요 늘리기, 한국 좋아요, 게시물 좋아요" } },
+  { slug: "ig-comments-kr", fields: { keywords: "인스타그램 댓글, 인스타 댓글, 커스텀 댓글, 게시물 댓글" } },
+  { slug: "ig-comments-real", fields: { keywords: "인스타그램 댓글 좋아요, 인스타 댓글, 게시물 댓글, 인스타 마케팅" } },
+  { slug: "ig-reels-views", fields: { keywords: "인스타그램 릴스 조회수, 릴스 조회수, 인스타 릴스, 릴스 알고리즘" } },
+  { slug: "tg-subscribers-global", fields: { keywords: "텔레그램 채널 멤버, 텔레그램 구독자, Telegram Members, 텔레그램 가성비" } }, // '텔레그램 구독자'는 kr(주력)이 소유
+  { slug: "tg-bot-start", fields: { keywords: "텔레그램 봇 사용자, 텔레그램 봇, Bot Start, 챗봇" } },
+  { slug: "yt-likes-korea", fields: { keywords: "유튜브 한국인 좋아요, 유튜브 좋아요, 한국 유튜브, 유튜브 마케팅" } }, // 기존 '유튜브 한국'→타이틀 어색
+  { slug: "yt-shorts-views", fields: { keywords: "유튜브 쇼츠 조회수, 쇼츠 조회수, YouTube Shorts, 쇼츠 알고리즘" } },
+  { slug: "tt-followers-kr", fields: { keywords: "틱톡 활성 팔로워, 틱톡 팔로워, 틱톡 팔로워 늘리기, 틱톡 라이브" } }, // '틱톡 팔로워'는 global이 소유
+  { slug: "x-followers-global", fields: { keywords: "트위터 팔로워, X 팔로워, Twitter Followers, 트위터 마케팅" } }, // 실검색은 '트위터'
+  { slug: "x-followers-kr", fields: { keywords: "X(트위터) 팔로워, 트위터 팔로워 실계정, 실계정 팔로워, 트위터 마케팅" } },
 ];
 
 // ── ② 도매 영어용어 사전 (순서 중요: 긴 것 먼저) ────────────────
