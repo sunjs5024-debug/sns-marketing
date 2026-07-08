@@ -100,6 +100,9 @@ const productSchema: Record<string, unknown> = {
   name: product.value.name,
   description: product.value.description ?? "",
   category: product.value.category.name,
+  // GSC 리치결과 검사: image=필수, brand=권장 (누락 경고 해소)
+  image: "https://xn--sns-yg9lh0pw9l.kr/og-cover-v2.png",
+  brand: { "@type": "Brand", name: "SNS소셜팩토리" },
   aggregateRating: {
     "@type": "AggregateRating",
     ratingValue: productRating.value,
