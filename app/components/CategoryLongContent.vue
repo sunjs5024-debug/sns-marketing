@@ -1,21 +1,10 @@
 <script setup lang="ts">
 import type { PlatformSlug } from "#shared/catalog";
 import { getPlatformContent } from "#shared/platform-content";
-import { getGuide } from "#shared/guides";
 
 const props = defineProps<{ platformKey: PlatformSlug | null }>();
 
 const content = computed(() => getPlatformContent(props.platformKey));
-
-// 관련 가이드 — 내부링크 (슬러그 → 라벨/경로)
-const relatedGuides = computed(() =>
-  (content.value?.relatedGuideSlugs ?? [])
-    .map((slug) => {
-      const g = getGuide(slug);
-      return g ? { slug: g.slug, label: g.breadcrumbLabel } : null;
-    })
-    .filter((g): g is { slug: string; label: string } => g !== null),
-);
 </script>
 
 <template>
@@ -30,20 +19,8 @@ const relatedGuides = computed(() =>
         </section>
       </div>
 
-      <!-- 관련 가이드 내부링크 -->
-      <div v-if="relatedGuides.length > 0" class="mt-8 border-t border-neutral-100 pt-6">
-        <p class="text-xs uppercase tracking-widest text-indigo-700">관련 가이드</p>
-        <ul class="mt-3 space-y-2">
-          <li v-for="g in relatedGuides" :key="g.slug">
-            <NuxtLink
-              :to="`/guide/${g.slug}`"
-              class="inline-flex items-center gap-1.5 text-sm text-neutral-800 hover:text-indigo-600 hover:underline"
-            >
-              <span class="text-indigo-500">→</span> {{ g.label }}
-            </NuxtLink>
-          </li>
-        </ul>
-      </div>
+      <!-- 관련 가이드 내부링크 (RelatedGuideLinks 공용 컴포넌트) -->
+      <RelatedGuideLinks :platform-key="platformKey" bordered />
     </div>
   </section>
 </template>
