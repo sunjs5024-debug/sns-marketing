@@ -1,6 +1,10 @@
-# urpanel 발주 주문 상태 동기화 (5분 주기)
+# urpanel 발주 주문 상태 동기화
 # 필요한 secrets:
 #   CRON_SECRET  — .env 의 CRON_SECRET 와 동일한 값
+#
+# ⚠️ GitHub 의 schedule 은 정확히 5분마다 돌지 않는다 (실측 1~3시간 지연).
+#    그래서 이 cron 은 "보조 수단"이고, 실제 최신 상태 보장은
+#    주문 조회 API 의 즉시 동기화(syncOrderStatusIfStale)가 담당한다.
 
 name: Sync urpanel Orders
 
@@ -23,8 +27,29 @@ jobs:
           SITE_URL: https://xn--sns-yg9lh0pw9l.kr
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          set +e
-          RESP=$(curl -s -X POST "${SITE_URL}/api/cron/sync-urpanel" \
+          set -euo pipefail
+
+          if [ -z "${CRON_SECRET}" ]; then
+            echo "::error::CRON_SECRET 시크릿이 설정되어 있지 않습니다. Settings → Secrets → Actions 에서 추가하세요."
+            exit 1
+          fi
+
+          # HTTP 상태코드와 본문을 함께 받는다
+          RESP=$(curl -s -w "\n%{http_code}" -X POST "${SITE_URL}/api/cron/sync-urpanel" \
             -H "X-CRON-SECRET: ${CRON_SECRET}" \
             --max-time 60)
-          echo "Response: $RESP"
+          BODY=$(echo "$RESP" | sed '$d')
+          CODE=$(echo "$RESP" | tail -n1)
+
+          echo "HTTP $CODE"
+          echo "Response: $BODY"
+
+          # 이전에는 set +e 로 실패를 삼켜서 인증 실패(401)에도 초록불이 떴다 → 반드시 실패로 표시
+          if [ "$CODE" != "200" ]; then
+            echo "::error::동기화 엔드포인트 호출 실패 (HTTP $CODE)"
+            exit 1
+          fi
+          if echo "$BODY" | grep -q '"ok":false'; then
+            echo "::error::동기화 처리 중 오류: $BODY"
+            exit 1
+          fi

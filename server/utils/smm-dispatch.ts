@@ -192,6 +192,76 @@ export async function syncUrpanelStatuses(): Promise<{
 }
 
 /**
+ * 특정 주문 1건만 즉시 동기화 (고객이 주문 조회할 때 호출).
+ *
+ * cron(GitHub Actions)은 스케줄이 실제로는 1~3시간 간격으로 지연 실행되기 때문에
+ * cron 에만 의존하면 이미 끝난 작업이 사이트에서 "진행중"으로 오래 남는다.
+ * → 고객이 주문을 볼 때마다 오래된 항목만 골라 urpanel 에 물어본다.
+ *
+ * - maxAgeMs 이내에 이미 동기화된 항목은 건너뛴다 (조회 폭주 시 API 낭비 방지)
+ * - 실패해도 절대 예외를 던지지 않는다 (주문 조회 화면이 깨지면 안 됨)
+ * @returns 실제로 갱신했으면 true (호출측에서 다시 읽어야 함)
+ */
+export async function syncOrderStatusIfStale(orderId: string, maxAgeMs = 60_000): Promise<boolean> {
+  try {
+    const items = await prisma.orderItem.findMany({
+      where: {
+        orderId,
+        externalProvider: "urpanel",
+        externalOrderId: { not: null },
+        externalStatus: { notIn: ["Completed", "Cancelled"] },
+      },
+      select: { id: true, externalOrderId: true, lastSyncedAt: true },
+    });
+    if (items.length === 0) return false;
+
+    const now = Date.now();
+    const stale = items.filter((it) => !it.lastSyncedAt || now - it.lastSyncedAt.getTime() > maxAgeMs);
+    if (stale.length === 0) return false;
+
+    const statusMap = await getUrpanelOrdersStatus(stale.map((it) => it.externalOrderId!));
+
+    let updated = 0;
+    for (const item of stale) {
+      const st = statusMap[item.externalOrderId!];
+      if (!st) continue;
+      await prisma.orderItem.update({
+        where: { id: item.id },
+        data: {
+          externalStatus: st.status ?? null,
+          remainsCount: st.remains !== undefined ? Number(st.remains) : null,
+          startCount: st.start_count !== undefined ? Number(st.start_count) : null,
+          externalCharge: st.charge !== undefined ? Number(st.charge) : null,
+          lastSyncedAt: new Date(),
+        },
+      });
+      updated++;
+    }
+
+    if (updated > 0) await markOrderCompletedIfDone(orderId);
+    return updated > 0;
+  } catch (e) {
+    // 외부 패널 장애 등 — 조회는 계속 되어야 하므로 삼킨다
+    console.error("[sync-on-view] 실패", e);
+    return false;
+  }
+}
+
+/** 주문 1건이 모두 끝났으면 COMPLETED 처리 (markCompletedOrders 의 단건 버전) */
+async function markOrderCompletedIfDone(orderId: string) {
+  const order = await prisma.order.findUnique({ where: { id: orderId }, include: { items: true } });
+  if (!order || order.status !== "PAID") return;
+  const allDone = order.items.every((it) => !it.externalOrderId || it.externalStatus === "Completed");
+  const hasAnyDispatched = order.items.some((it) => !!it.externalOrderId);
+  if (allDone && hasAnyDispatched) {
+    await prisma.order.update({
+      where: { id: orderId },
+      data: { status: "COMPLETED", completedAt: new Date() },
+    });
+  }
+}
+
+/**
  * 모든 OrderItem이 Completed(또는 외부 매핑 없음)인 Order를 COMPLETED 로 변경
  */
 async function markCompletedOrders() {
