@@ -72,6 +72,8 @@ export default defineNuxtConfig({
     // 공개 상품 페이지·카탈로그 API 를 엣지에서 SWR 캐싱 → 재방문 시 DB 안 거치고 즉시 로드.
     // (개인화 데이터인 /api/header·/api/me·/api/cart·/api/orders 등은 캐시 대상 아님)
     routeRules: {
+      // 통합·폐지된 상품 → 대체 상품으로 301 영구 리다이렉트 (색인/북마크 보존)
+      "/products/ig-comments-real": { redirect: { to: "/products/ig-comments-kr", statusCode: 301 } },
       "/products/**": { swr: 600 },
       "/sns/**": { swr: 600 },
       "/marketing/**": { swr: 600 },
