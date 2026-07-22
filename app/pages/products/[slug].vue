@@ -315,11 +315,27 @@ async function handleAdd(mode: "cart" | "buy") {
           </label>
 
           <!-- 인스타 계열: 반영 지연 방지 안내 (플래그·공개계정) -->
-          <div v-if="isInstagram" class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs leading-5 text-amber-800">
-            <b>⚠️ 주문 전 확인</b> — 아래 설정이 안 돼 있으면 좋아요·댓글·팔로워 반영이 지연/누락될 수 있어요.
-            <br />① 계정을 <b>공개</b>로 전환
-            <br />② 인스타 <b>설정 → 팔로우 및 친구 초대 → '검토를 위한 플래그' 끄기</b>
-            <br />③ 해당 게시물의 댓글·좋아요 <b>제한 해제</b>
+          <div v-if="isInstagram" class="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-900">
+            <p class="flex items-center gap-1.5 text-sm font-semibold">
+              <span>⚠️</span><span>주문 전 확인해 주세요</span>
+            </p>
+            <p class="mt-1 text-[13px] leading-6 text-amber-800">
+              아래 설정이 안 돼 있으면 좋아요·댓글·팔로워 반영이 지연되거나 누락될 수 있어요.
+            </p>
+            <ul class="mt-3 space-y-2 text-[13px] leading-6">
+              <li class="flex gap-2">
+                <span class="font-semibold text-amber-600">1.</span>
+                <span>계정을 <b>공개</b>로 전환</span>
+              </li>
+              <li class="flex gap-2">
+                <span class="font-semibold text-amber-600">2.</span>
+                <span>인스타 <b>설정 → 팔로우 및 친구 초대 → '검토를 위한 플래그'</b> 끄기</span>
+              </li>
+              <li class="flex gap-2">
+                <span class="font-semibold text-amber-600">3.</span>
+                <span>해당 게시물의 <b>댓글·좋아요 제한</b> 해제</span>
+              </li>
+            </ul>
           </div>
           <label class="block">
             <span class="text-sm text-neutral-700">요청사항 (선택)</span>
