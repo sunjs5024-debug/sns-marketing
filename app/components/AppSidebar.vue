@@ -16,6 +16,10 @@ const { data: header } = await useFetch("/api/header", {
   key: "header",
   default: () => ({ isAuthed: false, role: null, cartCount: 0, name: null, points: 0 }),
 });
+// 쪽지함 모달 열기 (전역 상태)
+const messagesModalOpen = useState<boolean>("messagesModalOpen", () => false);
+function openMessages() { messagesModalOpen.value = true; }
+
 async function onSignOut() {
   try {
     const csrf = await $fetch<{ csrfToken: string }>("/api/auth/csrf");
@@ -89,9 +93,9 @@ const comingSoon = [
           </div>
           <div class="mt-2 grid grid-cols-2 gap-2">
             <NuxtLink to="/orders" class="rounded-xl border border-neutral-200 py-2 text-center text-xs text-neutral-700 hover:bg-neutral-50">내 주문</NuxtLink>
-            <NuxtLink to="/messages" class="relative rounded-xl border border-neutral-200 py-2 text-center text-xs text-neutral-700 hover:bg-neutral-50">
+            <button type="button" class="relative rounded-xl border border-neutral-200 py-2 text-center text-xs text-neutral-700 hover:bg-neutral-50" @click="openMessages">
               쪽지함<span v-if="(header?.unreadMessages ?? 0) > 0" class="ml-1 inline-flex items-center rounded-full bg-rose-500 px-1.5 text-[10px] font-medium text-white">{{ header?.unreadMessages }}</span>
-            </NuxtLink>
+            </button>
           </div>
           <button type="button" class="mt-2 w-full rounded-xl border border-neutral-200 py-2 text-center text-xs text-neutral-500 hover:bg-neutral-50" @click="onSignOut">로그아웃</button>
           <NuxtLink v-if="header?.role === 'ADMIN'" to="/admin" class="mt-2 block rounded-xl bg-amber-100 py-2 text-center text-xs text-amber-800 hover:bg-amber-200">관리자 콘솔</NuxtLink>

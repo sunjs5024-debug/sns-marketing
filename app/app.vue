@@ -14,5 +14,6 @@ const showSidebar = computed(() => !route.path.startsWith("/admin"));
       </main>
     </div>
     <SiteFooter />
+    <MessagesModal />
   </div>
 </template>
