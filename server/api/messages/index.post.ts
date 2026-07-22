@@ -11,6 +11,12 @@ export default defineEventHandler(async (event) => {
   const parsed = schema.safeParse(await readBody(event));
   if (!parsed.success) throw createError({ statusCode: 400, statusMessage: "메시지를 입력해주세요." });
 
+  // 고객은 "답장"만 가능 — 운영팀이 먼저 보낸 쪽지가 있어야 전송 허용
+  const adminStarted = await prisma.message.count({ where: { userId, fromAdmin: true } });
+  if (adminStarted === 0) {
+    throw createError({ statusCode: 403, statusMessage: "운영팀이 보낸 쪽지에만 답장하실 수 있어요." });
+  }
+
   const msg = await prisma.message.create({
     data: { userId, fromAdmin: false, body: parsed.data.body },
     select: { id: true, fromAdmin: true, body: true, readAt: true, createdAt: true },

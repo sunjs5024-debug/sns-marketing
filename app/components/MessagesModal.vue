@@ -48,6 +48,9 @@ async function send() {
   }
 }
 
+// 고객은 운영팀이 먼저 보낸 쪽지가 있을 때만 답장 가능
+const canReply = computed(() => messages.value.some((m) => m.fromAdmin));
+
 function close() { open.value = false; }
 
 // 열릴 때 로드 + 배경 스크롤 잠금
@@ -96,24 +99,29 @@ onUnmounted(() => { window.removeEventListener("keydown", onKey); if (import.met
             </div>
           </div>
 
-          <!-- 입력 -->
+          <!-- 입력 (운영팀이 먼저 쪽지를 보낸 경우에만 답장 가능) -->
           <div class="border-t border-neutral-100 p-3">
-            <textarea
-              v-model="draft"
-              rows="2"
-              placeholder="메시지를 입력하세요…"
-              class="block w-full resize-none rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm focus:border-neutral-900 focus:outline-none"
-              @keydown.enter.exact.prevent="send"
-            />
-            <p v-if="error" class="mt-1 text-xs text-rose-600">{{ error }}</p>
-            <div class="mt-2 flex justify-end">
-              <button
-                type="button"
-                :disabled="sending || !draft.trim()"
-                class="rounded-full bg-neutral-900 px-6 py-2 text-sm text-white hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                @click="send"
-              >{{ sending ? '전송 중…' : '보내기' }}</button>
-            </div>
+            <template v-if="canReply">
+              <textarea
+                v-model="draft"
+                rows="2"
+                placeholder="메시지를 입력하세요…"
+                class="block w-full resize-none rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm focus:border-neutral-900 focus:outline-none"
+                @keydown.enter.exact.prevent="send"
+              />
+              <p v-if="error" class="mt-1 text-xs text-rose-600">{{ error }}</p>
+              <div class="mt-2 flex justify-end">
+                <button
+                  type="button"
+                  :disabled="sending || !draft.trim()"
+                  class="rounded-full bg-neutral-900 px-6 py-2 text-sm text-white hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  @click="send"
+                >{{ sending ? '전송 중…' : '보내기' }}</button>
+              </div>
+            </template>
+            <p v-else-if="!loading" class="rounded-xl bg-neutral-50 px-4 py-3 text-center text-xs leading-5 text-neutral-500">
+              운영팀이 먼저 쪽지를 보내면 여기서 답장하실 수 있어요.<br />문의는 고객센터(텔레그램)를 이용해 주세요.
+            </p>
           </div>
         </div>
       </div>

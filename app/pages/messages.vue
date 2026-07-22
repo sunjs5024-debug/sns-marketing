@@ -6,6 +6,9 @@ type Msg = { id: string; fromAdmin: boolean; body: string; readAt: string | null
 
 const { data: messages, refresh } = await useFetch<Msg[]>("/api/messages", { default: () => [] });
 
+// 고객은 운영팀이 먼저 보낸 쪽지가 있을 때만 답장 가능
+const canReply = computed(() => (messages.value ?? []).some((m) => m.fromAdmin));
+
 const draft = ref("");
 const sending = ref(false);
 const error = ref<string | null>(null);
@@ -74,22 +77,27 @@ onMounted(() => {
     </div>
 
     <div class="mt-4">
-      <textarea
-        v-model="draft"
-        rows="3"
-        placeholder="메시지를 입력하세요…"
-        class="block w-full rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-sm focus:border-neutral-900 focus:outline-none"
-        @keydown.enter.exact.prevent="send"
-      />
-      <p v-if="error" class="mt-1 text-xs text-rose-600">{{ error }}</p>
-      <div class="mt-2 flex justify-end">
-        <button
-          type="button"
-          :disabled="sending || !draft.trim()"
-          class="rounded-full bg-neutral-900 px-6 py-2.5 text-sm text-white hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          @click="send"
-        >{{ sending ? '전송 중…' : '보내기' }}</button>
-      </div>
+      <template v-if="canReply">
+        <textarea
+          v-model="draft"
+          rows="3"
+          placeholder="메시지를 입력하세요…"
+          class="block w-full rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-sm focus:border-neutral-900 focus:outline-none"
+          @keydown.enter.exact.prevent="send"
+        />
+        <p v-if="error" class="mt-1 text-xs text-rose-600">{{ error }}</p>
+        <div class="mt-2 flex justify-end">
+          <button
+            type="button"
+            :disabled="sending || !draft.trim()"
+            class="rounded-full bg-neutral-900 px-6 py-2.5 text-sm text-white hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            @click="send"
+          >{{ sending ? '전송 중…' : '보내기' }}</button>
+        </div>
+      </template>
+      <p v-else class="rounded-2xl bg-neutral-50 px-4 py-4 text-center text-sm leading-6 text-neutral-500">
+        운영팀이 먼저 쪽지를 보내면 여기서 답장하실 수 있어요.<br />문의는 고객센터(텔레그램)를 이용해 주세요.
+      </p>
     </div>
   </div>
 </template>
