@@ -68,6 +68,21 @@ model User {
   reviews   Review[]
   charges   Charge[]
   taxInvoiceRequests TaxInvoiceRequest[]
+  messages  Message[]
+}
+
+// 관리자 ↔ 고객 1:1 쪽지 (고객끼리는 불가). userId = 대화 상대 고객.
+model Message {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fromAdmin Boolean   // true=관리자→고객, false=고객→관리자
+  body      String
+  readAt    DateTime? // 받는 쪽이 읽은 시각 (null=안읽음)
+  createdAt DateTime  @default(now())
+
+  @@index([userId, createdAt])
+  @@index([fromAdmin, readAt])
 }
 
 enum ChargeStatus {

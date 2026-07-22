@@ -5,6 +5,11 @@ useSeoMeta({
   title: "관리자 콘솔",
   robots: "noindex, nofollow",
 });
+// 안읽음 쪽지 배지
+const { data: msgUnread } = await useFetch<{ count: number }>("/api/admin/messages/unread", {
+  key: "admin-msg-unread",
+  default: () => ({ count: 0 }),
+});
 </script>
 
 <template>
@@ -19,6 +24,9 @@ useSeoMeta({
         <NuxtLink to="/admin/payments" class="shrink-0 rounded-full px-3 py-1.5 hover:bg-neutral-100 whitespace-nowrap" active-class="bg-neutral-100">결제내역</NuxtLink>
         <NuxtLink to="/admin/charges" class="shrink-0 rounded-full px-3 py-1.5 hover:bg-neutral-100 whitespace-nowrap" active-class="bg-neutral-100">충전관리</NuxtLink>
         <NuxtLink to="/admin/users" class="shrink-0 rounded-full px-3 py-1.5 hover:bg-neutral-100 whitespace-nowrap" active-class="bg-neutral-100">회원관리</NuxtLink>
+        <NuxtLink to="/admin/messages" class="relative shrink-0 rounded-full px-3 py-1.5 hover:bg-neutral-100 whitespace-nowrap" active-class="bg-neutral-100">
+          쪽지<span v-if="(msgUnread?.count ?? 0) > 0" class="ml-1 inline-flex items-center rounded-full bg-rose-500 px-1.5 text-[10px] font-medium text-white">{{ msgUnread?.count }}</span>
+        </NuxtLink>
         <NuxtLink to="/admin/products" class="shrink-0 rounded-full px-3 py-1.5 hover:bg-neutral-100 whitespace-nowrap" active-class="bg-neutral-100">상품관리</NuxtLink>
         <NuxtLink to="/admin/dispatches" class="shrink-0 rounded-full px-3 py-1.5 hover:bg-neutral-100 whitespace-nowrap" active-class="bg-neutral-100">발주현황</NuxtLink>
         <NuxtLink to="/admin/tax-invoices" class="shrink-0 rounded-full px-3 py-1.5 hover:bg-neutral-100 whitespace-nowrap" active-class="bg-neutral-100">세금계산서</NuxtLink>

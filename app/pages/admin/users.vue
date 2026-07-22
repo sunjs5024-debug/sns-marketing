@@ -141,6 +141,10 @@ async function toggleRole(u: User) {
                   >취소</button>
                 </template>
                 <template v-else>
+                  <NuxtLink
+                    :to="`/admin/messages?user=${u.id}`"
+                    class="rounded-full border border-indigo-300 px-3 py-1 text-xs text-indigo-700 hover:bg-indigo-50"
+                  >쪽지</NuxtLink>
                   <button
                     type="button"
                     class="rounded-full border border-neutral-300 px-3 py-1 text-xs hover:bg-neutral-50"

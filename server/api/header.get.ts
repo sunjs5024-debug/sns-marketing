@@ -6,11 +6,12 @@ export default defineEventHandler(async (event) => {
   const userId = token?.id as string | undefined;
   const role = token?.role as string | undefined;
   if (!userId) {
-    return { isAuthed: false, role: null, cartCount: 0, name: null, points: 0 };
+    return { isAuthed: false, role: null, cartCount: 0, name: null, points: 0, unreadMessages: 0 };
   }
-  const [cartCount, dbUser] = await Promise.all([
+  const [cartCount, dbUser, unreadMessages] = await Promise.all([
     prisma.cartItem.count({ where: { userId } }),
     prisma.user.findUnique({ where: { id: userId }, select: { name: true, points: true } }),
+    prisma.message.count({ where: { userId, fromAdmin: true, readAt: null } }),
   ]);
   return {
     isAuthed: true,
@@ -18,5 +19,6 @@ export default defineEventHandler(async (event) => {
     cartCount,
     name: dbUser?.name ?? null,
     points: dbUser?.points ?? 0,
+    unreadMessages,
   };
 });
