@@ -14,7 +14,7 @@ const { data: navProducts } = await useFetch<NavProd[]>("/api/products/nav", {
 // 로그인 상태 (SiteHeader 와 동일 key 라 중복 호출 없음)
 const { data: header } = await useFetch("/api/header", {
   key: "header",
-  default: () => ({ isAuthed: false, role: null, cartCount: 0, name: null, points: 0 }),
+  default: () => ({ isAuthed: false, role: null, cartCount: 0, name: null, points: 0, unreadMessages: 0 }),
 });
 // 쪽지함 모달 열기 (전역 상태)
 const messagesModalOpen = useState<boolean>("messagesModalOpen", () => false);

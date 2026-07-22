@@ -4,7 +4,7 @@ import { SNS_PLATFORMS, RANK_PLATFORMS, MARKETING_PLATFORMS, PLATFORMS, type Pla
 // sidebase의 useAuth() 는 SSR 중 재귀 이슈가 있어 자체 API로 우회
 const { data: header, refresh: refreshHeader } = await useFetch("/api/header", {
   key: "header",
-  default: () => ({ isAuthed: false, role: null, cartCount: 0, name: null, points: 0 }),
+  default: () => ({ isAuthed: false, role: null, cartCount: 0, name: null, points: 0, unreadMessages: 0 }),
 });
 
 // 페이지 이동 시 자동 refresh — 포인트/카트 변경 사항 즉시 반영
@@ -26,6 +26,13 @@ watch(drawerOpen, (v) => {
     document.body.style.overflow = v ? "hidden" : "";
   }
 });
+
+// 쪽지함 모달 (전역 상태) — 드로어 닫고 모달 열기
+const messagesModalOpen = useState<boolean>("messagesModalOpen", () => false);
+function openMessages() {
+  drawerOpen.value = false;
+  messagesModalOpen.value = true;
+}
 
 async function onSignOut() {
   try {
@@ -230,6 +237,11 @@ const marketingItems: DropItem[] = MARKETING_PLATFORMS.map((s) => ({
                     <span class="text-xl">📦</span>
                     <span class="text-sm text-neutral-900">내 주문</span>
                   </NuxtLink>
+                  <button type="button" class="flex w-full items-center gap-3 rounded-xl p-3 text-left hover:bg-neutral-50" @click="openMessages">
+                    <span class="text-xl">💬</span>
+                    <span class="text-sm text-neutral-900">쪽지함</span>
+                    <span v-if="(header?.unreadMessages ?? 0) > 0" class="ml-auto inline-flex items-center rounded-full bg-rose-500 px-1.5 text-[10px] font-medium text-white">{{ header?.unreadMessages }}</span>
+                  </button>
                   <!-- 포인트 충전 비활성화 (2026-06-14) — 계좌이체 전용 운영. 되살리려면 아래 블록 복원 -->
                   <NuxtLink to="/mypage/settings" class="flex items-center gap-3 rounded-xl p-3 hover:bg-neutral-50">
                     <span class="text-xl">⚙️</span>
