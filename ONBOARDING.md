@@ -62,7 +62,9 @@ git push origin feature/작업명   # 배포 안 됨. 검토 후 main 에 머지
 
 ## 4. 꼭 알아야 하는 지뢰들 (과거에 실제 터졌던 것)
 
-1. **package-lock.json 은 gitignore 됨** — Windows 에서 만든 lock 에 리눅스 네이티브 모듈이 빠져 Cloudflare 빌드가 깨짐. 커밋하지 말 것.
+1. **package-lock.json 은 이제 커밋한다** (2026-07-22 변경) — lock 없이 두면 CF 가 매번 `npm install` 로 트리를 새로 계산하다 npm 버그(edgesOut)로 빌드가 깨진다. 대신 두 가지를 지켜야 한다:
+   - **리눅스 네이티브 바이너리는 `optionalDependencies` 에 직접 고정** (`@oxc-parser/binding-linux-x64-gnu`, `@rollup/rollup-linux-x64-gnu`, `@esbuild/linux-x64`). 간접 optional 로만 두면 CF(리눅스)의 `npm ci` 가 설치를 건너뛴다(npm #4828). oxc/rollup/esbuild 버전 올릴 때 이 값들도 같이 맞출 것.
+   - **lock 재생성은 CF 와 같은 npm 버전으로** — CF 는 npm 10.9.2 를 쓴다. 로컬 npm 이 다르면 `npx npm@10.9.2 install` 로 만들고 `npx npm@10.9.2 ci --dry-run` 통과를 확인한 뒤 커밋할 것. (버전 불일치 시 `npm ci ... not in sync` 로 빌드 실패)
 2. **Prisma 는 6.x 고정** — Prisma 7 은 Cloudflare 에서 WASM 런타임 컴파일 차단으로 동작 불가. 업그레이드 금지.
 3. **prisma client 는 요청별 생성** (`server/utils/prisma.ts`) — Cloudflare 는 요청 간 I/O 공유 금지. 모듈 스코프 싱글톤으로 되돌리면 죽는다.
 4. **next-auth 소셜 로그인은 수동 OAuth** (`server/utils/oauth.ts` + `/api/oauth/[provider]` + `/api/auth/callback/{kakao,naver,google}.get.ts`) — next-auth v4 의 openid-client 가 엣지에서 안 돌아 직접 구현했다. `callback/[provider]` 같은 와일드카드 라우트를 만들면 credentials 콜백과 충돌하니 주의.
