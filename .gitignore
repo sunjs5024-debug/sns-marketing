@@ -9,10 +9,12 @@ node_modules
 .dev.vars
 .wrangler
 
-# package-lock 제외: Windows에서 생성한 lock 에는 리눅스용 네이티브 모듈(oxc-parser 등)이
-# 빠져 Cloudflare(리눅스) 빌드의 npm ci 가 실패함. lock 없이 npm install 로 빌드시켜
-# 플랫폼에 맞는 바이너리를 받게 한다. (npm bug #4828)
-package-lock.json
+# package-lock.json 은 이제 커밋한다.
+#  - lock 없이 CF 가 매번 npm install 로 트리를 새로 계산하다 npm 버그
+#    (Cannot read properties of null - edgesOut)로 빌드가 깨졌음 (2026-07-22).
+#  - npm 11(lockfileVersion 3)이 만든 lock 은 리눅스용 네이티브 모듈(oxc-parser/rollup/esbuild
+#    linux 항목)을 모두 포함하므로 예전의 "리눅스 바이너리 누락" 문제는 없다.
+#  - 의존성 갱신 시 반드시 `npm install` 후 이 파일을 함께 커밋할 것.
 dist
 *.log
 .DS_Store
