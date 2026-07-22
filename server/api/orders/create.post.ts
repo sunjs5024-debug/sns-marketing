@@ -37,6 +37,15 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "장바구니에 곧 오픈 예정인 상품이 있습니다. 해당 상품을 제외하고 주문해주세요." });
   }
 
+  // 작업 대상 URL 없는 상품 주문 차단 (빈 URL → 발주 불가 → 결제만 되고 작업 안 나가는 사고 방지)
+  const missingUrl = items.find((it) => !it.targetUrl || !it.targetUrl.trim());
+  if (missingUrl) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: `'${missingUrl.product.name}'의 작업 URL이 없습니다. 장바구니에서 URL을 입력한 뒤 다시 주문해주세요.`,
+    });
+  }
+
   const totalAmount = items.reduce(
     (sum, it) => sum + (it.option?.price ?? it.product.basePrice) * it.quantity,
     0,

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { formatPrice, platformKeyFor, laneForCategorySlug, LANE_META, CONTACT } from "#shared/catalog";
+import { cleanTargetUrl } from "#shared/target-url";
 
 const route = useRoute();
 const slug = computed(() => String(route.params.slug));
@@ -166,7 +167,11 @@ const selectedOption = ref(product.value.options[0] ?? null);
 const targetUrl = ref("");
 const memo = ref("");
 const feedback = ref<string | null>(null);
+const feedbackError = ref(false);
 const pending = ref(false);
+
+// 인스타 계열이면 플래그/공개계정 주의사항 노출
+const isInstagram = computed(() => iconKey.value === "instagram");
 
 const unitPrice = computed(() => selectedOption.value?.price ?? product.value?.basePrice ?? 0);
 
@@ -179,8 +184,20 @@ const isComingSoon = computed(() => {
 const router = useRouter();
 
 async function handleAdd(mode: "cart" | "buy") {
-  if (isComingSoon.value) { feedback.value = "곧 오픈 예정인 상품입니다."; return; }
+  if (isComingSoon.value) { feedback.value = "곧 오픈 예정인 상품입니다."; feedbackError.value = true; return; }
+
+  // URL 필수 — 비어있으면 주문 진행 막고 안내
+  const cleaned = cleanTargetUrl(targetUrl.value);
+  if (!cleaned) {
+    feedback.value = "작업하실 URL(계정 또는 게시물 주소)을 입력해주세요.";
+    feedbackError.value = true;
+    return;
+  }
+  // 추적 파라미터 제거된 깔끔한 주소를 입력칸에도 반영
+  targetUrl.value = cleaned;
+
   feedback.value = null;
+  feedbackError.value = false;
   pending.value = true;
   try {
     await $fetch("/api/cart/add", {
@@ -189,7 +206,7 @@ async function handleAdd(mode: "cart" | "buy") {
         productId: product.value!.id,
         optionId: selectedOption.value?.id ?? null,
         quantity: 1,
-        targetUrl: targetUrl.value || undefined,
+        targetUrl: cleaned,
         memo: memo.value || undefined,
       },
     });
@@ -207,6 +224,7 @@ async function handleAdd(mode: "cart" | "buy") {
       return;
     }
     feedback.value = err.data?.statusMessage ?? err.statusMessage ?? "오류가 발생했습니다.";
+    feedbackError.value = true;
   } finally {
     pending.value = false;
   }
@@ -284,15 +302,25 @@ async function handleAdd(mode: "cart" | "buy") {
 
         <div class="mt-6 space-y-3">
           <label class="block">
-            <span class="text-sm text-neutral-700">타겟 URL</span>
+            <span class="text-sm text-neutral-700">작업할 URL <span class="text-rose-500">*</span></span>
             <input
               v-model="targetUrl"
               type="url"
-              placeholder="https://instagram.com/내계정 또는 게시물 링크"
+              placeholder="예: https://www.instagram.com/reel/AbC123xyz/"
               class="mt-1 block w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm focus:border-neutral-900 focus:outline-none"
             />
-            <span class="mt-1 block text-xs text-neutral-500">공개 URL만 필요해요. 비밀번호는 절대 묻지 않습니다.</span>
+            <span class="mt-1 block text-xs text-neutral-500">
+              작업할 <b>게시물 또는 계정 주소</b>를 붙여넣어 주세요. 물음표(?) 뒤 추적 문구는 자동으로 정리됩니다. 공개 주소만 필요하며 비밀번호는 절대 묻지 않습니다.
+            </span>
           </label>
+
+          <!-- 인스타 계열: 반영 지연 방지 안내 (플래그·공개계정) -->
+          <div v-if="isInstagram" class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs leading-5 text-amber-800">
+            <b>⚠️ 주문 전 확인</b> — 아래 설정이 안 돼 있으면 좋아요·댓글·팔로워 반영이 지연/누락될 수 있어요.
+            <br />① 계정을 <b>공개</b>로 전환
+            <br />② 인스타 <b>설정 → 팔로우 및 친구 초대 → '검토를 위한 플래그' 끄기</b>
+            <br />③ 해당 게시물의 댓글·좋아요 <b>제한 해제</b>
+          </div>
           <label class="block">
             <span class="text-sm text-neutral-700">요청사항 (선택)</span>
             <textarea
@@ -304,7 +332,11 @@ async function handleAdd(mode: "cart" | "buy") {
           </label>
         </div>
 
-        <p v-if="feedback" class="mt-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ feedback }}</p>
+        <p
+          v-if="feedback"
+          class="mt-4 rounded-xl px-4 py-3 text-sm"
+          :class="feedbackError ? 'bg-rose-50 text-rose-700' : 'bg-emerald-50 text-emerald-700'"
+        >{{ feedback }}</p>
 
         <!-- 오픈 예정 안내 -->
         <div v-if="isComingSoon" class="mt-8 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">

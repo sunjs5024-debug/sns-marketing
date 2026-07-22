@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { prisma } from "../../utils/prisma";
 import { requireUserId } from "../../utils/session";
+import { cleanTargetUrl } from "#shared/target-url";
 
 const schema = z.object({
   productId: z.string(),
@@ -27,6 +28,12 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  // 작업 대상 URL 필수 + 추적 파라미터 제거 (빈 URL 주문 → 발주 불가 사고 방지)
+  const targetUrl = cleanTargetUrl(parsed.data.targetUrl);
+  if (!targetUrl) {
+    throw createError({ statusCode: 400, statusMessage: "작업하실 URL(계정 또는 게시물 주소)을 입력해주세요." });
+  }
+
   const existing = await prisma.cartItem.findFirst({
     where: { userId, productId: parsed.data.productId, optionId },
   });
@@ -36,7 +43,7 @@ export default defineEventHandler(async (event) => {
       where: { id: existing.id },
       data: {
         quantity: { increment: quantity },
-        targetUrl: parsed.data.targetUrl,
+        targetUrl,
         memo: parsed.data.memo,
       },
     });
@@ -47,7 +54,7 @@ export default defineEventHandler(async (event) => {
         productId: parsed.data.productId,
         optionId,
         quantity,
-        targetUrl: parsed.data.targetUrl,
+        targetUrl,
         memo: parsed.data.memo,
       },
     });
