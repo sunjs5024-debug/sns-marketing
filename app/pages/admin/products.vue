@@ -366,7 +366,7 @@ async function deleteProduct(p: Product) {
               <input v-model="editing.deliveryInfo" class="mt-1 block w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm focus:border-neutral-900 focus:outline-none" />
             </label>
             <label class="block">
-              <span class="text-xs text-neutral-500">보장 안내 (예: 30일 자동 리필)</span>
+              <span class="text-xs text-neutral-500">보장 안내 (예: 논드롭 · 자동 리필 미제공)</span>
               <input v-model="editing.guaranteeInfo" class="mt-1 block w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm focus:border-neutral-900 focus:outline-none" />
             </label>
           </div>

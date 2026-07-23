@@ -247,10 +247,10 @@ function printPage() {
 
       <!-- 보장 안내 -->
       <section class="mt-6 rounded-2xl bg-emerald-50 p-4 text-[11px] leading-6 text-emerald-900">
-        <p class="font-medium">✓ 30일 유지 보장</p>
+        <p class="font-medium">✓ 진행 상황 안내</p>
         <p class="mt-1 text-emerald-800">
           본 결과는 작업 완료 시점 기준이며, 작업일로부터 30일간 자동 유지가 보장됩니다.
-          유지 기간 내 이탈이 30% 이상 발생할 경우 자동 리필 처리되며, 본 보고서를 첨부하여
+          반영 수치에 이상이 있는 경우 고객센터로 문의해 주시면 확인해 드리며, 본 보고서를 첨부하여
           텔레그램(@snssocialfactory) 또는 {{ COMPANY.email }} 로 문의 주시면 1영업일 내 처리해드립니다.
         </p>
       </section>

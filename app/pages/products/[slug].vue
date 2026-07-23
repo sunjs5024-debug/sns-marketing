@@ -56,7 +56,7 @@ const metaDesc = computed(() => {
   const base = product.value?.description ?? `${product.value?.name} | ${product.value?.category.name}`;
   // 너무 짧으면 카테고리·brand 보강
   return base.length < 80
-    ? `${base} | 한국인 실계정 · 빠른 처리 · 30일 보장 | SNS소셜팩토리`
+    ? `${base} | 한국인 실계정 · 빠른 처리 · 결과보고서 제공 | SNS소셜팩토리`
     : base;
 });
 
@@ -428,7 +428,7 @@ async function handleAdd(mode: "cart" | "buy") {
         <ul class="mt-4 space-y-3 text-sm leading-6 text-neutral-700">
           <li class="flex gap-2"><span>🔒</span><span><b>비밀번호 요구 없음</b> — 공개 URL·닉네임만으로 진행돼 계정이 안전해요.</span></li>
           <li class="flex gap-2"><span>👥</span><span><b>실계정 기반</b> 처리로 자연스럽게 녹아드는 부스팅.</span></li>
-          <li class="flex gap-2"><span>🛡️</span><span><b>30일 유지 보장</b> — 보장 기간 내 이탈 시 자동 리필.</span></li>
+          <li class="flex gap-2"><span>🛡️</span><span><b>진행 상황 안내</b> — 반영에 문제가 있으면 고객센터에서 확인해 드립니다.</span></li>
           <li class="flex gap-2"><span>📄</span><span>완료 시 <b>결과보고서 자동 발송</b> · 세금계산서 발행 가능.</span></li>
           <li class="flex gap-2"><span>↩️</span><span>작업 시작 전에는 <b>100% 환불</b> 가능.</span></li>
         </ul>

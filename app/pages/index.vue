@@ -10,7 +10,7 @@ const WHY_ITEMS = [
     icon: "shield",
     color: "from-blue-500 to-cyan-500",
     title: "비밀번호 없이 안전하게",
-    desc: "주문 시 비밀번호를 요구하지 않습니다. 공개된 URL과 닉네임만으로 처리되어 계정이 안전합니다.",
+    desc: "주문 시 비밀번호를 요구하지 않습니다. 공개된 URL과 닉네임만으로 처리되어 계정 비밀번호가 노출되지 않습니다.",
   },
   {
     icon: "users",
@@ -56,7 +56,7 @@ const STEPS = [
   },
   {
     title: "완료 · 결과보고서",
-    desc: "작업 완료 시 결과보고서가 자동 발송됩니다. 30일 유지 보장 — 이탈 시 자동 리필.",
+    desc: "작업 완료 시 결과보고서가 자동 발송됩니다. 진행 내역을 언제든 확인하실 수 있어요.",
   },
 ] as const;
 
@@ -66,7 +66,7 @@ const COMPARE = [
   { label: "계정 안전", self: "피로·위험", etc: "비번 요구 잦음", us: "비밀번호 0% 요구" },
   { label: "시작 속도", self: "며칠~몇 주", etc: "수 시간", us: "평균 10분" },
   { label: "실계정 여부", self: "직접 불가", etc: "봇 혼재", us: "실계정 기반" },
-  { label: "유지 · 리필", self: "없음", etc: "보장 약함", us: "30일 보장·자동 리필" },
+  { label: "문제 시 대응", self: "없음", etc: "연락 어려움", us: "쪽지·고객센터로 확인" },
   { label: "결과보고서", self: "없음", etc: "없음", us: "완료 시 자동 발송" },
   { label: "상담", self: "—", etc: "느림", us: "텔레그램 30분 내" },
 ] as const;
@@ -83,7 +83,7 @@ const REVIEWS = [
 const FAQS = [
   { q: "정말 계정이 안전한가요?", a: "네, 비밀번호를 요구하지 않습니다. 공개 프로필 URL과 닉네임만으로 처리되어 SNS 약관상 문제될 일이 없습니다." },
   { q: "작업은 얼마나 빨리 시작되나요?", a: "결제 완료 후 평균 10분 내 시작됩니다. 일부 대형 상품은 30분~수 시간 내 진행됩니다." },
-  { q: "유지 기간이 있나요?", a: "상품별로 다릅니다. 일반적으로 30일 ~ 평생 보장 옵션을 제공하며, 유지 보장 기간 내 이탈 시 자동 리필됩니다." },
+  { q: "유지 보장이나 리필이 있나요?", a: "자동 리필은 제공되지 않습니다. 상품 특성상 일부 자연 감소가 발생할 수 있으며, 감소 폭이 크거나 반영에 문제가 있으면 고객센터로 문의해 주시면 확인 후 도와드립니다." },
   { q: "결제는 어떻게 하나요?", a: "현재는 계좌이체로만 결제 가능합니다. 주문 완료 후 안내되는 계좌번호로 입금해주세요." },
   { q: "환불은 가능한가요?", a: "작업 시작 전엔 100% 환불 가능합니다. 작업 진행 중 / 완료 후엔 진행률에 따라 부분 환불이 적용됩니다." },
   { q: "결과 보고서를 받을 수 있나요?", a: "네, 모든 주문은 완료 시 자동으로 결과보고서가 이메일로 발송됩니다. 마이페이지에서도 확인 가능합니다." },
@@ -317,7 +317,7 @@ onMounted(async () => {
             </tbody>
           </table>
         </div>
-        <p class="mt-4 text-center text-xs text-neutral-400">* 실계정 기반 · 30일 유지 보장 · 결과보고서까지 한 번에 제공합니다.</p>
+        <p class="mt-4 text-center text-xs text-neutral-400">* 실계정 기반 · 결과보고서까지 한 번에 제공합니다.</p>
       </div>
     </section>
 
@@ -370,7 +370,7 @@ onMounted(async () => {
           </span>
         </h2>
         <p class="mx-auto mt-5 max-w-2xl text-sm leading-7 text-neutral-300 sm:text-base">
-          평균 10분 내 작업 시작 · 한국인 실계정 · 30일 유지 보장 · 결과보고서 자동 발송<br />
+          평균 10분 내 작업 시작 · 한국인 실계정 · 결과보고서 자동 발송<br />
           누구나 5분이면 첫 주문이 가능합니다.
         </p>
 
@@ -427,7 +427,7 @@ onMounted(async () => {
           </span>
           <span class="inline-flex items-center gap-1.5">
             <span class="grid h-4 w-4 place-items-center rounded-full bg-emerald-500/20 text-emerald-400">✓</span>
-            30일 유지 보장
+            결과보고서 제공
           </span>
           <span class="inline-flex items-center gap-1.5">
             <span class="grid h-4 w-4 place-items-center rounded-full bg-emerald-500/20 text-emerald-400">✓</span>
