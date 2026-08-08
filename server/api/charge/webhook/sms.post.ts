@@ -85,10 +85,29 @@ function parseBankSms(raw: string): { bank: string | null; amount: number | null
   return { bank, amount, depositor };
 }
 
-// 입금자명 비교용 정규화 — 공백·특수문자 제거 + 소문자화.
-// "(주)영천" vs "주영천", "KIM JI SU" vs "kimjisu", "J.Kim" vs "jkim" 모두 동일 취급.
+// 입금자명 비교용 정규화 — 법인 표기·공백·특수문자 제거 + 소문자화.
+// "주식회사 영천"·"영천(주)"·"㈜영천" → 모두 "영천". "KIM JI SU" → "kimjisu".
 function normName(s: string | null | undefined): string {
-  return (s ?? "").toLowerCase().replace(/[^0-9a-z가-힣]/g, "");
+  let x = (s ?? "").toLowerCase();
+  // 법인 표기 제거: 단어형(주식회사 등) + 원문자(㈜) + 괄호형((주)/(유)…)
+  x = x.replace(/주식회사|유한회사|유한책임회사|합자회사|합명회사|재단법인|사단법인/g, "");
+  x = x.replace(/㈜|㈔|㈖/g, "");
+  x = x.replace(/\(\s*(주|유|재|사|합)\s*\)/g, "");
+  return x.replace(/[^0-9a-z가-힣]/g, "");
+}
+
+// 입금자명 일치 판정.
+// 은행마다 법인명을 다르게 절삭/표기해서("고은디자인(주)" vs "고은디자인주식") 완전 일치가 안 될 수 있으므로,
+// 정규화 후 한쪽이 다른 쪽으로 시작하면(핵심 상호 3자 이상 일치) 같은 입금자로 본다.
+// ※ 금액(정확 일치)·PENDING·미만료 조건이 함께 걸려 있어 오매칭 위험은 매우 낮음.
+function nameMatches(a: string | null | undefined, b: string | null | undefined): boolean {
+  const x = normName(a);
+  const y = normName(b);
+  if (!x || !y) return false;
+  if (x === y) return true;
+  const short = x.length <= y.length ? x : y;
+  const long = x.length <= y.length ? y : x;
+  return short.length >= 3 && long.startsWith(short);
 }
 
 export default defineEventHandler(async (event) => {
@@ -136,8 +155,7 @@ export default defineEventHandler(async (event) => {
   // 2) 매칭 시도 — 금액 + 입금자명 둘 다 파싱돼야 시도
   if (amount && depositor) {
     // 2-A) Charge 매칭 (포인트 충전)
-    // 같은 금액의 대기 건을 모두 가져와 정규화된 이름으로 비교 (특수문자·공백·대소문자 무시)
-    const target = normName(depositor);
+    // 같은 금액의 대기 건을 모두 가져와 이름 정규화 비교 (법인 표기·특수문자·공백·대소문자 무시)
     const chargePendings = await prisma.charge.findMany({
       where: {
         status: "PENDING",
@@ -146,7 +164,7 @@ export default defineEventHandler(async (event) => {
       },
       orderBy: { createdAt: "asc" },
     });
-    const chargeCandidate = target ? (chargePendings.find((c) => normName(c.depositorName) === target) ?? null) : null;
+    const chargeCandidate = chargePendings.find((c) => nameMatches(c.depositorName, depositor)) ?? null;
 
     if (chargeCandidate) {
       await prisma.$transaction([
@@ -191,7 +209,7 @@ export default defineEventHandler(async (event) => {
       },
       orderBy: { createdAt: "asc" },
     });
-    const orderCandidate = target ? (orderPendings.find((o) => normName(o.depositorName) === target) ?? null) : null;
+    const orderCandidate = orderPendings.find((o) => nameMatches(o.depositorName, depositor)) ?? null;
 
     if (orderCandidate) {
       await prisma.$transaction([
