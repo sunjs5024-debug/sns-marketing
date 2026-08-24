@@ -170,6 +170,8 @@ model Product {
   keywords     String?  // 쉼표 구분 키워드 (예: "인스타 팔로워, 한국인 팔로워")
   minQty       Int      @default(1)
   isActive     Boolean  @default(true)
+  // 품절 — 페이지·SEO는 유지하되 구매만 차단(OutOfStock). isActive=false(완전 숨김/404)와 구분됨
+  isSoldOut    Boolean  @default(false)
   isFeatured   Boolean  @default(false)
   salesCount   Int      @default(0)
   rating       Float    @default(5.0)

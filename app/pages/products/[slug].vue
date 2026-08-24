@@ -23,6 +23,7 @@ type RelatedProduct = {
   badge: "HOT" | "BEST" | "SALE" | "NEW" | null;
   rating: number;
   salesCount: number;
+  isSoldOut: boolean;
   category: { name: string; slug: string };
   _count: { options: number };
 };
@@ -115,7 +116,7 @@ const productSchema: Record<string, unknown> = {
     url: `https://xn--sns-yg9lh0pw9l.kr/products/${product.value.slug}`,
     priceCurrency: "KRW",
     price: product.value.basePrice,
-    availability: product.value.isActive
+    availability: product.value.isActive && !product.value.isSoldOut
       ? "https://schema.org/InStock"
       : "https://schema.org/OutOfStock",
     seller: { "@type": "Organization", name: "SNS소셜팩토리" },
@@ -181,9 +182,15 @@ const isComingSoon = computed(() => {
   return opts.length > 0 && opts.every((o) => o.externalServiceId == null);
 });
 
+// 품절 — 페이지·SEO는 유지하되 구매만 차단 (isActive=false 완전 숨김과 구분)
+const isSoldOut = computed(() => product.value?.isSoldOut === true);
+// 구매 불가 상태 통합 (품절 우선)
+const isUnavailable = computed(() => isSoldOut.value || isComingSoon.value);
+
 const router = useRouter();
 
 async function handleAdd(mode: "cart" | "buy") {
+  if (isSoldOut.value) { feedback.value = "현재 품절된 상품입니다."; feedbackError.value = true; return; }
   if (isComingSoon.value) { feedback.value = "곧 오픈 예정인 상품입니다."; feedbackError.value = true; return; }
 
   // URL 필수 — 비어있으면 주문 진행 막고 안내
@@ -354,8 +361,13 @@ async function handleAdd(mode: "cart" | "buy") {
           :class="feedbackError ? 'bg-rose-50 text-rose-700' : 'bg-emerald-50 text-emerald-700'"
         >{{ feedback }}</p>
 
+        <!-- 품절 안내 (품절이 오픈예정보다 우선) -->
+        <div v-if="isSoldOut" class="mt-8 rounded-2xl border border-neutral-300 bg-neutral-100 px-4 py-3 text-sm text-neutral-700">
+          🚫 <b>일시 품절</b>된 상품입니다. 재입고 시 다시 구매하실 수 있어요. 문의는 텔레그램 상담을 이용해 주세요.
+        </div>
+
         <!-- 오픈 예정 안내 -->
-        <div v-if="isComingSoon" class="mt-8 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <div v-else-if="isComingSoon" class="mt-8 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
           🔜 <b>오픈 예정 상품</b>입니다. 준비 중이며 곧 만나보실 수 있어요.
         </div>
 
@@ -363,7 +375,7 @@ async function handleAdd(mode: "cart" | "buy") {
         <div class="mt-8 hidden gap-3 lg:flex">
           <button
             type="button"
-            :disabled="pending || isComingSoon"
+            :disabled="pending || isUnavailable"
             class="flex-1 rounded-full border border-neutral-300 bg-white py-3 text-sm text-neutral-900 hover:bg-neutral-50 disabled:opacity-60 disabled:cursor-not-allowed"
             @click="handleAdd('cart')"
           >
@@ -371,11 +383,11 @@ async function handleAdd(mode: "cart" | "buy") {
           </button>
           <button
             type="button"
-            :disabled="pending || isComingSoon"
+            :disabled="pending || isUnavailable"
             class="flex-[2] rounded-full bg-neutral-900 py-3 text-sm text-white hover:bg-neutral-700 disabled:opacity-60 disabled:cursor-not-allowed"
             @click="handleAdd('buy')"
           >
-            {{ isComingSoon ? "오픈 예정" : pending ? "처리 중…" : "바로 구매하기" }}
+            {{ isSoldOut ? "품절" : isComingSoon ? "오픈 예정" : pending ? "처리 중…" : "바로 구매하기" }}
           </button>
         </div>
 
@@ -388,16 +400,16 @@ async function handleAdd(mode: "cart" | "buy") {
             </div>
             <button
               type="button"
-              :disabled="pending || isComingSoon"
+              :disabled="pending || isUnavailable"
               class="rounded-full border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 hover:bg-neutral-50 disabled:opacity-60 disabled:cursor-not-allowed"
               @click="handleAdd('cart')"
             >🛒</button>
             <button
               type="button"
-              :disabled="pending || isComingSoon"
+              :disabled="pending || isUnavailable"
               class="flex-1 rounded-full bg-neutral-900 px-4 py-3 text-sm text-white hover:bg-neutral-700 disabled:opacity-60 disabled:cursor-not-allowed"
               @click="handleAdd('buy')"
-            >{{ isComingSoon ? "오픈 예정" : pending ? "처리 중…" : "바로 구매" }}</button>
+            >{{ isSoldOut ? "품절" : isComingSoon ? "오픈 예정" : pending ? "처리 중…" : "바로 구매" }}</button>
           </div>
         </div>
       </div>
@@ -512,6 +524,7 @@ async function handleAdd(mode: "cart" | "buy") {
           :category-name="p.category.name"
           :icon-key="platformKeyFor(p.category.slug)"
           :option-count="p._count?.options"
+          :is-sold-out="p.isSoldOut"
         />
       </div>
     </section>
@@ -537,6 +550,7 @@ async function handleAdd(mode: "cart" | "buy") {
           :category-name="p.category.name"
           :icon-key="platformKeyFor(p.category.slug)"
           :option-count="p._count?.options"
+          :is-sold-out="p.isSoldOut"
         />
       </div>
     </section>

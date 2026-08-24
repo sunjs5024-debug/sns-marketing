@@ -22,6 +22,7 @@ const schema = z.object({
   deliveryInfo: z.string().max(200).nullable().optional(),
   guaranteeInfo: z.string().max(200).nullable().optional(),
   isActive: z.boolean().optional(),
+  isSoldOut: z.boolean().optional(),
   isFeatured: z.boolean().optional(),
   options: z.array(optionSchema).optional(), // 옵션 전체 동기화
 });

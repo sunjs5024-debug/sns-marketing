@@ -18,6 +18,7 @@ const props = defineProps<{
   categoryName: string;
   iconKey: PlatformSlug | null;
   optionCount?: number;
+  isSoldOut?: boolean;
 }>();
 
 // 클릭 전에 상품 데이터를 미리 불러와 엣지 캐시를 데워둠 → 클릭 시 즉시 열림
@@ -65,13 +66,21 @@ onMounted(() => {
 
     <!-- 이미지 영역 -->
     <div class="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-neutral-50 to-neutral-100">
-      <div class="absolute inset-0 grid place-items-center transition-transform duration-500 group-hover:scale-110">
+      <div
+        class="absolute inset-0 grid place-items-center transition-transform duration-500 group-hover:scale-110"
+        :class="{ 'opacity-40 grayscale': isSoldOut }"
+      >
         <BrandIcon v-if="iconKey" :kind="iconKey" :size="80" class="sm:[--size:88px]" />
         <span v-else class="text-5xl sm:text-6xl">📦</span>
       </div>
 
+      <!-- 품절 오버레이 -->
+      <div v-if="isSoldOut" class="absolute inset-0 z-20 grid place-items-center">
+        <span class="rounded-full bg-neutral-900/85 px-3 py-1 text-xs font-bold tracking-wide text-white shadow-sm">품절</span>
+      </div>
+
       <!-- 뱃지 -->
-      <div v-if="badge" class="absolute left-2.5 top-2.5 z-10 sm:left-3 sm:top-3">
+      <div v-if="badge && !isSoldOut" class="absolute left-2.5 top-2.5 z-10 sm:left-3 sm:top-3">
         <BadgePill :badge="badge" />
       </div>
 

@@ -170,6 +170,7 @@ const stats = computed(() => {
           :category-name="p.category.name"
           :icon-key="platformKeyFor(p.category.slug)"
           :option-count="p._count?.options"
+          :is-sold-out="p.isSoldOut"
         />
       </div>
     </section>
