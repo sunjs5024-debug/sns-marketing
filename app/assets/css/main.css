@@ -9,23 +9,8 @@
 /* WHY US 카드 — v-for 안 동적 :class 의 그라데이션·호버 클래스를 강제 컴파일에 포함 */
 @source inline("from-blue-500 from-pink-500 from-emerald-500 from-amber-500 from-indigo-500 from-yellow-400 from-rose-500 to-cyan-500 to-rose-500 to-teal-500 to-orange-500 to-violet-500 to-amber-500 to-rose-600 group-hover:scale-110 group-hover:rotate-3 group-hover:opacity-30 group-hover:opacity-100 group-hover:-translate-y-1 group-hover:shadow-xl group-hover:translate-x-1 group-hover:visible bg-gradient-to-br");
 
-/* 여기어때 잘난체 */
-@font-face {
-  font-family: "Jalnan";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_four@1.2/JalnanOTF00.woff") format("woff");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Jalnan Gothic";
-  src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_231029@1.1/JalnanGothic.woff") format("woff");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Pretendard — 본문/설명 가독성용 */
+/* Pretendard Variable — 2026 트렌드 · 본문·헤딩 통일 가변폰트 (고가독성).
+   구 Jalnan(여기어때 잘난체) 디스플레이 폰트를 본문에서 걷어내 눈피로 해소 + 외부 폰트요청 절감. */
 @font-face {
   font-family: "Pretendard Variable";
   font-weight: 45 920;
@@ -40,8 +25,9 @@
 }
 
 @theme inline {
-  --font-sans: "Jalnan Gothic", "Jalnan", "Apple SD Gothic Neo", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-display: "Jalnan", "Jalnan Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
+  /* 본문·헤딩 모두 Pretendard 통일 — 굵기(400/600/700/800)로 위계, 2026 클린 트렌드 */
+  --font-sans: "Pretendard Variable", "Pretendard", "Apple SD Gothic Neo", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-display: "Pretendard Variable", "Pretendard", "Apple SD Gothic Neo", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-pretendard: "Pretendard Variable", "Pretendard", "Apple SD Gothic Neo", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
 
@@ -51,7 +37,15 @@ html, body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  letter-spacing: -0.005em;
+  letter-spacing: -0.01em;
+  text-rendering: optimizeLegibility;
+}
+
+/* 헤딩·강조(디스플레이) — Pretendard 볼드 + 타이트 트래킹으로 위계·임팩트 복원.
+   :where() 라 0-특이도 → tracking-*/font-* 유틸을 명시한 요소는 그대로 그 값을 쓴다. */
+:where(.font-display) {
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
