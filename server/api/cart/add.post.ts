@@ -20,10 +20,11 @@ export default defineEventHandler(async (event) => {
   const quantity = parsed.data.quantity ?? 1;
   const optionId = parsed.data.optionId ?? null;
 
-  // 오픈예정(발주 매핑 없는) 옵션은 담기 불가
+  // 오픈예정(발주 매핑 없는) 옵션은 담기 불가.
+  //   매핑됨 = urpanel serviceId 있음 OR kakao command 있음 (둘 다 없어야 오픈예정)
   if (optionId) {
-    const opt = await prisma.productOption.findUnique({ where: { id: optionId }, select: { externalServiceId: true } });
-    if (opt && opt.externalServiceId == null) {
+    const opt = await prisma.productOption.findUnique({ where: { id: optionId }, select: { externalServiceId: true, externalCommand: true } });
+    if (opt && opt.externalServiceId == null && !opt.externalCommand) {
       throw createError({ statusCode: 400, statusMessage: "곧 오픈 예정인 상품입니다. 조금만 기다려주세요." });
     }
   }
