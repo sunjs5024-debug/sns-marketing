@@ -103,7 +103,13 @@ const faqs = computed<Faq[]>(() => {
   return [];
 });
 
-// Product JSON-LD — review 배열은 실제 DB 리뷰가 있으면 6개 노출 (구글 리치 결과 별점)
+// Product JSON-LD
+// ★aggregateRating 은 '실제 승인 리뷰가 있을 때만'(SSR 확정 reviewCount>0) 방출한다.
+//   과거: ratingValue=product.rating(기본 5.0)·reviewCount=판매수(salesCount) 를 무조건 방출 →
+//   구글 구조화데이터 '가짜 평점' 정책 위반(수동조치·리치결과 전체 소거 위험). 판매수는 리뷰수가 아님.
+const ssrReviewCount = (product.value as { reviewCount?: number }).reviewCount ?? 0;
+const ssrAvgRating = (product.value as { avgRating?: number | null }).avgRating ?? null;
+
 const productSchema: Record<string, unknown> = {
   "@type": "Product",
   name: product.value.name,
@@ -112,31 +118,38 @@ const productSchema: Record<string, unknown> = {
   // GSC 리치결과 검사: image=필수, brand=권장 (누락 경고 해소)
   image: "https://xn--sns-yg9lh0pw9l.kr/og-cover-v2.png",
   brand: { "@type": "Brand", name: "SNS소셜팩토리" },
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: productRating.value,
-    bestRating: 5,
-    reviewCount: productReviewCount.value,
-  },
   offers: {
     "@type": "Offer",
     url: `https://xn--sns-yg9lh0pw9l.kr/products/${product.value.slug}`,
     priceCurrency: "KRW",
     price: product.value.basePrice,
+    // priceValidUntil = 렌더타임 +90일 롤링(만료 위험 최소화). sku = slug 재사용(정직한 내부식별자). mpn/gtin 은 디지털 서비스라 부여 금지.
+    priceValidUntil: new Date(Date.now() + 90 * 864e5).toISOString().slice(0, 10),
+    sku: product.value.slug,
     availability: product.value.isActive && !product.value.isSoldOut
       ? "https://schema.org/InStock"
       : "https://schema.org/OutOfStock",
     seller: { "@type": "Organization", name: "SNS소셜팩토리" },
   },
 };
-if (productReviews.value.length > 0) {
-  productSchema.review = productReviews.value.slice(0, 6).map((r) => ({
-    "@type": "Review",
-    author: { "@type": "Person", name: r.author },
-    datePublished: r.date.replace(/\./g, "-"),
-    reviewRating: { "@type": "Rating", ratingValue: r.rating, bestRating: 5 },
-    reviewBody: r.content,
-  }));
+// 실제 승인 리뷰가 있을 때만 별점·리뷰 마크업 (없으면 통째로 생략 — 폴백 금지)
+if (ssrReviewCount > 0 && ssrAvgRating != null) {
+  productSchema.aggregateRating = {
+    "@type": "AggregateRating",
+    ratingValue: Number(ssrAvgRating.toFixed(2)),
+    bestRating: 5,
+    worstRating: 1,
+    reviewCount: ssrReviewCount,
+  };
+  if (productReviews.value.length > 0) {
+    productSchema.review = productReviews.value.slice(0, 6).map((r) => ({
+      "@type": "Review",
+      author: { "@type": "Person", name: r.author },
+      datePublished: r.date.replace(/\./g, "-"),
+      reviewRating: { "@type": "Rating", ratingValue: r.rating, bestRating: 5 },
+      reviewBody: r.content,
+    }));
+  }
 }
 
 const schemaList: Array<Record<string, unknown>> = [
