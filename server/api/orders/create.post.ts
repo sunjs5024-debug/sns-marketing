@@ -23,7 +23,16 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const parsed = schema.safeParse(body);
   if (!parsed.success) {
-    throw createError({ statusCode: 400, statusMessage: parsed.error.issues[0]?.message });
+    // Zod 기본 메시지("Invalid input")는 불친절 → 어느 필드인지 한국어로 안내
+    const issue = parsed.error.issues[0];
+    const field = String(issue?.path?.[0] ?? "");
+    const LABEL: Record<string, string> = {
+      buyerName: "이름을 입력해 주세요.",
+      buyerPhone: "연락처를 입력해 주세요.",
+      buyerEmail: "이메일 형식을 확인해 주세요. (예: name@example.com)",
+      depositorName: "입금자명을 입력해 주세요.",
+    };
+    throw createError({ statusCode: 400, statusMessage: LABEL[field] ?? "입력값을 확인해 주세요." });
   }
 
   const items = await prisma.cartItem.findMany({
