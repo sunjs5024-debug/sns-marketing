@@ -164,6 +164,12 @@ if (faqs.value.length > 0) {
 useSchemaOrg(schemaList);
 
 const iconKey = computed(() => (product.value ? platformKeyFor(product.value.category.slug) : null));
+// 플랫폼별 작업 URL 입력 안내 (카카오는 링크 형식이 달라 별도 안내)
+const targetPlaceholder = computed(() =>
+  iconKey.value === "kakaotalk"
+    ? "예: https://open.kakao.com/o/gXXXX (오픈채팅) · https://pf.kakao.com/_xxxx (채널) — 상품 안내 참고"
+    : "예: https://www.instagram.com/reel/AbC123xyz/",
+);
 const selectedOption = ref(product.value.options[0] ?? null);
 const targetUrl = ref("");
 const memo = ref("");
@@ -314,7 +320,7 @@ async function handleAdd(mode: "cart" | "buy") {
             <input
               v-model="targetUrl"
               type="url"
-              placeholder="예: https://www.instagram.com/reel/AbC123xyz/"
+              :placeholder="targetPlaceholder"
               class="mt-1 block w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm focus:border-neutral-900 focus:outline-none"
             />
             <span class="mt-1 block text-xs text-neutral-500">

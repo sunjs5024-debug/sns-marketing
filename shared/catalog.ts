@@ -181,12 +181,13 @@ export const PLATFORMS: Record<PlatformSlug, PlatformMeta> = {
   },
 };
 
-// 활성 플랫폼만 노출 — urpanel 매핑이 가능한 플랫폼 위주
-// 카카오톡 / 네이버 (스마트스토어/블로그/카페) 는 urpanel 미지원이라 일시 비활성 (별도 패널 도입 시 복원)
+// 활성 플랫폼만 노출.
+// 카카오톡 = 카카오 관제탑 API 패널 연동으로 활성화(2026-08). 네이버(스마트스토어/블로그/카페)는 아직 별도 패널 미도입.
 export const SNS_PLATFORMS: PlatformSlug[] = [
   "instagram",
   "youtube",
   "tiktok",
+  "kakaotalk",
   "x",
   "telegram",
 ];
