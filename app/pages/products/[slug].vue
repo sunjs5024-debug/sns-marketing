@@ -72,8 +72,11 @@ const metaDesc = computed(() => {
 //   기존 title=제품명("텔레그램 채널 구독자 (HQ…)")은 실검색어 "텔레그램 구독자 구매/늘리기"를
 //   놓쳐 2페이지에 묶였음. 경쟁 상위는 전부 풀키워드를 타이틀에 박음 → 온페이지 즉시 갭 해소.
 const seoKeyword = (product.value.keywords ?? "").split(",")[0]?.trim() || product.value.name;
-// 보통 "구매·늘리기"(구매+늘리기 두 검색의도 동시 조준). 단 키워드에 이미 "구매"가 있으면 중복 방지.
-const seoTitle = seoKeyword.includes("구매") ? `${seoKeyword} 늘리기` : `${seoKeyword} 구매·늘리기`;
+// keywords[0]이 이미 검색동사(늘리기/구매/올리기/방법/사는법)를 포함하면 그대로 사용 → 중복("늘리기 구매·늘리기")·
+//   활성화형 상품("친구추가 구매·늘리기") 어색함 방지. 아니면 "구매·늘리기"(구매+늘리기 두 의도 동시 조준) 부착.
+const seoTitle = /(늘리기|구매|올리기|방법|사는\s?법)/.test(seoKeyword)
+  ? seoKeyword
+  : `${seoKeyword} 구매·늘리기`;
 
 useSeoMeta({
   // 전역 titleTemplate(seo-utils)가 " | SNS소셜팩토리"를 자동으로 덧붙임 → 본문엔 브랜드 제외(중복 방지)
