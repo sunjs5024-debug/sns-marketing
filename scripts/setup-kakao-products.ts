@@ -6,6 +6,9 @@
 //          npx tsx scripts/setup-kakao-products.ts apply     # 실제 생성/갱신
 //
 //   gift(선물)·shopping(톡딜) 은 api_119 명령어 목록에 없어 isActive=false 로 생성 (담당자 확인 후 활성).
+//   ★ 신규 생성 시 isSoldOut=true(품절)로 만든다 — 탭/상품은 노출되되 구매는 막힘.
+//     카카오 서버 주소(KAKAO_API_BASE) 세팅+연결확인 후 품절 해제하면 진짜 오픈.
+//     (ON CONFLICT 재실행은 isSoldOut 을 건드리지 않음 → 오픈 후 재실행해도 다시 품절 안 됨)
 import "dotenv/config";
 import { neon } from "@neondatabase/serverless";
 
@@ -58,10 +61,25 @@ function faqs(s: Service) {
 }
 
 async function main() {
-  const apply = process.argv[2] === "apply";
+  const mode = process.argv[2]; // undefined(dry-run) | "apply" | "open"
+  const apply = mode === "apply";
   const url = process.env.DATABASE_URL;
   if (!url) { console.error("❌ DATABASE_URL 없음 (.env 확인)"); process.exit(1); }
   const sql = neon(url);
+
+  // 오픈 스위치 — 활성 카카오 상품의 품절을 해제 (카카오 주소 세팅+연결확인 후 실행)
+  if (mode === "open") {
+    const activeSlugs = SERVICES.filter((s) => s.active).map((s) => `kko-${s.key}`);
+    const rows = (await sql`
+      UPDATE "Product" SET "isSoldOut" = false, "updatedAt" = now()
+      WHERE slug = ANY(${activeSlugs}) AND "isActive" = true
+      RETURNING slug, name
+    `) as Array<{ slug: string; name: string }>;
+    console.log(`🔓 품절 해제(오픈) ${rows.length}건:`);
+    for (const r of rows) console.log(`   ✓ ${r.name} (${r.slug})`);
+    console.log("\n(엣지 캐시로 최대 10분 후 구매 가능)");
+    return;
+  }
 
   // 사전조건: externalCommand 컬럼
   const col = (await sql`SELECT 1 FROM information_schema.columns WHERE table_name='ProductOption' AND column_name='externalCommand'`) as unknown[];
@@ -102,7 +120,7 @@ async function main() {
         ${`${s.name} — 실제 카카오 계정으로 안전하게. ${s.delivery}, 목표 수량까지 자동 처리.`},
         ${longDescription(s)}, ${catId}, ${basePrice},
         ${null}, ${s.delivery}, ${""}, ${JSON.stringify(faqs(s))}::jsonb,
-        ${`${s.name}, ${shortName(s)}, 카카오 마케팅`}, ${1}, ${s.active}, ${false}, ${false},
+        ${`${s.name}, ${shortName(s)}, 카카오 마케팅`}, ${1}, ${s.active}, ${true}, ${false},
         ${0}, ${5.0}, now(), now())
       ON CONFLICT (slug) DO UPDATE SET
         name=EXCLUDED.name, description=EXCLUDED.description, "longDescription"=EXCLUDED."longDescription",
@@ -131,7 +149,7 @@ async function main() {
   }
 
   console.log(apply
-    ? "\n총 6개 카카오 상품 반영 완료. (엣지 캐시로 최대 10분 지연 · 화면 노출은 카카오톡 활성화 코드 배포 후)"
-    : "\n미리보기 끝. 실제 생성: 인자 apply 붙여 재실행");
+    ? "\n총 6개 카카오 상품 반영 완료 (신규는 품절 상태). 카카오 주소 세팅+연결확인 후 품절 해제하면 오픈. (엣지 캐시 최대 10분)"
+    : "\n미리보기 끝(신규는 품절 상태로 생성됨). 실제 생성: 인자 apply 붙여 재실행");
 }
 main().catch((e) => { console.error(e); process.exit(1); });
