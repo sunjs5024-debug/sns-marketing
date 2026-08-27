@@ -176,10 +176,11 @@ const isInstagram = computed(() => iconKey.value === "instagram");
 
 const unitPrice = computed(() => selectedOption.value?.price ?? product.value?.basePrice ?? 0);
 
-// 발주 매핑(externalServiceId) 없는 상품 = 오픈예정 (아직 주문 불가)
+// 발주 매핑 없는 상품 = 오픈예정 (아직 주문 불가)
+//   매핑됨 = urpanel serviceId 있음 OR kakao command 있음
 const isComingSoon = computed(() => {
-  const opts = (product.value?.options ?? []) as Array<{ externalServiceId?: number | null }>;
-  return opts.length > 0 && opts.every((o) => o.externalServiceId == null);
+  const opts = (product.value?.options ?? []) as Array<{ externalServiceId?: number | null; externalCommand?: string | null }>;
+  return opts.length > 0 && opts.every((o) => o.externalServiceId == null && !o.externalCommand);
 });
 
 // 품절 — 페이지·SEO는 유지하되 구매만 차단 (isActive=false 완전 숨김과 구분)

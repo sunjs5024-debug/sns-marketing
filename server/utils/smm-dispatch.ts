@@ -8,6 +8,11 @@ import {
   getUrpanelOrdersStatus,
   type UrpanelOrderStatus,
 } from "./urpanel";
+import {
+  addKakaoOrder,
+  getKakaoOrderStatus,
+  mapKakaoStatus,
+} from "./kakao-order";
 
 const MAX_DISPATCH_ATTEMPTS = 3;
 const SYNC_BATCH_SIZE = 100; // urpanel 다중 status 최대 100개
@@ -47,14 +52,22 @@ export async function dispatchOrderToProviders(orderId: string): Promise<{
       skipped++;
       continue;
     }
-    // 옵션에 외부 서비스 매핑 안 됨
-    const serviceId = item.option?.externalServiceId;
-    if (!serviceId) {
+    // 발주 provider 결정 — urpanel(serviceId) vs kakao(command)
+    const opt = item.option;
+    const serviceId = opt?.externalServiceId ?? null;
+    const command = opt?.externalCommand ?? null;
+    const provider: "urpanel" | "kakao" | null =
+      opt?.externalProvider === "kakao" || (command && !serviceId)
+        ? "kakao"
+        : serviceId
+          ? "urpanel"
+          : null;
+    if (!provider) {
       // 매핑 안 된 항목은 그냥 패스 (수동 처리 대상)
       skipped++;
       continue;
     }
-    // targetUrl 필수
+    // targetUrl 필수 (공통)
     if (!item.targetUrl?.trim()) {
       await prisma.orderItem.update({
         where: { id: item.id },
@@ -68,42 +81,77 @@ export async function dispatchOrderToProviders(orderId: string): Promise<{
       continue;
     }
 
-    // urpanel 발주 시도
-    // ⚠️ urpanel 에 보낼 수량 = 옵션의 실제 작업수량(예: 좋아요 25개) × 구매 묶음수(item.quantity)
-    //    item.quantity 는 "몇 개 묶음을 샀나"라서 그대로 보내면 안 됨 (옵션 수량 곱해야 함)
-    const smmQuantity = (item.option?.quantity ?? 1) * item.quantity;
+    // 외부에 보낼 수량 = 옵션의 실제 작업수량(예: 좋아요 25개) × 구매 묶음수(item.quantity)
+    //   item.quantity 는 "몇 개 묶음을 샀나"라서 그대로 보내면 안 됨 (옵션 수량 곱해야 함)
+    const smmQuantity = (opt?.quantity ?? 1) * item.quantity;
     try {
-      const res = await addUrpanelOrder({
-        service: serviceId,
-        link: item.targetUrl,
-        quantity: smmQuantity,
-      });
-
-      if (typeof res.order === "number" || typeof res.order === "string") {
-        await prisma.orderItem.update({
-          where: { id: item.id },
-          data: {
-            externalProvider: "urpanel",
-            externalServiceId: serviceId,
-            externalOrderId: String(res.order),
-            externalStatus: "Pending",
-            dispatchedAt: new Date(),
-            dispatchedAttempts: { increment: 1 },
-            dispatchError: null,
-          },
+      if (provider === "kakao") {
+        // 카카오 발주 — { command, count, target }. Idempotency-Key = OrderItem id (중복발주 방지)
+        if (!command) throw new Error("kakao 옵션에 externalCommand 없음");
+        const res = await addKakaoOrder({
+          command,
+          count: smmQuantity,
+          target: item.targetUrl,
+          idempotencyKey: item.id,
         });
-        dispatched++;
+        if (res.order_id) {
+          await prisma.orderItem.update({
+            where: { id: item.id },
+            data: {
+              externalProvider: "kakao",
+              externalServiceId: null,
+              externalOrderId: res.order_id,
+              externalStatus: "Pending",
+              dispatchedAt: new Date(),
+              dispatchedAttempts: { increment: 1 },
+              dispatchError: null,
+            },
+          });
+          dispatched++;
+        } else {
+          await prisma.orderItem.update({
+            where: { id: item.id },
+            data: {
+              dispatchedAttempts: { increment: 1 },
+              dispatchError: `kakao 응답에 order_id 없음: ${JSON.stringify(res).slice(0, 200)}`,
+            },
+          });
+          failed++;
+          errors.push(`item:${item.id} no order_id`);
+        }
       } else {
-        // 응답에 order 필드 없음 (이상한 케이스)
-        await prisma.orderItem.update({
-          where: { id: item.id },
-          data: {
-            dispatchedAttempts: { increment: 1 },
-            dispatchError: `urpanel 응답에 order 필드 없음: ${JSON.stringify(res).slice(0, 200)}`,
-          },
+        // urpanel 발주 시도
+        const res = await addUrpanelOrder({
+          service: serviceId!,
+          link: item.targetUrl,
+          quantity: smmQuantity,
         });
-        failed++;
-        errors.push(`item:${item.id} no order field`);
+        if (typeof res.order === "number" || typeof res.order === "string") {
+          await prisma.orderItem.update({
+            where: { id: item.id },
+            data: {
+              externalProvider: "urpanel",
+              externalServiceId: serviceId,
+              externalOrderId: String(res.order),
+              externalStatus: "Pending",
+              dispatchedAt: new Date(),
+              dispatchedAttempts: { increment: 1 },
+              dispatchError: null,
+            },
+          });
+          dispatched++;
+        } else {
+          // 응답에 order 필드 없음 (이상한 케이스)
+          await prisma.orderItem.update({
+            where: { id: item.id },
+            data: {
+              dispatchedAttempts: { increment: 1 },
+              dispatchError: `urpanel 응답에 order 필드 없음: ${JSON.stringify(res).slice(0, 200)}`,
+            },
+          });
+          failed++;
+          errors.push(`item:${item.id} no order field`);
+        }
       }
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
@@ -192,6 +240,53 @@ export async function syncUrpanelStatuses(): Promise<{
 }
 
 /**
+ * 진행 중인 모든 kakao 주문의 상태를 일괄 동기화.
+ * - kakao 는 다중 status 엔드포인트가 없어 주문별로 개별 조회 (GET /api/v1/orders/{id})
+ * - Completed / Cancelled / Partial(종료) 항목은 다시 조회 안 함
+ */
+export async function syncKakaoStatuses(): Promise<{
+  checked: number;
+  updated: number;
+  completed: number;
+}> {
+  const pendingItems = await prisma.orderItem.findMany({
+    where: {
+      externalProvider: "kakao",
+      externalOrderId: { not: null },
+      externalStatus: { notIn: ["Completed", "Cancelled", "Partial"] },
+    },
+    select: { id: true, externalOrderId: true },
+  });
+  if (pendingItems.length === 0) return { checked: 0, updated: 0, completed: 0 };
+
+  let updated = 0;
+  let completed = 0;
+
+  for (const item of pendingItems) {
+    try {
+      const st = await getKakaoOrderStatus(item.externalOrderId!);
+      const mapped = mapKakaoStatus(st);
+      await prisma.orderItem.update({
+        where: { id: item.id },
+        data: {
+          externalStatus: mapped.status,
+          remainsCount: mapped.remains,
+          startCount: mapped.startCount,
+          lastSyncedAt: new Date(),
+        },
+      });
+      updated++;
+      if (mapped.status === "Completed") completed++;
+    } catch (e) {
+      console.error(`[sync-kakao] ${item.externalOrderId} 조회 실패`, e);
+    }
+  }
+
+  await markCompletedOrders();
+  return { checked: pendingItems.length, updated, completed };
+}
+
+/**
  * 특정 주문 1건만 즉시 동기화 (고객이 주문 조회할 때 호출).
  *
  * cron(GitHub Actions)은 스케줄이 실제로는 1~3시간 간격으로 지연 실행되기 때문에
@@ -207,11 +302,10 @@ export async function syncOrderStatusIfStale(orderId: string, maxAgeMs = 60_000)
     const items = await prisma.orderItem.findMany({
       where: {
         orderId,
-        externalProvider: "urpanel",
         externalOrderId: { not: null },
-        externalStatus: { notIn: ["Completed", "Cancelled"] },
+        externalStatus: { notIn: ["Completed", "Cancelled", "Partial"] },
       },
-      select: { id: true, externalOrderId: true, lastSyncedAt: true },
+      select: { id: true, externalProvider: true, externalOrderId: true, lastSyncedAt: true },
     });
     if (items.length === 0) return false;
 
@@ -219,23 +313,48 @@ export async function syncOrderStatusIfStale(orderId: string, maxAgeMs = 60_000)
     const stale = items.filter((it) => !it.lastSyncedAt || now - it.lastSyncedAt.getTime() > maxAgeMs);
     if (stale.length === 0) return false;
 
-    const statusMap = await getUrpanelOrdersStatus(stale.map((it) => it.externalOrderId!));
-
     let updated = 0;
-    for (const item of stale) {
-      const st = statusMap[item.externalOrderId!];
-      if (!st) continue;
-      await prisma.orderItem.update({
-        where: { id: item.id },
-        data: {
-          externalStatus: st.status ?? null,
-          remainsCount: st.remains !== undefined ? Number(st.remains) : null,
-          startCount: st.start_count !== undefined ? Number(st.start_count) : null,
-          externalCharge: st.charge !== undefined ? Number(st.charge) : null,
-          lastSyncedAt: new Date(),
-        },
-      });
-      updated++;
+
+    // urpanel — 다중 status 일괄 조회
+    const urpanelStale = stale.filter((it) => it.externalProvider !== "kakao");
+    if (urpanelStale.length > 0) {
+      const statusMap = await getUrpanelOrdersStatus(urpanelStale.map((it) => it.externalOrderId!));
+      for (const item of urpanelStale) {
+        const st = statusMap[item.externalOrderId!];
+        if (!st) continue;
+        await prisma.orderItem.update({
+          where: { id: item.id },
+          data: {
+            externalStatus: st.status ?? null,
+            remainsCount: st.remains !== undefined ? Number(st.remains) : null,
+            startCount: st.start_count !== undefined ? Number(st.start_count) : null,
+            externalCharge: st.charge !== undefined ? Number(st.charge) : null,
+            lastSyncedAt: new Date(),
+          },
+        });
+        updated++;
+      }
+    }
+
+    // kakao — 주문별 개별 조회
+    const kakaoStale = stale.filter((it) => it.externalProvider === "kakao");
+    for (const item of kakaoStale) {
+      try {
+        const st = await getKakaoOrderStatus(item.externalOrderId!);
+        const mapped = mapKakaoStatus(st);
+        await prisma.orderItem.update({
+          where: { id: item.id },
+          data: {
+            externalStatus: mapped.status,
+            remainsCount: mapped.remains,
+            startCount: mapped.startCount,
+            lastSyncedAt: new Date(),
+          },
+        });
+        updated++;
+      } catch (e) {
+        console.error(`[sync-on-view] kakao ${item.externalOrderId} 실패`, e);
+      }
     }
 
     if (updated > 0) await markOrderCompletedIfDone(orderId);

@@ -11,6 +11,7 @@ type Option = {
   sortOrder?: number;
   externalProvider?: string | null;
   externalServiceId?: number | null;
+  externalCommand?: string | null;
 };
 type Category = { id: string; slug: string; name: string; platform: "SNS" | "RANK" };
 type Product = {
@@ -144,6 +145,7 @@ function addOption() {
     sortOrder: editing.value.options.length,
     externalProvider: null,
     externalServiceId: null,
+    externalCommand: null,
   });
 }
 function removeOption(i: number) {
@@ -175,8 +177,10 @@ async function saveForm() {
         quantity: Number(o.quantity),
         price: Number(o.price),
         sortOrder: i,
-        externalProvider: o.externalServiceId ? "urpanel" : null,
+        // kakao command 있으면 kakao, 아니면 urpanel serviceId, 둘 다 없으면 수동
+        externalProvider: o.externalCommand ? "kakao" : o.externalServiceId ? "urpanel" : null,
         externalServiceId: o.externalServiceId ? Number(o.externalServiceId) : null,
+        externalCommand: o.externalCommand || null,
       })),
     };
     if (f.id) {
@@ -406,8 +410,28 @@ async function deleteProduct(p: Product) {
                   </div>
                   <button type="button" class="rounded border border-rose-200 bg-rose-50 px-2 py-1.5 text-xs text-rose-700 hover:bg-rose-100" @click="removeOption(i)">제거</button>
                 </div>
+                <div class="mt-2 flex items-center gap-2">
+                  <span class="pl-1 text-[11px] text-amber-700">카카오:</span>
+                  <select
+                    v-model="opt.externalCommand"
+                    class="rounded border border-amber-200 bg-amber-50/40 px-2 py-1.5 text-sm focus:border-amber-500 focus:outline-none"
+                    title="카카오 명령어 — 선택 시 결제 완료 자동 발주 (urpanel ID보다 우선)"
+                  >
+                    <option :value="null">— 카카오 아님 —</option>
+                    <option value="like">오픈채팅 좋아요 (like)</option>
+                    <option value="join">오픈방 입장 (join)</option>
+                    <option value="channel_add">채널 친구추가 (channel_add)</option>
+                    <option value="channel_fav">채널 즐겨찾기 (channel_fav)</option>
+                    <option value="post_like">게시글 좋아요 (post_like)</option>
+                    <option value="post_share">게시글 공유 (post_share)</option>
+                    <option value="short_like">숏폼 좋아요 (short_like)</option>
+                    <option value="short_comment">숏폼 댓글 (short_comment)</option>
+                    <option value="short_bookmark">숏폼 북마크 (short_bookmark)</option>
+                    <option value="short_share">숏폼 공유 (short_share)</option>
+                  </select>
+                </div>
                 <p class="mt-1 pl-1 text-[10px] text-neutral-400">
-                  💡 urpanel ID 입력 시 결제 완료 자동 발주 / 비워두면 수동 처리
+                  💡 발주 매핑: <b>카카오 명령어</b> 선택(카카오) <b>또는</b> urpanel ID 입력(urpanel) → 결제 완료 시 자동 발주 · 둘 다 비우면 수동 처리 (카카오 우선)
                 </p>
               </div>
               <p v-if="editing.options.length === 0" class="text-center text-xs text-neutral-400">

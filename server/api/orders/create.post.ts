@@ -33,7 +33,8 @@ export default defineEventHandler(async (event) => {
   if (items.length === 0) throw createError({ statusCode: 400, statusMessage: "장바구니가 비어 있어요." });
 
   // 오픈예정(발주 매핑 없는) 상품 주문 차단
-  if (items.some((it) => it.option && it.option.externalServiceId == null)) {
+  //   매핑됨 = urpanel serviceId 있음 OR kakao command 있음
+  if (items.some((it) => it.option && it.option.externalServiceId == null && !it.option.externalCommand)) {
     throw createError({ statusCode: 400, statusMessage: "장바구니에 곧 오픈 예정인 상품이 있습니다. 해당 상품을 제외하고 주문해주세요." });
   }
 

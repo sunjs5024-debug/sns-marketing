@@ -193,9 +193,11 @@ model ProductOption {
   price     Int
   sortOrder Int     @default(0)
 
-  // 외부 SMM 패널 자동 발주용 (urpanel 등)
-  externalProvider  String? // "urpanel" (확장 가능)
+  // 외부 SMM 패널 자동 발주용 (urpanel / kakao 등)
+  externalProvider  String? // "urpanel" | "kakao" (확장 가능)
   externalServiceId Int?    // urpanel 서비스 ID — NULL이면 수동 처리
+  // kakao 발주용 — 명령어(like/join/channel_add/…). urpanel 은 serviceId, kakao 는 command 로 매핑
+  externalCommand   String? // "like" | "channel_add" | "post_like" | "short_like" | ... (kakao 전용)
 
   orderItems OrderItem[]
   cartItems  CartItem[]

@@ -10,6 +10,7 @@ const optionSchema = z.object({
   sortOrder: z.number().int().optional().default(0),
   externalProvider: z.string().max(20).nullable().optional(),
   externalServiceId: z.number().int().min(1).nullable().optional(),
+  externalCommand: z.string().max(40).nullable().optional(), // kakao 명령어 (like/join/…)
 });
 
 const schema = z.object({
@@ -60,6 +61,7 @@ export default defineEventHandler(async (event) => {
               sortOrder: opt.sortOrder ?? 0,
               externalProvider: opt.externalProvider ?? null,
               externalServiceId: opt.externalServiceId ?? null,
+              externalCommand: opt.externalCommand ?? null,
             },
           });
         } else {
@@ -72,6 +74,7 @@ export default defineEventHandler(async (event) => {
               sortOrder: opt.sortOrder ?? 0,
               externalProvider: opt.externalProvider ?? null,
               externalServiceId: opt.externalServiceId ?? null,
+              externalCommand: opt.externalCommand ?? null,
             },
           });
         }
