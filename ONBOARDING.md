@@ -84,3 +84,20 @@ git push origin feature/작업명   # 배포 안 됨. 검토 후 main 에 머지
 - `.env`·`.dev.vars` 는 절대 커밋·공개채팅 전송 금지 (gitignore 돼 있음)
 - 운영 환경변수는 Cloudflare Pages → 설정 → 변수 및 비밀 (수정 후 재배포해야 반영)
 - 팀원이 나가면 DB 비번·API 키 교체할 것
+
+## 7. 엣지 캐시 (성능) — ★대시보드 설정이라 git에 없음
+
+**배경**: nuxt.config `routeRules` 의 `swr:600` 은 Cloudflare Pages 에서 사실상 무효였다(응답 헤더만 나가고 cf-cache-status: DYNAMIC, 매 요청 SSR+Neon 왕복 → TTFB 3초). 2026-08-24 성능감사로 규명.
+
+**해결**: Cloudflare 대시보드 → Caching → **Cache Rules** 에 규칙 1개 생성(코드 아님·대시보드 전용):
+- 이름: `공개 페이지·카탈로그 엣지캐시`
+- 매칭식: `starts_with(path,"/products/") or "/sns/" or "/marketing/" or "/guide/" or "/api/products/" or path in {"/" "/price" "/reviews" "/faq"}`
+- 동작: 캐시에 적합(Eligible for cache) + 에지 TTL "캐시 제어 헤더 무시 및 **600초**"
+- 결과: TTFB 3.3초 → **0.37초**(약 9배), 전 경로 cf-cache-status HIT.
+
+**전제(중요)**: 이게 안전한 건 SSR HTML 이 익명이기 때문. SiteHeader/AppSidebar 의 `/api/header`·nav 를 `server:false`(클라 전용)로 뺐다. **개인화(로그인/카트/포인트)를 SSR 에 다시 넣으면 캐시된 HTML 로 남의 정보가 유출**되니 절대 금지.
+
+**⚠️ 운영 주의 — 공개 페이지가 최대 10분 stale**:
+- 관리자 콘솔에서 가격·품절 수정, 또는 카카오 상품 품절 해제(`setup-kakao-products.ts open`) 후 **즉시 반영이 필요하면** Cloudflare 대시보드 → Caching → **Configuration → Purge Cache**(전체 또는 해당 URL) 실행.
+- 안 하면 최대 10분 뒤 자동 반영(정상). 결제 금액은 주문 시점 라이브 DB로 재계산하므로 캐시 staleness 와 무관(과금 안전).
+- 캐시 금지 경로: `/api/header`·`/cart`·`/checkout`·`/mypage`·`/admin`·`/auth`·`/api/me` (매칭식에 안 들어가 자동 제외됨 — 넓히지 말 것).
