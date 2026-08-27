@@ -28,8 +28,15 @@ type RelatedProduct = {
   _count: { options: number };
 };
 type Related = { sameCategory: RelatedProduct[]; samePlatform: RelatedProduct[] };
-// 관련 상품은 페이지 진입을 막지 않도록 lazy 로 뒤이어 로드 (체감 속도 개선)
-const { data: related } = useFetch<Related>(`/api/products/${slug.value}/related`, { lazy: true });
+// 관련 상품은 페이지 진입을 막지 않도록 lazy 로 뒤이어 로드 (체감 속도 개선).
+// 이미 가진 product 정보(id/categoryId/categorySlug)를 넘겨 related 쪽 중복 상품조회 왕복 제거.
+const { data: related } = useFetch<Related>(
+  () =>
+    `/api/products/${slug.value}/related?productId=${product.value!.id}` +
+    `&categoryId=${product.value!.categoryId}` +
+    `&categorySlug=${encodeURIComponent(product.value!.category.slug)}`,
+  { lazy: true },
+);
 
 // 이 상품의 실제 승인된 리뷰
 type ProductReview = {

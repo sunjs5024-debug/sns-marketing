@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { SNS_PLATFORMS, RANK_PLATFORMS, MARKETING_PLATFORMS, PLATFORMS, type PlatformSlug } from "#shared/catalog";
 
-// sidebase의 useAuth() 는 SSR 중 재귀 이슈가 있어 자체 API로 우회
-const { data: header, refresh: refreshHeader } = await useFetch("/api/header", {
+// sidebase의 useAuth() 는 SSR 중 재귀 이슈가 있어 자체 API로 우회.
+// ★개인화(로그인/카트/포인트/쪽지)는 클라이언트에서만 로드 → SSR HTML은 로그아웃(익명) 상태로 고정.
+//   (공개 페이지 엣지 캐싱의 안전 전제 = 남의 개인정보가 캐시된 HTML에 안 박힘 + 페이지당 개인화 DB왕복 제거)
+const { data: header, refresh: refreshHeader } = useFetch("/api/header", {
   key: "header",
+  server: false,
+  lazy: true,
   default: () => ({ isAuthed: false, role: null, cartCount: 0, name: null, points: 0, unreadMessages: 0 }),
 });
 

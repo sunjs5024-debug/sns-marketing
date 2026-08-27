@@ -146,6 +146,13 @@ export default defineNuxtConfig({
         { name: "google-site-verification", content: "v-IYp-1JE-V-cuz71BDBd3gCW6Dah93P3_P52EQ1X-M" },
       ],
       link: [
+        // 본문·헤딩 폰트 Pretendard — dynamic-subset(필요 글자만 로드) + preconnect 로 LCP 개선.
+        //   ⚠️ 구 main.css @font-face URL(gh/…/PretendardVariable.woff2)은 404였음 → 정상 npm 경로로 교체.
+        { rel: "preconnect", href: "https://cdn.jsdelivr.net", crossorigin: "anonymous" },
+        {
+          rel: "stylesheet",
+          href: "https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css",
+        },
         // 현대 브라우저 — 벡터 SVG favicon 우선
         { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
         // 구형 브라우저 fallback

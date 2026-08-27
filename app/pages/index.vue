@@ -136,15 +136,21 @@ useSchemaOrg([
 // (이메일/구글/네이버/카카오 무관, 어느 버튼에서 가입했든 동작)
 const { status } = useAuth();
 const showWelcome = ref(false);
-onMounted(async () => {
-  if (status.value === "unauthenticated") return; // 비로그인 방문자/크롤러는 호출 안 함
+// ★인증이 '확정(authenticated)'된 뒤에만 호출 → 비로그인/세션확정전 레이스로 인한 잉여 401 제거.
+//   status 가 로드 후 확정되는 경우도 있어 onMounted + watch 로 딱 1회 실행.
+let welcomeChecked = false;
+async function checkWelcome() {
+  if (welcomeChecked || status.value !== "authenticated") return;
+  welcomeChecked = true;
   try {
     const r = await $fetch<{ welcome: boolean }>("/api/me/welcome-check", { method: "POST" });
     if (r?.welcome) showWelcome.value = true;
   } catch {
-    /* 비로그인/오류 시 무시 */
+    /* 오류 시 무시 */
   }
-});
+}
+onMounted(checkWelcome);
+watch(status, checkWelcome);
 </script>
 
 <template>

@@ -10,14 +10,9 @@
 @source inline("from-blue-500 from-pink-500 from-emerald-500 from-amber-500 from-indigo-500 from-yellow-400 from-rose-500 to-cyan-500 to-rose-500 to-teal-500 to-orange-500 to-violet-500 to-amber-500 to-rose-600 group-hover:scale-110 group-hover:rotate-3 group-hover:opacity-30 group-hover:opacity-100 group-hover:-translate-y-1 group-hover:shadow-xl group-hover:translate-x-1 group-hover:visible bg-gradient-to-br");
 
 /* Pretendard Variable — 2026 트렌드 · 본문·헤딩 통일 가변폰트 (고가독성).
-   구 Jalnan(여기어때 잘난체) 디스플레이 폰트를 본문에서 걷어내 눈피로 해소 + 외부 폰트요청 절감. */
-@font-face {
-  font-family: "Pretendard Variable";
-  font-weight: 45 920;
-  font-style: normal;
-  font-display: swap;
-  src: url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/PretendardVariable.woff2") format("woff2-variations");
-}
+   ⚠️ @font-face 는 여기 두지 않는다. 구 URL(gh/…/PretendardVariable.woff2)이 404라 폰트가 안 불러와졌었음.
+   → nuxt.config app.head 에서 정상 경로의 dynamic-subset CSS(필요 글자만 로드) + preconnect 로 로드.
+   구 Jalnan(여기어때 잘난체) 디스플레이 폰트는 본문에서 제거(눈피로 해소). */
 
 :root {
   --background: #ffffff;
@@ -97,3 +92,11 @@ html, body {
 .anim-marquee    { animation: marquee 30s linear infinite; }
 .anim-marquee:hover { animation-play-state: paused; }
 .anim-blob       { animation: blob 18s ease-in-out infinite; }
+
+/* 접근성·성능: prefers-reduced-motion 사용자는 항상 도는 무한 애니메이션(blur blob·marquee·gradient) 정지 → CPU/배터리 절감 */
+@media (prefers-reduced-motion: reduce) {
+  .anim-float-up, .anim-float-down, .anim-bounce, .anim-spin-slow,
+  .anim-pulse, .anim-gradient-flow, .anim-marquee, .anim-blob {
+    animation: none !important;
+  }
+}

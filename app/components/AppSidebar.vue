@@ -5,15 +5,20 @@ import { SNS_PLATFORMS, MARKETING_PLATFORMS, PLATFORMS, platformKeyFor, type Pla
 
 type NavProd = { slug: string; name: string; featured: boolean; categorySlug: string };
 
-// SSR 에서 미리 로드 → 초기 HTML 에 포함 → 펼칠 때 즉시 표시 (로딩 없음)
-const { data: navProducts } = await useFetch<NavProd[]>("/api/products/nav", {
+// 카탈로그 nav 는 클라이언트에서 로드 → 모든 페이지 SSR의 '활성상품 전체' Neon(싱가포르) 왕복 제거.
+//   (사이드바는 데스크탑 보조 네비 + DB장애 시 빈배열 폴백이라 client-only 안전. 하이드레이션 직후 채워짐)
+const { data: navProducts } = useFetch<NavProd[]>("/api/products/nav", {
   key: "nav-products",
+  server: false,
+  lazy: true,
   default: () => [],
 });
 
-// 로그인 상태 (SiteHeader 와 동일 key 라 중복 호출 없음)
-const { data: header } = await useFetch("/api/header", {
+// 로그인 상태 (SiteHeader 와 동일 key 라 중복 호출 없음) — 개인화라 클라이언트 전용
+const { data: header } = useFetch("/api/header", {
   key: "header",
+  server: false,
+  lazy: true,
   default: () => ({ isAuthed: false, role: null, cartCount: 0, name: null, points: 0, unreadMessages: 0 }),
 });
 // 쪽지함 모달 열기 (전역 상태)
