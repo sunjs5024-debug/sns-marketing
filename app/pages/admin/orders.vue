@@ -23,6 +23,33 @@ async function updateStatus(id: string, status: OrderStatus) {
   await $fetch(`/api/admin/orders/${id}`, { method: "PATCH", body: { status } });
   await refresh();
 }
+
+// 수동 발주(첫 발주/재발주) — 입금문자 자동매칭이 안 됐거나 테스트 발주용.
+//   외부 provider(urpanel/kakao)로 즉시 발주 시도. 결제상태와 무관하게 관리자 권한으로 실행.
+const dispatching = ref<string | null>(null);
+async function dispatchNow(orderNumber: string) {
+  if (!confirm(`${orderNumber} 주문을 지금 발주하시겠어요?\n(외부 provider로 실제 발주가 나갑니다)`)) return;
+  dispatching.value = orderNumber;
+  try {
+    const r = await $fetch<{ dispatched?: number; failed?: number; skipped?: number; errors?: string[] }>(
+      `/api/admin/orders/${orderNumber}/dispatch`,
+      { method: "POST", body: { resetAttempts: true } },
+    );
+    const msg = [
+      `발주 완료: ${r.dispatched ?? 0}건`,
+      r.failed ? `실패: ${r.failed}건` : "",
+      r.skipped ? `스킵: ${r.skipped}건` : "",
+      r.errors?.length ? `\n오류: ${r.errors.join(", ")}` : "",
+    ].filter(Boolean).join(" · ");
+    alert(msg || "발주 처리됨");
+    await refresh();
+  } catch (e: unknown) {
+    const err = e as { data?: { statusMessage?: string }; statusMessage?: string };
+    alert(`발주 실패: ${err?.data?.statusMessage ?? err?.statusMessage ?? "알 수 없는 오류"}`);
+  } finally {
+    dispatching.value = null;
+  }
+}
 </script>
 
 <template>
@@ -62,6 +89,13 @@ async function updateStatus(id: string, status: OrderStatus) {
               {{ STATUS_LABEL[o.status] }}
             </span>
             <div class="flex gap-1">
+              <button
+                v-if="o.status !== 'CANCELLED' && o.status !== 'REFUNDED'"
+                type="button"
+                :disabled="dispatching === o.orderNumber"
+                class="rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-[11px] font-medium text-indigo-700 hover:bg-indigo-100 disabled:opacity-50"
+                @click="dispatchNow(o.orderNumber)"
+              >{{ dispatching === o.orderNumber ? '발주 중…' : '⚡ 발주' }}</button>
               <button
                 v-for="s in NEXT_OPTIONS[o.status]"
                 :key="s"
