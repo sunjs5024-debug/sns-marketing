@@ -27,7 +27,7 @@ export default defineNuxtConfig({
   // /mypage/**(인증 전용)·/rank(/sns 로 301) 는 indexable 200 이 아니므로 사이트맵에서 제외
   sitemap: {
     // /search 는 noindex,follow(검색 결과 페이지) → 사이트맵 제외
-    exclude: ["/admin/**", "/cart", "/checkout/**", "/orders/**", "/auth/**", "/mypage/**", "/rank", "/rank/**", "/search"],
+    exclude: ["/admin/**", "/cart", "/checkout/**", "/orders/**", "/auth/**", "/mypage/**", "/messages", "/messages/**", "/rank", "/rank/**", "/search"],
     sources: ["/api/__sitemap__/urls"],
   },
 
