@@ -52,12 +52,9 @@ useSchemaOrg([
     headline: guide.h1,
     description: guide.metaDescription,
     inLanguage: "ko-KR",
-    author: { "@type": "Organization", name: "SNS소셜팩토리" },
-    publisher: {
-      "@type": "Organization",
-      name: "SNS소셜팩토리",
-      logo: { "@type": "ImageObject", url: "https://xn--sns-yg9lh0pw9l.kr/logo.png" },
-    },
+    // 중복 Organization 방지 — 전역 identity Organization(@id=#identity) 참조
+    author: { "@id": "https://xn--sns-yg9lh0pw9l.kr/#identity" },
+    publisher: { "@id": "https://xn--sns-yg9lh0pw9l.kr/#identity" },
     mainEntityOfPage: {
       "@type": "WebPage",
       "@id": `https://xn--sns-yg9lh0pw9l.kr/guide/${guide.slug}`,

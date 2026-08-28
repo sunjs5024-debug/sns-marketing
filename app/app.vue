@@ -3,14 +3,11 @@
 const route = useRoute();
 const showSidebar = computed(() => !route.path.startsWith("/admin"));
 
-// 전역 1회 — WebSite + SearchAction (구글 사이트링크 검색창 자격). /search?q= 실제 동작함.
+// 전역 1회 — WebSite 엔티티. (SearchAction/사이트링크 검색창은 구글이 2024.11 폐지 → 제거)
 useSchemaOrg([
   defineWebSite({
     name: "SNS소셜팩토리",
     url: "https://xn--sns-yg9lh0pw9l.kr",
-    potentialAction: [
-      defineSearchAction({ target: "/search?q={search_term_string}" }),
-    ],
   }),
 ]);
 </script>
