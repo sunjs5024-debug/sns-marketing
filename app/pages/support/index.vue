@@ -44,6 +44,26 @@ const helpLinks = [
         <span class="mt-4 inline-block rounded-full bg-white px-4 py-2 text-sm text-blue-700 group-hover:bg-sky-50">텔레그램으로 문의하기 →</span>
       </a>
 
+      <!-- 카카오톡 상담 -->
+      <a
+        :href="CONTACT.kakao.url"
+        target="_blank"
+        rel="noopener"
+        class="group rounded-3xl bg-[#FEE500] p-6 text-[#3C1E1E] transition hover:-translate-y-0.5 hover:shadow-xl"
+      >
+        <div class="flex items-center gap-3">
+          <span class="grid h-12 w-12 place-items-center rounded-2xl bg-black/10">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M12 3C6.48 3 2 6.66 2 10.8c0 2.67 1.83 5.02 4.6 6.36-.2.7-.72 2.6-.83 3-.13.5.18.5.39.36.16-.1 2.55-1.73 3.6-2.45.72.1 1.47.16 2.24.16 5.52 0 10-3.66 10-7.79C22 6.66 17.52 3 12 3z"/></svg>
+          </span>
+          <div>
+            <p class="font-display text-lg">카카오톡 1:1 상담</p>
+            <p class="text-xs text-[#3C1E1E]/70">카톡이 편하시면 채널로 · 순차 답변</p>
+          </div>
+        </div>
+        <p class="mt-4 text-sm text-[#3C1E1E]/80">카카오톡으로 편하게 문의하세요. 채널로 주문 전 상담부터 진행 문의까지 도와드립니다.</p>
+        <span class="mt-4 inline-block rounded-full bg-[#3C1E1E] px-4 py-2 text-sm text-[#FEE500] group-hover:bg-black">카카오톡으로 문의하기 →</span>
+      </a>
+
       <!-- 이메일 -->
       <a
         :href="`mailto:${CONTACT.email}`"
