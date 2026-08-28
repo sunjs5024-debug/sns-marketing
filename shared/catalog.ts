@@ -8,6 +8,11 @@ export const CONTACT = {
     label: "텔레그램 상담",
     iconText: "✈",
   },
+  kakao: {
+    channelId: "_SBIxaX",
+    url: "https://pf.kakao.com/_SBIxaX/chat",
+    label: "카카오톡 상담",
+  },
   email: "dkssudgktka53@gmail.com",
 } as const;
 

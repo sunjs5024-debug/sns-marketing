@@ -32,15 +32,26 @@ const year = new Date().getFullYear();
           <p class="mt-3 max-w-sm text-sm leading-6 text-neutral-600">
             SNS 마케팅이 가장 빠르게 시작되는 곳. 실계정 · 안전결제 · 결과보고서로 신뢰를 드립니다.
           </p>
-          <a
-            :href="CONTACT.telegram.url"
-            target="_blank"
-            rel="noopener"
-            class="mt-4 inline-flex items-center gap-2 rounded-full bg-sky-100 px-3 py-2 text-xs text-sky-900 hover:bg-sky-200"
-          >
-            <TelegramIcon :size="16" />
-            {{ CONTACT.telegram.label }}
-          </a>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <a
+              :href="CONTACT.telegram.url"
+              target="_blank"
+              rel="noopener"
+              class="inline-flex items-center gap-2 rounded-full bg-sky-100 px-3 py-2 text-xs text-sky-900 hover:bg-sky-200"
+            >
+              <TelegramIcon :size="16" />
+              {{ CONTACT.telegram.label }}
+            </a>
+            <a
+              :href="CONTACT.kakao.url"
+              target="_blank"
+              rel="noopener"
+              class="inline-flex items-center gap-2 rounded-full bg-[#FEE500] px-3 py-2 text-xs font-medium text-[#3C1E1E] hover:bg-[#FDD835]"
+            >
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 3C6.48 3 2 6.66 2 10.8c0 2.67 1.83 5.02 4.6 6.36-.2.7-.72 2.6-.83 3-.13.5.18.5.39.36.16-.1 2.55-1.73 3.6-2.45.72.1 1.47.16 2.24.16 5.52 0 10-3.66 10-7.79C22 6.66 17.52 3 12 3z"/></svg>
+              {{ CONTACT.kakao.label }}
+            </a>
+          </div>
         </div>
 
         <!-- SNS 마케팅 -->
