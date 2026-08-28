@@ -35,12 +35,15 @@ export type PlatformMeta = {
   bgGradient: string;
   tagline: string;
   description: string;
+  /** 허브/카테고리 페이지 <title>·<h1>용 구매의도 키워드 (없으면 name 사용) */
+  seoTitle?: string;
 };
 
 export const PLATFORMS: Record<PlatformSlug, PlatformMeta> = {
   instagram: {
     slug: "instagram",
     name: "인스타그램 마케팅",
+    seoTitle: "인스타 팔로워 늘리기·좋아요 구매",
     shortName: "인스타그램",
     emoji: "📸",
     platform: "SNS",
@@ -53,6 +56,7 @@ export const PLATFORMS: Record<PlatformSlug, PlatformMeta> = {
   youtube: {
     slug: "youtube",
     name: "유튜브 마케팅",
+    seoTitle: "유튜브 구독자 늘리기·조회수 구매",
     shortName: "유튜브",
     emoji: "▶️",
     platform: "SNS",
@@ -65,6 +69,7 @@ export const PLATFORMS: Record<PlatformSlug, PlatformMeta> = {
   tiktok: {
     slug: "tiktok",
     name: "틱톡 마케팅",
+    seoTitle: "틱톡 팔로워 늘리기·조회수 구매",
     shortName: "틱톡",
     emoji: "🎵",
     platform: "SNS",
@@ -76,6 +81,7 @@ export const PLATFORMS: Record<PlatformSlug, PlatformMeta> = {
   kakaotalk: {
     slug: "kakaotalk",
     name: "카카오톡 채널 마케팅",
+    seoTitle: "카카오톡 채널 친구 늘리기",
     shortName: "카카오톡",
     emoji: "💬",
     platform: "SNS",
@@ -88,6 +94,7 @@ export const PLATFORMS: Record<PlatformSlug, PlatformMeta> = {
   x: {
     slug: "x",
     name: "X(트위터) 마케팅",
+    seoTitle: "X(트위터) 팔로워·좋아요 늘리기",
     shortName: "X (트위터)",
     emoji: "✖️",
     platform: "SNS",
@@ -100,6 +107,7 @@ export const PLATFORMS: Record<PlatformSlug, PlatformMeta> = {
   telegram: {
     slug: "telegram",
     name: "텔레그램 마케팅",
+    seoTitle: "텔레그램 구독자·조회수 늘리기",
     shortName: "텔레그램",
     emoji: "✈️",
     platform: "SNS",

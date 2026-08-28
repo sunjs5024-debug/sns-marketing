@@ -11,9 +11,9 @@ if (!isValidPlatformSlug(platformParam.value) || !RANK_PLATFORMS.includes(platfo
 const meta = PLATFORMS[platformParam.value];
 
 useSeoMeta({
-  title: meta.name,
+  title: meta.seoTitle ?? meta.name,
   description: meta.description,
-  ogTitle: `${meta.name} | SNS소셜팩토리`,
+  ogTitle: `${meta.seoTitle ?? meta.name} | SNS소셜팩토리`,
   ogDescription: meta.description,
   ogType: "website",
   ogLocale: "ko_KR",
@@ -79,7 +79,7 @@ const { data: products } = await useFetch(
           </div>
           <div>
             <p class="text-xs uppercase tracking-widest text-neutral-600">SEARCH RANKING</p>
-            <h1 class="font-display text-3xl text-neutral-900 sm:text-4xl">{{ meta.name }}</h1>
+            <h1 class="font-display text-3xl text-neutral-900 sm:text-4xl">{{ meta.seoTitle ?? meta.name }}</h1>
           </div>
         </div>
         <p class="mt-5 max-w-2xl text-sm leading-7 text-neutral-700">{{ meta.description }}</p>

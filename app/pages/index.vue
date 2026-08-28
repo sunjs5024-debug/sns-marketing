@@ -93,8 +93,8 @@ const FAQS = [
 // 메인 페이지는 가장 중요한 랜딩. 한국어 검색 핵심 키워드 자연스럽게 포함.
 useSeoMeta({
   // seo-utils 가 자동으로 " | SNS소셜팩토리" 를 뒤에 붙여줌 → title 본문엔 브랜드 제외
-  // 검색 핵심 키워드(인스타 팔로워 구매·좋아요)를 앞에 배치 — SERP 클릭·노출 유리
-  title: "인스타 팔로워 구매·좋아요 늘리기 — SNS마케팅 1번지",
+  // 홈은 상위 카테고리·브랜드 헤드텀 담당(개별 '인스타 팔로워' 구매어는 상품/허브에 위임 → 카니발 방지)
+  title: "SNS 마케팅·상위노출 — 인스타·유튜브·틱톡·텔레그램 한 곳에",
   description:
     "인스타 팔로워·좋아요·스토리, 유튜브 구독자·시청시간·쇼츠, 틱톡 팔로워·공유, X 리트윗, 텔레그램 리액션까지. 한국인 실계정·글로벌 가성비 옵션, 10분 내 빠른 시작, 결과보고서 보장.",
   ogTitle: "SNS 마케팅 1번지 | SNS소셜팩토리",
@@ -193,8 +193,8 @@ watch(status, checkWelcome);
           <p class="mt-0.5 text-[10px] text-neutral-500 sm:text-xs">누적 주문</p>
         </div>
         <div class="px-2 py-5 text-center sm:py-6">
-          <p class="font-display text-xl text-amber-500 sm:text-2xl">★ 4.9<span class="text-sm text-neutral-400">/5</span></p>
-          <p class="mt-0.5 text-[10px] text-neutral-500 sm:text-xs">평균 만족도</p>
+          <p class="font-display text-xl text-amber-500 sm:text-2xl">100<span class="text-sm text-neutral-400">%</span></p>
+          <p class="mt-0.5 text-[10px] text-neutral-500 sm:text-xs">실계정 기반 처리</p>
         </div>
         <div class="px-2 py-5 text-center sm:py-6">
           <p class="font-display text-xl text-emerald-600 sm:text-2xl">10<span class="text-sm">분</span></p>
@@ -222,6 +222,25 @@ watch(status, checkWelcome);
           :icon-key="platformKeyFor(p.category.slug)"
           :option-count="p._count?.options"
         />
+      </div>
+    </section>
+
+    <!-- 플랫폼별 바로가기 (SSR 키워드 앵커 내부링크 — 카테고리 색인·크롤 도달성 강화) -->
+    <section class="mx-auto max-w-7xl px-4 pb-4 sm:px-6 lg:px-8">
+      <SectionTitle eyebrow="PLATFORMS" title="플랫폼별 마케팅 바로가기" description="찾으시는 SNS를 골라 바로 시작하세요. 인스타·유튜브·틱톡·X·텔레그램·카카오톡까지." />
+      <div class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <NuxtLink
+          v-for="s in SNS_PLATFORMS"
+          :key="s"
+          :to="`/sns/${s}`"
+          class="group flex items-center gap-3 rounded-2xl border border-neutral-100 bg-white p-4 transition hover:-translate-y-0.5 hover:border-indigo-100 hover:shadow-md"
+        >
+          <span class="text-2xl" aria-hidden>{{ PLATFORMS[s].emoji }}</span>
+          <span class="min-w-0">
+            <span class="block truncate font-display text-sm text-neutral-900">{{ PLATFORMS[s].seoTitle ?? PLATFORMS[s].name }}</span>
+            <span class="block truncate text-[11px] text-neutral-500">{{ PLATFORMS[s].tagline }}</span>
+          </span>
+        </NuxtLink>
       </div>
     </section>
 

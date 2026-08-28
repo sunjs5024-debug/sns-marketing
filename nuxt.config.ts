@@ -45,6 +45,23 @@ export default defineNuxtConfig({
       url: "https://xn--sns-yg9lh0pw9l.kr",
       logo: "https://xn--sns-yg9lh0pw9l.kr/logo.png",
       email: "dkssudgktka53@gmail.com",
+      // E-E-A-T 엔티티 신호 — AI 검색·구글이 실존 사업자로 확정(entity grounding)하는 근거
+      sameAs: ["https://t.me/snssocialfactory"],
+      foundingDate: "2026",
+      areaServed: "KR",
+      priceRange: "₩100 - ₩300,000",
+      knowsLanguage: ["ko"],
+      identifier: {
+        "@type": "PropertyValue",
+        propertyID: "사업자등록번호",
+        value: "447-81-03597",
+      },
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        url: "https://t.me/snssocialfactory",
+        availableLanguage: ["ko"],
+      },
       address: {
         "@type": "PostalAddress",
         streetAddress: "에나로77번길 4, 502호",

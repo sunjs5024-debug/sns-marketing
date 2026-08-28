@@ -50,12 +50,12 @@ const cards: FloatCardData[] = [
           </div>
 
           <h1 class="mt-5 font-display text-4xl tracking-tight text-neutral-900 sm:text-5xl lg:text-[3.5rem] leading-[1.2] text-balance">
-            SNS 성장,
+            인스타·유튜브·틱톡·텔레그램
             <br />
             <span
               class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent anim-gradient-flow"
               style="background-size: 200% 200%"
-            >숫자로 증명되는 마케팅</span>
+            >팔로워·구독자 늘리기</span>
           </h1>
 
           <p class="mt-5 text-lg leading-7 text-neutral-700 max-w-xl text-pretty">

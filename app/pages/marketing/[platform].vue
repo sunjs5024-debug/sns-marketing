@@ -11,9 +11,9 @@ if (!isValidPlatformSlug(platformParam.value) || !MARKETING_PLATFORMS.includes(p
 const meta = PLATFORMS[platformParam.value];
 
 useSeoMeta({
-  title: meta.name,
+  title: meta.seoTitle ?? meta.name,
   description: meta.description,
-  ogTitle: `${meta.name} | SNS소셜팩토리`,
+  ogTitle: `${meta.seoTitle ?? meta.name} | SNS소셜팩토리`,
   ogDescription: meta.description,
   ogType: "website",
   ogLocale: "ko_KR",
@@ -100,7 +100,7 @@ const stats = computed(() => {
           </div>
           <div>
             <p class="text-[10px] uppercase tracking-widest text-neutral-600 sm:text-xs">PLATFORM MARKETING</p>
-            <h1 class="font-display text-2xl text-neutral-900 sm:text-4xl">{{ meta.name }}</h1>
+            <h1 class="font-display text-2xl text-neutral-900 sm:text-4xl">{{ meta.seoTitle ?? meta.name }}</h1>
           </div>
         </div>
         <p class="mt-4 max-w-2xl text-xs leading-6 text-neutral-700 sm:mt-5 sm:text-sm sm:leading-7">{{ meta.description }}</p>

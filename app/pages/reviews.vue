@@ -2,10 +2,10 @@
 useSeoMeta({
   title: "고객 후기 — 실제 사용 후기 모음",
   description:
-    "인스타·유튜브·틱톡·X(트위터)·텔레그램까지 — 실제 고객들의 SNS 마케팅 후기. 평균 만족도 4.9/5.0, 검증된 리뷰만 노출.",
-  ogTitle: "고객 후기 4.9/5.0 — SNS소셜팩토리 실사용 후기 모음",
+    "인스타·유튜브·틱톡·X(트위터)·텔레그램까지 — SNS 마케팅 이용 후기 모음. 실계정 기반 처리, 결과보고서로 검증.",
+  ogTitle: "고객 후기 — SNS소셜팩토리 실사용 후기 모음",
   ogDescription:
-    "실제 마케터·소상공인·크리에이터의 진짜 후기. 인스타·유튜브·틱톡·네이버 상위노출까지 검증된 성과.",
+    "실제 마케터·소상공인·크리에이터의 SNS 마케팅 후기. 인스타·유튜브·틱톡·네이버 상위노출까지.",
   ogType: "website",
   ogLocale: "ko_KR",
 });
@@ -91,8 +91,10 @@ const avgRating = computed(() => {
   return DUMMY_REVIEWS.reduce((s, r) => s + r.rating, 0) / DUMMY_REVIEWS.length;
 });
 
-// 구조화 데이터 — Organization 에 AggregateRating 부여 + 상위 6개 Review 노출
-useSchemaOrg([
+// 구조화 데이터 — ⚠️ 별점/리뷰(aggregateRating·review)는 "실제 승인된 DB 리뷰가 있을 때만" 방출한다.
+//   더미(화면표시용)를 JSON-LD로 내보내면 구글 가짜리뷰 정책 위반(수동조치 위험) → 절대 금지.
+//   @id 를 nuxt.config identity Organization 과 동일하게 줘 중복 엔티티 병합.
+const reviewSchema: Record<string, unknown>[] = [
   defineWebPage({
     name: "고객 후기 — 실제 사용 후기 모음",
     description: "SNS 마케팅·상위노출 실제 고객 후기 모음",
@@ -104,31 +106,28 @@ useSchemaOrg([
       { "@type": "ListItem", position: 2, name: "고객 후기", item: "https://xn--sns-yg9lh0pw9l.kr/reviews" },
     ],
   },
-  // Organization 에 AggregateRating 덧붙임 — 검색 결과에 별점 노출 가능
-  {
+];
+if ((liveData.value?.totalCount ?? 0) > 0) {
+  reviewSchema.push({
     "@type": "Organization",
-    name: "SNS소셜팩토리",
-    url: "https://xn--sns-yg9lh0pw9l.kr",
+    "@id": "https://xn--sns-yg9lh0pw9l.kr/#identity",
     aggregateRating: {
       "@type": "AggregateRating",
-      ratingValue: Number(avgRating.value.toFixed(2)),
+      ratingValue: Number((liveData.value!.avgRating ?? 5).toFixed(2)),
       bestRating: 5,
-      reviewCount: REVIEWS.value.length,
+      worstRating: 1,
+      reviewCount: liveData.value!.totalCount,
     },
-    // DB 리뷰 우선, 부족하면 더미로 채워서 상위 6개
-    review: REVIEWS.value.slice(0, 6).map((r) => ({
+    review: dbReviews.value.slice(0, 6).map((r) => ({
       "@type": "Review",
       author: { "@type": "Person", name: r.author },
       datePublished: r.date.replace(/\./g, "-"),
-      reviewRating: {
-        "@type": "Rating",
-        ratingValue: r.rating,
-        bestRating: 5,
-      },
+      reviewRating: { "@type": "Rating", ratingValue: r.rating, bestRating: 5, worstRating: 1 },
       reviewBody: r.text,
     })),
-  },
-]);
+  });
+}
+useSchemaOrg(reviewSchema);
 </script>
 
 <template>
