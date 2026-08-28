@@ -2,7 +2,8 @@
 import { PLATFORMS, SNS_PLATFORMS, MARKETING_PLATFORMS, RANK_PLATFORMS, platformKeyFor, CONTACT } from "#shared/catalog";
 
 const { data: featured } = await useFetch("/api/products/featured");
-const { data: live } = await useFetch("/api/live");
+// 라이브 티커(활성자·누적주문)는 SEO 무관 → 클라전용으로 빼 SSR 블로킹 쿼리 1개 제거(콜드 렌더 가속)
+const { data: live } = await useFetch("/api/live", { server: false, lazy: true, default: () => ({}) });
 
 // 각 항목별 카드 — 아이콘 SVG path + 그라데이션 컬러
 const WHY_ITEMS = [
