@@ -7,7 +7,7 @@ type NavProd = { slug: string; name: string; featured: boolean; categorySlug: st
 
 // 카탈로그 nav 는 클라이언트에서 로드 → 모든 페이지 SSR의 '활성상품 전체' Neon(싱가포르) 왕복 제거.
 //   (사이드바는 데스크탑 보조 네비 + DB장애 시 빈배열 폴백이라 client-only 안전. 하이드레이션 직후 채워짐)
-const { data: navProducts } = useFetch<NavProd[]>("/api/products/nav", {
+const { data: navProducts, status: navStatus } = useFetch<NavProd[]>("/api/products/nav", {
   key: "nav-products",
   server: false,
   lazy: true,
@@ -145,7 +145,7 @@ function toggle(key: string) {
               <span class="min-w-0 flex-1 truncate">{{ short(p.name) }}</span>
               <span v-if="p.featured" class="shrink-0 rounded bg-rose-100 px-1 text-[9px] font-medium text-rose-600">인기</span>
             </NuxtLink>
-            <p v-if="(byPlatform[slug] ?? []).length === 0" class="px-3 py-1.5 text-xs text-neutral-400">준비 중</p>
+            <p v-if="navStatus === 'success' && (byPlatform[slug] ?? []).length === 0" class="px-3 py-1.5 text-xs text-neutral-400">준비 중</p>
             <NuxtLink
               :to="`/${baseFor(slug)}/${slug}`"
               class="block rounded-lg px-3 py-1.5 text-xs font-medium text-indigo-600 hover:bg-neutral-50"
