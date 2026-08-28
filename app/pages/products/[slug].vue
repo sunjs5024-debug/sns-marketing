@@ -64,7 +64,7 @@ const metaDesc = computed(() => {
   const base = product.value?.description ?? `${product.value?.name} | ${product.value?.category.name}`;
   // 너무 짧으면 카테고리·brand 보강
   return base.length < 80
-    ? `${base} | 한국인 실계정 · 빠른 처리 · 결과보고서 제공 | SNS소셜팩토리`
+    ? `${base} | 실계정 기반 · 빠른 처리 · 결과보고서 제공 | SNS소셜팩토리`
     : base;
 });
 
