@@ -119,7 +119,7 @@ export function notifyOrderPaid(o: {
     `📦 ${o.itemCount}건 상품`,
     `🔢 <code>${o.orderNumber}</code>`,
     "",
-    "🚀 <i>urpanel 자동 발주 진행</i>",
+    "🚀 <i>외부 API 자동 발주 진행</i>",
   ].join("\n");
   return sendTelegramMessage(msg);
 }
@@ -143,7 +143,7 @@ export function notifySmsUnmatched(s: {
   return sendTelegramMessage(msg);
 }
 
-/** urpanel 발주 실패 (재시도 한계 도달 등) */
+/** 외부 발주 실패 (urpanel/kakao 공통 — 재시도 한계 도달 등) */
 export function notifyDispatchFailed(d: {
   orderNumber: string;
   failed: number;
@@ -151,7 +151,7 @@ export function notifyDispatchFailed(d: {
 }) {
   const errs = d.errors.slice(0, 3).map((e) => `• ${tgEscape(e.slice(0, 100))}`).join("\n");
   const msg = [
-    "🔴 <b>urpanel 발주 실패</b>",
+    "🔴 <b>자동 발주 실패</b>",
     "",
     `📦 주문 <code>${d.orderNumber}</code>`,
     `❌ ${d.failed}건 실패`,
@@ -173,7 +173,7 @@ export function notifyDispatchOK(d: {
 }) {
   if (d.dispatched === 0) return Promise.resolve(false); // 발주 0건이면 알림 X
   const msg = [
-    "🚀 <b>urpanel 자동 발주 완료</b>",
+    "🚀 <b>자동 발주 완료</b>",
     "",
     `📦 주문 <code>${d.orderNumber}</code>`,
     `✅ ${d.dispatched}건 발주 성공${d.failed > 0 ? ` · ❌ ${d.failed}건 실패` : ""}${d.skipped > 0 ? ` · ⏭ ${d.skipped}건 스킵` : ""}`,
