@@ -7,16 +7,16 @@ const { data: live } = await useFetch("/api/live");
 // 각 항목별 카드 — 아이콘 SVG path + 그라데이션 컬러
 const WHY_ITEMS = [
   {
-    icon: "shield",
-    color: "from-blue-500 to-cyan-500",
-    title: "비밀번호 없이 안전하게",
-    desc: "주문 시 비밀번호를 요구하지 않습니다. 공개된 URL과 닉네임만으로 처리되어 계정 비밀번호가 노출되지 않습니다.",
-  },
-  {
     icon: "users",
     color: "from-pink-500 to-rose-500",
-    title: "실제 사용자 기반",
-    desc: "어뷰징 봇이 아닌 실계정 기반으로 처리합니다. 알고리즘에 자연스럽게 녹아드는 부스팅입니다.",
+    title: "실제 계정 기반 처리",
+    desc: "어뷰징 봇이 아닌 실계정 기반으로 처리합니다. 공개 URL·닉네임만으로 자연스럽게 진행됩니다.",
+  },
+  {
+    icon: "bolt",
+    color: "from-amber-500 to-orange-500",
+    title: "10분 내 빠른 시작",
+    desc: "결제 후 평균 10분 안에 작업이 시작됩니다. 긴급 상황엔 우선 처리도 가능합니다.",
   },
   {
     icon: "chart",
@@ -25,10 +25,10 @@ const WHY_ITEMS = [
     desc: "주문 진행률과 완료 시점을 실시간으로 확인할 수 있고, 완료 시 결과보고서가 자동 발송됩니다.",
   },
   {
-    icon: "bolt",
-    color: "from-amber-500 to-orange-500",
-    title: "10분 내 빠른 시작",
-    desc: "결제 후 평균 10분 안에 작업이 시작됩니다. 긴급 상황엔 우선 처리도 가능합니다.",
+    icon: "shield",
+    color: "from-blue-500 to-cyan-500",
+    title: "비밀번호 없이 안전하게",
+    desc: "주문 시 비밀번호를 요구하지 않습니다. 공개된 URL과 닉네임만으로 처리되어 계정 비밀번호가 노출되지 않습니다.",
   },
   {
     icon: "wallet",
