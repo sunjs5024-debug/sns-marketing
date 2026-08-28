@@ -50,16 +50,16 @@ const cards: FloatCardData[] = [
           </div>
 
           <h1 class="mt-5 font-display text-4xl tracking-tight text-neutral-900 sm:text-5xl lg:text-[3.5rem] leading-[1.2] text-balance">
-            인스타·유튜브·틱톡·텔레그램
+            인스타·카카오톡·유튜브·틱톡
             <br />
             <span
               class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent anim-gradient-flow"
               style="background-size: 200% 200%"
-            >팔로워·구독자 늘리기</span>
+            >팔로워·구독자·채널 늘리기</span>
           </h1>
 
           <p class="mt-5 text-lg leading-7 text-neutral-700 max-w-xl text-pretty">
-            인스타·유튜브·틱톡·X(트위터)·텔레그램 SNS 마케팅을 한 곳에서.
+            인스타·카카오톡·유튜브·틱톡·텔레그램 SNS 마케팅을 한 곳에서.
             한국인 실계정 · 글로벌 가성비 옵션까지 — 안전하게, 결과보고서로 투명하게 진행합니다.
           </p>
 
