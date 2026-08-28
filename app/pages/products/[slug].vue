@@ -113,27 +113,57 @@ const faqs = computed<Faq[]>(() => {
 const ssrReviewCount = (product.value as { reviewCount?: number }).reviewCount ?? 0;
 const ssrAvgRating = (product.value as { avgRating?: number | null }).avgRating ?? null;
 
+// 가격: 옵션이 여러 개면 AggregateOffer(범위)로 방출 — basePrice 단일가와 화면 '최저가' 불일치 시 리치결과 부적격 방지.
+const _schemaOpts = (product.value.options ?? []) as Array<{ price?: number | null; externalServiceId?: number | null; externalCommand?: string | null }>;
+const _optionPrices = _schemaOpts.map((o) => o.price).filter((p): p is number => typeof p === "number");
+const lowPrice = _optionPrices.length ? Math.min(..._optionPrices) : product.value.basePrice;
+const highPrice = _optionPrices.length ? Math.max(..._optionPrices) : product.value.basePrice;
+const productUrl = `https://xn--sns-yg9lh0pw9l.kr/products/${product.value.slug}`;
+const priceValidUntil = new Date(Date.now() + 90 * 864e5).toISOString().slice(0, 10);
+// 재고: 품절>오픈예정(옵션 전부 미매핑=구매불가)>비활성 순으로 정확히 반영
+const _comingSoonForSchema = _schemaOpts.length > 0 && _schemaOpts.every((o) => o.externalServiceId == null && !o.externalCommand);
+const availability = product.value.isSoldOut
+  ? "https://schema.org/OutOfStock"
+  : _comingSoonForSchema
+    ? "https://schema.org/PreOrder"
+    : product.value.isActive
+      ? "https://schema.org/InStock"
+      : "https://schema.org/OutOfStock";
+const offers: Record<string, unknown> = _optionPrices.length > 1
+  ? {
+      "@type": "AggregateOffer",
+      priceCurrency: "KRW",
+      lowPrice,
+      highPrice,
+      offerCount: _optionPrices.length,
+      availability,
+      url: productUrl,
+      priceValidUntil,
+    }
+  : {
+      "@type": "Offer",
+      url: productUrl,
+      priceCurrency: "KRW",
+      price: lowPrice,
+      // priceValidUntil = 렌더타임 +90일 롤링(만료 위험 최소화). sku = slug 재사용(정직한 내부식별자). mpn/gtin 은 디지털 서비스라 부여 금지.
+      priceValidUntil,
+      sku: product.value.slug,
+      availability,
+      seller: { "@type": "Organization", name: "SNS소셜팩토리" },
+    };
+
 const productSchema: Record<string, unknown> = {
   "@type": "Product",
+  "@id": `${productUrl}#product`,
   name: product.value.name,
   description: product.value.description ?? "",
   category: product.value.category.name,
+  url: productUrl,
+  mainEntityOfPage: productUrl,
   // GSC 리치결과 검사: image=필수, brand=권장 (누락 경고 해소)
   image: "https://xn--sns-yg9lh0pw9l.kr/og-cover-v2.png",
   brand: { "@type": "Brand", name: "SNS소셜팩토리" },
-  offers: {
-    "@type": "Offer",
-    url: `https://xn--sns-yg9lh0pw9l.kr/products/${product.value.slug}`,
-    priceCurrency: "KRW",
-    price: product.value.basePrice,
-    // priceValidUntil = 렌더타임 +90일 롤링(만료 위험 최소화). sku = slug 재사용(정직한 내부식별자). mpn/gtin 은 디지털 서비스라 부여 금지.
-    priceValidUntil: new Date(Date.now() + 90 * 864e5).toISOString().slice(0, 10),
-    sku: product.value.slug,
-    availability: product.value.isActive && !product.value.isSoldOut
-      ? "https://schema.org/InStock"
-      : "https://schema.org/OutOfStock",
-    seller: { "@type": "Organization", name: "SNS소셜팩토리" },
-  },
+  offers,
 };
 // 실제 승인 리뷰가 있을 때만 별점·리뷰 마크업 (없으면 통째로 생략 — 폴백 금지)
 if (ssrReviewCount > 0 && ssrAvgRating != null) {
@@ -162,12 +192,8 @@ const schemaList: Array<Record<string, unknown>> = [
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "홈", item: "https://xn--sns-yg9lh0pw9l.kr/" },
       { "@type": "ListItem", position: 2, name: sectionLabel, item: `https://xn--sns-yg9lh0pw9l.kr${sectionPath}` },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: product.value.category.name,
-        item: `https://xn--sns-yg9lh0pw9l.kr/products/${product.value.slug}`,
-      },
+      { "@type": "ListItem", position: 3, name: product.value.category.name, item: `https://xn--sns-yg9lh0pw9l.kr${categoryUrl}` },
+      { "@type": "ListItem", position: 4, name: product.value.name, item: `https://xn--sns-yg9lh0pw9l.kr/products/${product.value.slug}` },
     ],
   },
 ];
