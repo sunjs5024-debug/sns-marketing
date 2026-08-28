@@ -49,13 +49,12 @@ export default defineNuxtConfig({
       sameAs: ["https://t.me/snssocialfactory"],
       foundingDate: "2026",
       areaServed: "KR",
-      priceRange: "₩100 - ₩300,000",
       knowsLanguage: ["ko"],
-      identifier: {
-        "@type": "PropertyValue",
-        propertyID: "사업자등록번호",
-        value: "447-81-03597",
-      },
+      founder: { "@type": "Person", name: "김선민" },
+      identifier: [
+        { "@type": "PropertyValue", propertyID: "사업자등록번호", value: "447-81-03597" },
+        { "@type": "PropertyValue", propertyID: "통신판매업신고번호", value: "제2026-경남진주-0298호" },
+      ],
       contactPoint: {
         "@type": "ContactPoint",
         contactType: "customer support",
@@ -97,6 +96,10 @@ export default defineNuxtConfig({
       "/price": { swr: 600 },
       "/api/products/**": { swr: 600 },
       "/api/reviews": { swr: 120 },
+      // 사이트맵 — Neon 콜드스타트 시 503(발견 병목) 방지. 캐시된 last-good 재서빙.
+      "/sitemap.xml": { swr: 3600 },
+      "/sitemap_index.xml": { swr: 3600 },
+      "/__sitemap__/**": { swr: 3600 },
     },
   },
 
