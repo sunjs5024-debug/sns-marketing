@@ -120,6 +120,7 @@ const lowPrice = _optionPrices.length ? Math.min(..._optionPrices) : product.val
 const highPrice = _optionPrices.length ? Math.max(..._optionPrices) : product.value.basePrice;
 const productUrl = `https://xn--sns-yg9lh0pw9l.kr/products/${product.value.slug}`;
 const priceValidUntil = new Date(Date.now() + 90 * 864e5).toISOString().slice(0, 10);
+const validFrom = new Date().toISOString().slice(0, 10); // 가격 유효 시작일(오늘) — GSC 판매자목록 validFrom 경고 해소
 // 재고: 품절>오픈예정(옵션 전부 미매핑=구매불가)>비활성 순으로 정확히 반영
 const _comingSoonForSchema = _schemaOpts.length > 0 && _schemaOpts.every((o) => o.externalServiceId == null && !o.externalCommand);
 const availability = product.value.isSoldOut
@@ -138,6 +139,7 @@ const offers: Record<string, unknown> = _optionPrices.length > 1
       offerCount: _optionPrices.length,
       availability,
       url: productUrl,
+      validFrom,
       priceValidUntil,
     }
   : {
@@ -146,6 +148,7 @@ const offers: Record<string, unknown> = _optionPrices.length > 1
       priceCurrency: "KRW",
       price: lowPrice,
       // priceValidUntil = 렌더타임 +90일 롤링(만료 위험 최소화). sku = slug 재사용(정직한 내부식별자). mpn/gtin 은 디지털 서비스라 부여 금지.
+      validFrom,
       priceValidUntil,
       sku: product.value.slug,
       availability,
