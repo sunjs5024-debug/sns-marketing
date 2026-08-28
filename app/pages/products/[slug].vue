@@ -157,7 +157,7 @@ const productSchema: Record<string, unknown> = {
   "@id": `${productUrl}#product`,
   name: product.value.name,
   description: product.value.description ?? "",
-  category: product.value.category.name,
+  // category 제거 — 한글 분류명이 구글 상품 taxonomy와 불일치("값 잘못됨" 경고). 분류는 BreadcrumbList로 전달.
   url: productUrl,
   mainEntityOfPage: productUrl,
   // GSC 리치결과 검사: image=필수, brand=권장 (누락 경고 해소)
