@@ -408,7 +408,7 @@ watch(status, checkWelcome);
             <div class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-indigo-500 to-pink-500 text-white">
               <span class="text-lg">🚀</span>
             </div>
-            <p class="mt-3 font-display text-base text-neutral-900">상품 둘러보기</p>
+            <p class="mt-3 font-display text-base text-neutral-900">SNS 마케팅 상품 전체보기</p>
             <p class="mt-1 text-xs text-neutral-500">31개+ SNS 마케팅 상품 카탈로그</p>
             <p class="mt-3 text-xs text-indigo-600 group-hover:underline">바로가기 →</p>
           </NuxtLink>

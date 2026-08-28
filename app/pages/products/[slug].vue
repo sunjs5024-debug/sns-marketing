@@ -565,7 +565,7 @@ async function handleAdd(mode: "cart" | "buy") {
           v-if="product?.category"
           :to="`${sectionPath}/${product.category.slug.split('-')[0]}`"
           class="hidden text-xs text-neutral-500 hover:text-neutral-900 sm:inline"
-        >전체 보기 →</NuxtLink>
+        >{{ product.category.name }} 전체 보기 →</NuxtLink>
       </div>
       <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
         <ProductCard

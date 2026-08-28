@@ -27,7 +27,7 @@ defineProps<{
     </div>
     <p class="relative mt-4 line-clamp-2 text-sm text-neutral-700">{{ platform.description }}</p>
     <div class="relative mt-4 inline-flex items-center gap-1 text-sm text-neutral-900">
-      상품 보기 <span aria-hidden class="transition group-hover:translate-x-1">→</span>
+      {{ platform.shortName }} 상품 보기 <span aria-hidden class="transition group-hover:translate-x-1">→</span>
     </div>
   </NuxtLink>
 </template>

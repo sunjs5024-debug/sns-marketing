@@ -442,7 +442,7 @@ export const PLATFORM_CONTENT: Partial<Record<PlatformSlug, PlatformContent>> = 
     safety:
       "SNS소셜팩토리는 카카오 계정 비밀번호나 관리자 권한을 절대 묻지 않고 공개 링크만으로 작업합니다. " +
       "진행 상황을 확인하며 유지 보장으로 안정적으로 운영합니다.",
-    relatedGuideSlugs: ["kakaotalk-channel"],
+    relatedGuideSlugs: ["kakaotalk-channel", "kakaotalk-openchat"],
   },
 
   tistory: {
