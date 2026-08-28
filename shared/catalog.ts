@@ -92,9 +92,9 @@ export const PLATFORMS: Record<PlatformSlug, PlatformMeta> = {
     platform: "SNS",
     accent: "from-yellow-300 to-amber-500",
     bgGradient: "from-yellow-50 via-amber-50 to-orange-50",
-    tagline: "채널친구·비즈보드·오픈채팅 한 번에",
+    tagline: "채널친구·오픈방 인원·좋아요 한 번에",
     description:
-      "카카오톡 채널친구 늘리기부터 비즈보드 광고 운영, 오픈채팅방 입장까지 — 카카오 생태계 마케팅을 한 곳에서 해결합니다.",
+      "카카오톡 채널친구 늘리기부터 오픈채팅방 인원·좋아요, 채널 게시글 좋아요, 선물하기·톡딜 좋아요까지 — 카카오 마케팅을 한 곳에서 해결합니다.",
   },
   x: {
     slug: "x",
