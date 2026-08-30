@@ -330,12 +330,11 @@ async function handleAdd(mode: "cart" | "buy") {
         <p class="text-xs text-indigo-600">{{ product.category.name }}</p>
         <h1 class="mt-2 font-display text-2xl tracking-tight text-neutral-900 sm:text-3xl text-balance leading-tight">{{ seoH1 }}</h1>
         <p class="mt-1 text-sm text-neutral-500">{{ product.name }}</p>
-        <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-neutral-600">
-          <span class="text-amber-500">★ {{ productRating.toFixed(1) }}</span>
-          <span v-if="productReviews.length > 0" class="text-xs text-neutral-500">({{ productReviewCount.toLocaleString("ko-KR") }}건 후기)</span>
-          <span>·</span>
-          <span>판매 {{ product.salesCount.toLocaleString("ko-KR") }}</span>
-          <a v-if="productReviews.length > 0" href="#product-reviews" class="text-xs text-indigo-600 hover:underline">후기 보기 →</a>
+        <!-- 별점·후기수는 실제 승인 리뷰(SSR reviewCount>0)가 있을 때만. 가짜 별점·판매수 미표시(정직성 대원칙). -->
+        <div v-if="product.reviewCount > 0" class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-neutral-600">
+          <span class="text-amber-500">★ {{ (product.avgRating ?? 5).toFixed(1) }}</span>
+          <span class="text-xs text-neutral-500">({{ product.reviewCount.toLocaleString("ko-KR") }}건 후기)</span>
+          <a href="#product-reviews" class="text-xs text-indigo-600 hover:underline">후기 보기 →</a>
         </div>
         <p v-if="product.description" class="mt-5 text-sm leading-7 text-neutral-700">{{ product.description }}</p>
 

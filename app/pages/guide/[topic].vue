@@ -7,6 +7,9 @@ const topic = computed(() => String(route.params.topic));
 const guide = getGuide(topic.value);
 if (!guide) throw createError({ statusCode: 404, statusMessage: "가이드를 찾을 수 없습니다." });
 
+// 표시 수정일 — 하드코딩 대신 콘텐츠 최종 재작성일(GUIDES_CONTENT_UPDATED)과 동기화(정직)
+const updatedDisplay = GUIDES_CONTENT_UPDATED.slice(0, 10).replace(/-/g, ".");
+
 // SEO 메타 — 키워드 페이지 최우선
 // 전역 titleTemplate(seo-utils)가 " | SNS소셜팩토리"를 자동으로 덧붙이므로
 // title 본문엔 브랜드를 제외해 중복 브랜딩·길이초과를 막는다. ogTitle엔 브랜드 유지.
@@ -96,9 +99,9 @@ useSchemaOrg([
       <h1 class="font-display text-3xl tracking-tight text-neutral-900 sm:text-4xl lg:text-[2.5rem] text-balance leading-[1.25]">
         {{ guide.h1 }}
       </h1>
-      <p class="mt-4 text-sm leading-7 text-neutral-700 sm:text-base">{{ guide.intro }}</p>
+      <div class="mt-4 text-sm leading-7 text-neutral-700 sm:text-base" v-html="mdLite(guide.intro)" />
       <div class="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-neutral-500 sm:text-xs">
-        <span>📅 2026.06.01</span>
+        <span>📅 {{ updatedDisplay }} 업데이트</span>
         <span>·</span>
         <span>📖 {{ guide.sections.length }}분 읽기</span>
         <span>·</span>
@@ -123,7 +126,7 @@ useSchemaOrg([
     <div class="mt-10 space-y-10">
       <section v-for="(s, i) in guide.sections" :key="i" :id="`sec-${i}`" class="scroll-mt-20">
         <h2 class="font-display text-xl text-neutral-900 sm:text-2xl">{{ s.heading }}</h2>
-        <p class="mt-3 text-sm leading-7 text-neutral-700 sm:text-base">{{ s.body }}</p>
+        <div class="mt-3 text-sm leading-7 text-neutral-700 sm:text-base" v-html="mdLite(s.body)" />
       </section>
     </div>
 
@@ -147,7 +150,6 @@ useSchemaOrg([
             <p class="text-[10px] text-indigo-600">{{ p.category.name }}</p>
             <p class="mt-1 line-clamp-2 text-sm font-medium">{{ p.name }}</p>
             <p class="mt-3 font-display text-base text-neutral-900">{{ p.basePrice.toLocaleString("ko-KR") }}원~</p>
-            <p class="mt-1 text-[10px] text-neutral-500">★ {{ p.rating.toFixed(1) }} · 판매 {{ p.salesCount.toLocaleString("ko-KR") }}</p>
           </NuxtLink>
         </div>
       </div>
@@ -162,7 +164,7 @@ useSchemaOrg([
             <span>{{ f.q }}</span>
             <span class="ml-2 shrink-0 text-neutral-400 transition group-open:rotate-180">▾</span>
           </summary>
-          <p class="mt-3 whitespace-pre-line text-sm leading-7 text-neutral-600">{{ f.a }}</p>
+          <div class="mt-3 text-sm leading-7 text-neutral-600" v-html="mdLite(f.a)" />
         </details>
       </div>
     </section>

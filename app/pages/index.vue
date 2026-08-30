@@ -72,15 +72,6 @@ const COMPARE = [
   { label: "상담", self: "—", etc: "느림", us: "텔레그램 30분 내" },
 ] as const;
 
-const REVIEWS = [
-  { author: "@de****_yj", tag: "인스타 크리에이터", text: "릴스 조회수랑 같이 팔로워가 늘어서 진짜 자연스러웠어요. 알고리즘이 푸쉬해주는 게 체감됩니다." },
-  { author: "@k_b***ty_lab", tag: "인스타 / 한국인", text: "한국 타겟 팔로워 80% 여성으로 받았는데 진짜 정확하게 들어와서 한국인 협찬 문의가 늘었어요." },
-  { author: "@wt***_creator", tag: "유튜브 / 시청시간", text: "수익화 4,000시간 막막했는데 시청시간 옵션으로 한 달 만에 통과했어요. 비현실적이게 빨랐음." },
-  { author: "@da***_jiwon", tag: "유튜브 / 쇼츠", text: "쇼츠 조회수만 살짝 올렸는데 알고리즘이 노출을 늘려줘서 구독자가 따라 늘었어요." },
-  { author: "tg_re***_official", tag: "텔레그램 / 리액션", text: "이모지 리액션 5,000개 옵션 단가 진짜 저렴. 채널 게시물 활성도가 시각적으로 확 살아나요." },
-  { author: "@k_t****er", tag: "틱톡 크리에이터", text: "글로벌 라이브스트림 옵션이 활성도 있는 시청자라 라이브 입장률이 확 늘었어요." },
-];
-
 const FAQS = [
   { q: "정말 계정이 안전한가요?", a: "네, 비밀번호나 관리자 권한을 요구하지 않아 계정 정보가 노출될 위험이 없습니다. 공개 프로필 URL과 닉네임만으로 처리됩니다. 다만 각 플랫폼의 정책은 수시로 바뀔 수 있어, 계정 상태에 민감하다면 소량부터 시작하시길 권장합니다." },
   { q: "작업은 얼마나 빨리 시작되나요?", a: "결제 완료 후 평균 10분 내 시작됩니다. 일부 대형 상품은 30분~수 시간 내 진행됩니다." },
@@ -345,28 +336,6 @@ watch(status, checkWelcome);
           </table>
         </div>
         <p class="mt-4 text-center text-xs text-neutral-400">* 실계정 기반 · 결과보고서까지 한 번에 제공합니다.</p>
-      </div>
-    </section>
-
-    <section class="relative overflow-hidden bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 py-20">
-      <div class="pointer-events-none absolute -left-20 top-10 h-72 w-72 bg-indigo-300/30 blur-3xl anim-blob" />
-      <div class="pointer-events-none absolute -right-10 bottom-10 h-72 w-72 bg-pink-300/30 blur-3xl anim-blob" style="animation-delay: -7s" />
-      <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <SectionTitle eyebrow="REVIEWS" title="실제 고객 후기" description="평균 만족도 4.9/5.0 — 마케터·소상공인·크리에이터의 진짜 후기를 확인하세요." more-href="/reviews" />
-        <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div
-            v-for="r in REVIEWS"
-            :key="r.author"
-            class="group rounded-3xl border border-white/60 bg-white/85 p-6 backdrop-blur transition hover:-translate-y-1 hover:shadow-xl"
-          >
-            <div class="flex items-center justify-between">
-              <div class="text-amber-500">★★★★★</div>
-              <span class="rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] text-indigo-700">{{ r.tag }}</span>
-            </div>
-            <p class="mt-3 text-sm leading-6 text-neutral-700">"{{ r.text }}"</p>
-            <p class="mt-4 text-xs text-neutral-500">— {{ r.author }}</p>
-          </div>
-        </div>
       </div>
     </section>
 

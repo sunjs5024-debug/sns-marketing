@@ -106,19 +106,11 @@ const stats = computed(() => {
         </div>
         <p class="mt-4 max-w-2xl text-xs leading-6 text-neutral-700 sm:mt-5 sm:text-sm sm:leading-7">{{ meta.description }}</p>
 
-        <!-- 통계 위젯 (4개 카드) -->
-        <div v-if="stats" class="mt-6 grid grid-cols-2 gap-2 sm:mt-8 sm:max-w-2xl sm:grid-cols-4 sm:gap-3">
+        <!-- 통계 위젯 — 실제 수치(상품 수·최저가)만. 평균평점·누적판매는 시드 데이터라 제거(가짜 신호 금지). -->
+        <div v-if="stats" class="mt-6 grid grid-cols-2 gap-2 sm:mt-8 sm:max-w-md sm:gap-3">
           <div class="rounded-xl bg-white/70 px-3 py-2 backdrop-blur-sm sm:px-4 sm:py-3">
             <p class="text-[10px] text-neutral-500 sm:text-xs">상품 수</p>
             <p class="mt-0.5 font-display text-base text-neutral-900 sm:text-lg">{{ stats.count }}개</p>
-          </div>
-          <div class="rounded-xl bg-white/70 px-3 py-2 backdrop-blur-sm sm:px-4 sm:py-3">
-            <p class="text-[10px] text-neutral-500 sm:text-xs">평균 평점</p>
-            <p class="mt-0.5 font-display text-base text-amber-600 sm:text-lg">★ {{ stats.avgRating.toFixed(1) }}</p>
-          </div>
-          <div class="rounded-xl bg-white/70 px-3 py-2 backdrop-blur-sm sm:px-4 sm:py-3">
-            <p class="text-[10px] text-neutral-500 sm:text-xs">누적 판매</p>
-            <p class="mt-0.5 font-display text-base text-neutral-900 sm:text-lg">{{ stats.totalSales.toLocaleString('ko-KR') }}</p>
           </div>
           <div class="rounded-xl bg-white/70 px-3 py-2 backdrop-blur-sm sm:px-4 sm:py-3">
             <p class="text-[10px] text-neutral-500 sm:text-xs">최저가</p>

@@ -20,7 +20,7 @@ export default defineNuxtConfig({
   // 검색엔진 색인 정책 — 운영 도메인은 색인 허용, 그 외 차단
   robots: {
     // /admin/*, /cart, /checkout/*, /orders/*, /auth/*, /mypage/* 는 크롤링 차단 (비공개·인증 영역)
-    disallow: ["/admin", "/admin/", "/cart", "/checkout", "/checkout/", "/orders", "/orders/", "/auth", "/mypage"],
+    disallow: ["/admin", "/admin/", "/cart", "/checkout", "/checkout/", "/orders", "/orders/", "/auth", "/mypage", "/search"],
   },
 
   // sitemap.xml 자동 생성 — 비공개·리다이렉트 페이지는 제외, 동적 라우트는 sources 로 주입

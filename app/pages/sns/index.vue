@@ -2,10 +2,10 @@
 import { PLATFORMS, SNS_PLATFORMS, platformKeyFor } from "#shared/catalog";
 
 useSeoMeta({
-  title: "SNS 마케팅 — 인스타그램·유튜브·틱톡·X·텔레그램",
+  title: "SNS 마케팅 상품·가격 — 카카오톡·인스타·유튜브·틱톡·텔레그램",
   description:
-    "인스타그램 팔로워·좋아요, 유튜브 조회수·쇼츠, 틱톡 팔로워·좋아요·조회수, X(트위터), 텔레그램까지 — 글로벌 실계정 기반 SNS 마케팅을 한 곳에서.",
-  ogTitle: "SNS 마케팅 — 인스타·유튜브·틱톡·X·텔레그램 | SNS소셜팩토리",
+    "카카오톡 채널·오픈방, 인스타 팔로워·좋아요, 유튜브 조회수·쇼츠, 틱톡, X(트위터), 텔레그램까지 — 실계정 기반 SNS 마케팅 상품과 가격을 한 곳에서 비교하세요.",
+  ogTitle: "SNS 마케팅 상품·가격 — 카카오톡·인스타·유튜브·틱톡·텔레그램 | SNS소셜팩토리",
   ogDescription:
     "SNS 채널 성장을 위한 모든 마케팅 상품. 실계정 기반 부스팅, 결과보고서 제공, 텔레그램 빠른 상담.",
   ogType: "website",

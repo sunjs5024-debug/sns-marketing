@@ -95,15 +95,8 @@ onMounted(() => {
       <span class="text-[10px] font-medium uppercase tracking-wider text-indigo-600 sm:text-[11px]">{{ categoryName }}</span>
       <h3 class="mt-1 line-clamp-2 min-h-[2.5rem] text-sm leading-snug text-neutral-800 group-hover:text-neutral-900 sm:min-h-[2.75rem]">{{ name }}</h3>
 
-      <!-- 별점 + 판매수 -->
-      <div class="mt-2 flex items-center gap-2 text-[11px] text-neutral-500">
-        <span class="inline-flex items-center gap-0.5">
-          <span class="text-amber-400">★</span>
-          <span class="font-medium text-neutral-700">{{ rating.toFixed(1) }}</span>
-        </span>
-        <span class="text-neutral-300">·</span>
-        <span>판매 {{ salesCount.toLocaleString("ko-KR") }}</span>
-      </div>
+      <!-- 별점·판매수 미표시 — 실제 승인 리뷰/실주문 데이터가 없어 가짜 사회적 증거가 되므로 제거(정직성 대원칙).
+           실제 리뷰 시스템 연동 시 reviewCount>0 게이팅으로 부활 예정. rating/salesCount prop은 호환 위해 유지. -->
 
       <!-- 가격 -->
       <div class="mt-3 flex items-end justify-between border-t border-neutral-100 pt-3">
