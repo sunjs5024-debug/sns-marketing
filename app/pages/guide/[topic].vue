@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getGuide } from "#shared/guides";
+import { getGuide, GUIDES_CONTENT_UPDATED } from "#shared/guides";
 
 const route = useRoute();
 const topic = computed(() => String(route.params.topic));
@@ -52,6 +52,7 @@ useSchemaOrg([
     headline: guide.h1,
     description: guide.metaDescription,
     inLanguage: "ko-KR",
+    dateModified: GUIDES_CONTENT_UPDATED, // 콘텐츠 최종 재작성일(정직 — 실제 수정일)
     // 중복 Organization 방지 — 전역 identity Organization(@id=#identity) 참조
     author: { "@id": "https://xn--sns-yg9lh0pw9l.kr/#identity" },
     publisher: { "@id": "https://xn--sns-yg9lh0pw9l.kr/#identity" },

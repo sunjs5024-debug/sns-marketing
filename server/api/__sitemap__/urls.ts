@@ -1,7 +1,7 @@
 import { prisma } from "../../utils/prisma";
 import { isDbUnavailable, maskDbError } from "../../utils/db";
 import { SNS_PLATFORMS, RANK_PLATFORMS, MARKETING_PLATFORMS } from "#shared/catalog";
-import { listGuideSlugs } from "#shared/guides";
+import { listGuideSlugs, GUIDES_CONTENT_UPDATED } from "#shared/guides";
 
 // @nuxtjs/sitemap 의 sources 로 호출되는 동적 URL 제공 엔드포인트
 // — 플랫폼 카테고리 + 활성 상품 + SEO 키워드 가이드
@@ -30,6 +30,7 @@ export default defineSitemapEventHandler(async (event) => {
     loc: `/guide/${slug}`,
     changefreq: "monthly" as const,
     priority: 0.9, // 검색 유입 메인 페이지라 최고 우선순위
+    lastmod: GUIDES_CONTENT_UPDATED, // 콘텐츠 재작성일 → 구글 재크롤 신호
   }));
 
   // 3) 활성 상품 (DB) — lastmod 는 실제 수정일(updatedAt) 기반

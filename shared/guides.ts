@@ -1144,3 +1144,7 @@ export function getGuide(slug: string): Guide | null {
 export function listGuideSlugs(): string[] {
   return Object.keys(GUIDES);
 }
+
+// 가이드 콘텐츠 최종 재작성일(전편 2026 기준 심층 재작성). sitemap lastmod + Article dateModified 공용.
+// 가이드 본문을 다시 손보면 이 값을 갱신해 구글에 재크롤 신호를 준다.
+export const GUIDES_CONTENT_UPDATED = "2026-08-30T00:00:00.000Z";
