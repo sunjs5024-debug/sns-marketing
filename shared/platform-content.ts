@@ -232,7 +232,7 @@ export const PLATFORM_CONTENT: Partial<Record<PlatformSlug, PlatformContent>> = 
     safety:
       "SNS소셜팩토리는 비밀번호를 절대 묻지 않고 공개 URL만으로 작업하며, 모든 반응은 실사용 기반으로 처리됩니다. " +
       "봇 반응이 아니므로 완주율·추천 평가를 해치지 않고, 진행 상황을 확인하며 안정적으로 운영됩니다.",
-    relatedGuideSlugs: ["tiktok-followers", "tiktok-views"],
+    relatedGuideSlugs: ["tiktok-followers", "tiktok-views", "tiktok-likes"],
   },
 
   x: {
@@ -299,7 +299,7 @@ export const PLATFORM_CONTENT: Partial<Record<PlatformSlug, PlatformContent>> = 
     safety:
       "SNS소셜팩토리는 비밀번호를 절대 묻지 않고 공개 URL만으로 작업하며, 팔로워·좋아요·리트윗은 실계정 기반으로 처리됩니다. " +
       "봇 계정이 아니므로 정리 대상이 되지 않고, 진행 상황을 확인하며 안정적으로 운영됩니다.",
-    relatedGuideSlugs: ["x-followers"],
+    relatedGuideSlugs: ["x-followers", "x-engagement"],
   },
 
   telegram: {
