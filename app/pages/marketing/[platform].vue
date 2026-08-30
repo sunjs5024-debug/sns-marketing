@@ -78,6 +78,18 @@ if (productsError.value) {
 const { data: allProducts } = await useFetch(
   `/api/products/by-platform/${platformParam.value}`,
 );
+// 카테고리 상품 목록 ItemList — 목록형 제품 리치결과 신호(SSR)
+useSchemaOrg([
+  {
+    "@type": "ItemList",
+    name: `${meta.name} 상품 목록`,
+    itemListElement: (allProducts.value ?? []).map((p, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: `https://xn--sns-yg9lh0pw9l.kr/products/${p.slug}`,
+    })),
+  },
+]);
 const stats = computed(() => {
   const list = allProducts.value ?? [];
   if (list.length === 0) return null;

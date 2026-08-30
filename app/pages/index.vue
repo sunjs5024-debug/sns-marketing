@@ -123,6 +123,16 @@ useSchemaOrg([
       },
     })),
   },
+  // 가장 많이 찾는 상품 — ItemList(목록형 제품 리치결과 신호, SSR)
+  {
+    "@type": "ItemList",
+    name: "가장 많이 찾는 SNS 마케팅 상품",
+    itemListElement: (featured.value ?? []).map((p, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: `https://xn--sns-yg9lh0pw9l.kr/products/${p.slug}`,
+    })),
+  },
 ]);
 
 // 회원가입 후 환영 팝업(모달) — 신규 계정이면 서버가 딱 한 번 welcome:true 반환

@@ -188,9 +188,14 @@ export default defineNuxtConfig({
         // 본문·헤딩 폰트 Pretendard — dynamic-subset(필요 글자만 로드) + preconnect 로 LCP 개선.
         //   ⚠️ 구 main.css @font-face URL(gh/…/PretendardVariable.woff2)은 404였음 → 정상 npm 경로로 교체.
         { rel: "preconnect", href: "https://cdn.jsdelivr.net", crossorigin: "anonymous" },
+        // 렌더블로킹 제거 — media='print'로 비동기 로드 후 onload에서 'all' 스왑(표준 async-CSS).
+        //   pretendard 자체가 font-display:swap이라 텍스트는 폴백으로 즉시 표시 → LCP 안 막힘.
+        //   onload 미발화 시에도 폴백 스택(Apple SD Gothic Neo·system)으로 우아하게 저하(하드브레이크 없음).
         {
           rel: "stylesheet",
           href: "https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css",
+          media: "print",
+          onload: "this.media='all'",
         },
         // 현대 브라우저 — 벡터 SVG favicon 우선
         { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
