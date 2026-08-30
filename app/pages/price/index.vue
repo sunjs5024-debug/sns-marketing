@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { SNS_PLATFORMS, MARKETING_PLATFORMS, PLATFORMS, platformKeyFor, formatPrice, type PlatformSlug } from "#shared/catalog";
+import { getPlatformContent } from "#shared/platform-content";
+import { getGuide } from "#shared/guides";
 
 type NavProd = { slug: string; name: string; featured: boolean; basePrice: number; categorySlug: string };
 
@@ -17,6 +19,11 @@ const groups = computed(() => {
       tagline: PLATFORMS[slug].tagline,
       gradient: PLATFORMS[slug].bgGradient,
       base: MARKETING_PLATFORMS.includes(slug) ? "marketing" : "sns",
+      // 해당 플랫폼 가이드 — 가격표 ↔ 정보성 가이드 상호 내부링크(색인 유도 + 검색자 연결)
+      guides: (getPlatformContent(slug)?.relatedGuideSlugs ?? [])
+        .map((gs) => getGuide(gs))
+        .filter((g): g is NonNullable<typeof g> => g !== null)
+        .map((g) => ({ slug: g.slug, label: g.breadcrumbLabel })),
       items: (all.value ?? [])
         .filter((p) => platformKeyFor(p.categorySlug) === slug)
         .sort((a, b) => a.basePrice - b.basePrice),
@@ -114,6 +121,17 @@ useSeoMeta({
                 <span class="grid h-6 w-6 place-items-center rounded-full bg-neutral-100 text-neutral-500 transition group-hover:bg-neutral-900 group-hover:text-white">→</span>
               </span>
             </NuxtLink>
+
+            <!-- 관련 가이드 상호링크 — 가격표 ↔ 정보성 가이드(색인 유도 + 검색자 연결) -->
+            <div v-if="g.guides.length" class="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-neutral-100 bg-neutral-50/70 px-5 py-3 text-xs">
+              <span class="font-medium text-neutral-400">📖 가이드</span>
+              <NuxtLink
+                v-for="gd in g.guides"
+                :key="gd.slug"
+                :to="`/guide/${gd.slug}`"
+                class="text-indigo-600 transition hover:text-indigo-800 hover:underline"
+              >{{ gd.label }}</NuxtLink>
+            </div>
           </div>
         </section>
       </div>
@@ -121,8 +139,9 @@ useSeoMeta({
       <!-- CTA -->
       <div class="mt-12 rounded-3xl bg-gradient-to-br from-neutral-900 via-indigo-950 to-purple-950 px-6 py-8 text-center text-white sm:px-10">
         <p class="font-display text-xl">원하는 상품을 찾으셨나요?</p>
-        <p class="mt-2 text-sm text-neutral-300">궁금한 점은 텔레그램으로 1:1 상담 받으실 수 있어요. 평균 응답 30분 이내.</p>
-        <div class="mt-5 flex flex-wrap items-center justify-center gap-2">
+        <p class="mt-2 text-sm text-neutral-300">궁금한 점은 텔레그램·카카오톡으로 1:1 상담받으실 수 있어요. 평균 응답 30분 이내.</p>
+        <ContactButtons class="mt-5" dark center />
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
           <NuxtLink to="/sns" class="rounded-full bg-white px-5 py-3 text-sm text-neutral-900 hover:bg-neutral-100">상품 둘러보기</NuxtLink>
           <NuxtLink to="/support" class="rounded-full border border-white/40 px-5 py-3 text-sm text-white hover:bg-white/10">고객센터</NuxtLink>
         </div>

@@ -2,7 +2,6 @@
 // 플랫폼 랜딩 하단 공통 마케팅 블록 — 이용안내 + 추천대상/안심보장 + 상담 CTA.
 // 상품 상세페이지와 톤을 맞춰 플랫폼 랜딩도 꽉 차 보이게 한다.
 import type { PlatformSlug } from "#shared/catalog";
-import { CONTACT } from "#shared/catalog";
 
 defineProps<{ platformKey: PlatformSlug | null }>();
 </script>
@@ -38,18 +37,10 @@ defineProps<{ platformKey: PlatformSlug | null }>();
     <!-- 상담 CTA -->
     <section class="mt-12 rounded-3xl bg-gradient-to-br from-sky-500 to-blue-600 px-6 py-8 text-center text-white sm:px-10">
       <p class="font-display text-xl">어떤 상품이 맞을지 고민되시나요?</p>
-      <p class="mt-2 text-sm text-sky-100">텔레그램으로 1:1 상담 받으실 수 있어요. 평균 응답 30분 이내.</p>
-      <div class="mt-5 flex flex-wrap items-center justify-center gap-2">
-        <a
-          :href="CONTACT.telegram.url"
-          target="_blank"
-          rel="noopener"
-          class="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm text-blue-700 hover:bg-sky-50"
-        >
-          <TelegramIcon :size="20" />
-          텔레그램 상담
-        </a>
-        <NuxtLink to="/faq" class="inline-block rounded-full border border-white/40 px-5 py-3 text-sm text-white hover:bg-white/10">전체 FAQ 보기 →</NuxtLink>
+      <p class="mt-2 text-sm text-sky-100">텔레그램·카카오톡으로 1:1 상담 받으실 수 있어요. 평균 응답 30분 이내.</p>
+      <ContactButtons class="mt-5" center />
+      <div class="mt-3 flex justify-center">
+        <NuxtLink to="/faq" class="inline-block rounded-full border border-white/40 px-5 py-2.5 text-sm text-white hover:bg-white/10">전체 FAQ 보기 →</NuxtLink>
       </div>
     </section>
   </div>

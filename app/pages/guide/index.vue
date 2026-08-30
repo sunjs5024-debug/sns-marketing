@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { CONTACT } from "#shared/catalog";
 import { GUIDES } from "#shared/guides";
 
 // 키워드 SEO 가이드 카드 (메인 키워드)
@@ -166,16 +165,8 @@ useSchemaOrg([
 
     <section class="mt-12 rounded-3xl bg-gradient-to-br from-sky-400 to-blue-500 px-6 py-8 text-center text-white">
       <p class="font-display text-xl">아직 결정이 어려우신가요?</p>
-      <p class="mt-2 text-sm text-sky-50">상품 추천부터 견적 상담까지 — 텔레그램으로 부담 없이 문의하세요.</p>
-      <a
-        :href="CONTACT.telegram.url"
-        target="_blank"
-        rel="noopener"
-        class="mt-5 inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm text-blue-700 hover:bg-sky-50"
-      >
-        <TelegramIcon :size="20" />
-        {{ CONTACT.telegram.handle }} 텔레그램 상담
-      </a>
+      <p class="mt-2 text-sm text-sky-50">상품 추천부터 견적 상담까지 — 텔레그램·카카오톡으로 부담 없이 문의하세요.</p>
+      <ContactButtons class="mt-5" center />
     </section>
     </div>
   </div>

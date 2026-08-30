@@ -169,6 +169,13 @@ useSchemaOrg([
       </div>
     </section>
 
+    <!-- 상담 CTA — 텔레그램·카카오톡 1:1 -->
+    <section class="mt-14 rounded-3xl bg-gradient-to-br from-neutral-900 via-indigo-950 to-purple-950 px-6 py-8 text-center text-white">
+      <p class="font-display text-lg">{{ guide.breadcrumbLabel }}, 뭐부터 할지 고민되세요?</p>
+      <p class="mt-2 text-sm text-neutral-300">상품 추천부터 진행까지 텔레그램·카카오톡으로 1:1 상담받으실 수 있어요. 평균 30분 이내 답변.</p>
+      <ContactButtons class="mt-5" dark center />
+    </section>
+
     <!-- 관련 다른 가이드 -->
     <section class="mt-14">
       <h2 class="font-display text-xl text-neutral-900">다른 가이드도 둘러보세요</h2>

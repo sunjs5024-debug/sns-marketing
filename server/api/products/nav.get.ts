@@ -24,8 +24,10 @@ export default defineEventHandler(async () => {
       categorySlug: r.category.slug,
     }));
   } catch (e) {
-    // 사이드바는 부가 요소이므로 DB 장애 시에도 페이지가 죽지 않게 빈 배열 반환.
-    if (isDbUnavailable(e)) return [];
-    throw e;
+    // 사이드바·가격표용 부가 데이터이므로 어떤 에러에도 페이지를 죽이지 않는다(빈 배열 반환).
+    //   DB 일시장애든 예기치 못한 에러든, 이 엔드포인트가 SSR 워커 예외(1101)/500의 원인이 되지 않게 한다.
+    //   대신 에러는 로그로 남겨 워커 로그에서 관측 가능하게(silent 실패 방지).
+    if (!isDbUnavailable(e)) console.error("[api/products/nav] 예기치 못한 에러 — 빈 배열 반환:", e);
+    return [];
   }
 });

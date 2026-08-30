@@ -40,8 +40,8 @@ const WHY_ITEMS = [
   {
     icon: "chat",
     color: "from-sky-400 to-blue-500",
-    title: "텔레그램 빠른 상담",
-    desc: "주문 전·후 언제든 텔레그램(@snssocialfactory)으로 문의 가능. 평균 응답 30분 이내 · 글로벌·국내 모두 부담 없이.",
+    title: "텔레그램·카카오톡 상담",
+    desc: "주문 전·후 언제든 텔레그램 또는 카카오톡 채널로 문의 가능. 평균 응답 30분 이내 · 부담 없이.",
   },
 ] as const;
 
@@ -380,8 +380,8 @@ watch(status, checkWelcome);
           누구나 5분이면 첫 주문이 가능합니다.
         </p>
 
-        <!-- 3가지 행동 -->
-        <div class="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+        <!-- 빠른 행동 -->
+        <div class="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
           <NuxtLink
             to="/sns"
             class="group rounded-2xl bg-white p-5 text-left transition hover:-translate-y-1 hover:shadow-2xl"
@@ -418,6 +418,18 @@ watch(status, checkWelcome);
             <p class="mt-3 font-display text-base text-neutral-900">1:1 텔레그램 상담</p>
             <p class="mt-1 text-xs text-neutral-500">평균 응답 30분 이내 · 친절 상담</p>
             <p class="mt-3 text-xs text-blue-600 group-hover:underline">상담 시작 →</p>
+          </a>
+
+          <a
+            :href="CONTACT.kakao.url"
+            target="_blank"
+            rel="noopener"
+            class="group rounded-2xl bg-white p-5 text-left transition hover:-translate-y-1 hover:shadow-2xl"
+          >
+            <div class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-yellow-300 to-amber-400 text-lg text-[#3c1e1e]">💬</div>
+            <p class="mt-3 font-display text-base text-neutral-900">카카오톡 상담</p>
+            <p class="mt-1 text-xs text-neutral-500">카카오톡 채널로 편하게 문의</p>
+            <p class="mt-3 text-xs text-amber-600 group-hover:underline">상담 시작 →</p>
           </a>
         </div>
 
