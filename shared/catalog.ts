@@ -86,7 +86,7 @@ export const PLATFORMS: Record<PlatformSlug, PlatformMeta> = {
   kakaotalk: {
     slug: "kakaotalk",
     name: "카카오톡 채널 마케팅",
-    seoTitle: "카카오톡 채널 친구 늘리기",
+    seoTitle: "카카오톡 채널 친구·오픈방 늘리기",
     shortName: "카카오톡",
     emoji: "💬",
     platform: "SNS",
@@ -99,7 +99,7 @@ export const PLATFORMS: Record<PlatformSlug, PlatformMeta> = {
   x: {
     slug: "x",
     name: "X(트위터) 마케팅",
-    seoTitle: "X(트위터) 팔로워·좋아요 늘리기",
+    seoTitle: "트위터 팔로워 늘리기 · X 좋아요·리트윗",
     shortName: "X (트위터)",
     emoji: "✖️",
     platform: "SNS",
@@ -124,6 +124,7 @@ export const PLATFORMS: Record<PlatformSlug, PlatformMeta> = {
   ably: {
     slug: "ably",
     name: "에이블리 마켓 마케팅",
+    seoTitle: "에이블리 찜·소식받기 늘리기",
     shortName: "에이블리",
     emoji: "🛍️",
     platform: "SNS",
@@ -136,6 +137,7 @@ export const PLATFORMS: Record<PlatformSlug, PlatformMeta> = {
   tistory: {
     slug: "tistory",
     name: "티스토리 블로그 마케팅",
+    seoTitle: "티스토리 조회수·방문자 늘리기",
     shortName: "티스토리",
     emoji: "✍️",
     platform: "SNS",
@@ -148,6 +150,7 @@ export const PLATFORMS: Record<PlatformSlug, PlatformMeta> = {
   kmong: {
     slug: "kmong",
     name: "크몽 전문가 마케팅",
+    seoTitle: "크몽 찜·리뷰 늘리기",
     shortName: "크몽",
     emoji: "💼",
     platform: "SNS",

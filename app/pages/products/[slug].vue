@@ -72,11 +72,13 @@ const metaDesc = computed(() => {
 //   기존 title=제품명("텔레그램 채널 구독자 (HQ…)")은 실검색어 "텔레그램 구독자 구매/늘리기"를
 //   놓쳐 2페이지에 묶였음. 경쟁 상위는 전부 풀키워드를 타이틀에 박음 → 온페이지 즉시 갭 해소.
 const seoKeyword = (product.value.keywords ?? "").split(",")[0]?.trim() || product.value.name;
-// keywords[0]이 이미 검색동사(늘리기/구매/올리기/방법/사는법)를 포함하면 그대로 사용 → 중복("늘리기 구매·늘리기")·
-//   활성화형 상품("친구추가 구매·늘리기") 어색함 방지. 아니면 "구매·늘리기"(구매+늘리기 두 의도 동시 조준) 부착.
-const seoTitle = /(늘리기|구매|올리기|방법|사는\s?법)/.test(seoKeyword)
-  ? seoKeyword
-  : `${seoKeyword} 구매·늘리기`;
+// keywords[0]이 이미 검색동사(늘리기/구매/올리기/방법/사는법)를 포함하면 그대로 사용. 아니면 부착.
+// ★'구매(?!중|자)' = "구매중"·"구매자" 안의 '구매' 오탐 방지(에이블리 구매중 등 타이틀 버그 수정).
+const hasVerb = /(늘리기|올리기|방법|사는\s?법|구매(?!중|자))/.test(seoKeyword);
+const seoTitle = hasVerb ? seoKeyword : `${seoKeyword} 구매·늘리기`;
+// ★H1 = 머니키워드 + "늘리기"(검색동사). 기존 h1=product.name(내부명·괄호수식어)이라 title↔h1 불일치로
+//   관련도 희석되던 것을 해소 — 온페이지 최강 신호(H1)를 머니키워드에 정렬(전 상품 일괄).
+const seoH1 = hasVerb ? seoKeyword : `${seoKeyword} 늘리기`;
 
 useSeoMeta({
   // 전역 titleTemplate(seo-utils)가 " | SNS소셜팩토리"를 자동으로 덧붙임 → 본문엔 브랜드 제외(중복 방지)
@@ -326,7 +328,8 @@ async function handleAdd(mode: "cart" | "buy") {
 
       <div>
         <p class="text-xs text-indigo-600">{{ product.category.name }}</p>
-        <h1 class="mt-2 font-display text-2xl tracking-tight text-neutral-900 sm:text-3xl text-balance leading-tight">{{ product.name }}</h1>
+        <h1 class="mt-2 font-display text-2xl tracking-tight text-neutral-900 sm:text-3xl text-balance leading-tight">{{ seoH1 }}</h1>
+        <p class="mt-1 text-sm text-neutral-500">{{ product.name }}</p>
         <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-neutral-600">
           <span class="text-amber-500">★ {{ productRating.toFixed(1) }}</span>
           <span v-if="productReviews.length > 0" class="text-xs text-neutral-500">({{ productReviewCount.toLocaleString("ko-KR") }}건 후기)</span>
