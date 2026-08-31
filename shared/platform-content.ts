@@ -165,7 +165,7 @@ export const PLATFORM_CONTENT: Partial<Record<PlatformSlug, PlatformContent>> = 
     safety:
       "SNS소셜팩토리는 로그인 정보를 절대 묻지 않고 공개 URL만으로 작업하며, 구독자·조회수는 실채널·실시청 기반으로 처리됩니다. " +
       "봇 조회수가 아니므로 시청 지속시간 평가를 해치지 않고, 진행 상황을 확인하며 안정적으로 운영됩니다.",
-    relatedGuideSlugs: ["youtube-subscribers", "youtube-views"],
+    relatedGuideSlugs: ["youtube-subscribers", "youtube-views", "youtube-watchtime", "youtube-shorts"],
   },
 
   tiktok: {
@@ -366,7 +366,7 @@ export const PLATFORM_CONTENT: Partial<Record<PlatformSlug, PlatformContent>> = 
     safety:
       "SNS소셜팩토리는 관리자 권한이나 비밀번호를 절대 묻지 않고 공개 링크만으로 작업합니다. " +
       "진행 상황을 확인하며 안정적으로 운영됩니다.",
-    relatedGuideSlugs: ["telegram-subscribers"],
+    relatedGuideSlugs: ["telegram-subscribers", "telegram-views"],
   },
 
   kakaotalk: {
