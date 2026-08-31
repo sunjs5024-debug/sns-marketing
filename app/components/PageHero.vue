@@ -10,7 +10,7 @@ defineProps<{ eyebrow?: string; title: string; subtitle?: string }>();
     <div class="relative mx-auto max-w-5xl px-4 py-12 text-center sm:px-6 sm:py-16 lg:px-8">
       <p v-if="eyebrow" class="text-xs uppercase tracking-[0.2em] text-indigo-600">{{ eyebrow }}</p>
       <h1 class="mt-2 font-display text-3xl tracking-tight text-neutral-900 sm:text-4xl">{{ title }}</h1>
-      <p v-if="subtitle" class="mx-auto mt-3 max-w-xl text-sm leading-6 text-neutral-600">{{ subtitle }}</p>
+      <p v-if="subtitle" class="mx-auto mt-3 max-w-xl break-keep text-sm leading-6 text-neutral-600">{{ subtitle }}</p>
       <div class="mt-6 empty:hidden"><slot /></div>
     </div>
   </section>

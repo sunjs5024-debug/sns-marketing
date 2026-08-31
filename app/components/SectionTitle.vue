@@ -17,7 +17,7 @@ defineProps<{
       <h2 class="text-2xl sm:text-3xl text-neutral-900">
         {{ title }}
       </h2>
-      <p v-if="description" class="mt-2 text-sm text-neutral-600 max-w-xl">
+      <p v-if="description" class="mt-2 max-w-xl break-keep text-sm text-neutral-600">
         {{ description }}
       </p>
     </div>

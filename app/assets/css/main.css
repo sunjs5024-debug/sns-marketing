@@ -43,6 +43,10 @@ html, body {
   letter-spacing: -0.02em;
 }
 
+/* 한글 단어 중간 줄바꿈 방지 — '카카오톡'이 '카카오/톡'으로 쪼개지던 것. 헤딩·디스플레이 전역.
+   :where() 0-특이도라 break-normal 유틸로 개별 opt-out 가능. (스페이스 없는 middot 나열은 <wbr>로 끊김점 제공) */
+:where(h1, h2, h3, .font-display) { word-break: keep-all; }
+
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 9999px; }
