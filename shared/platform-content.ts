@@ -97,7 +97,7 @@ export const PLATFORM_CONTENT: Partial<Record<PlatformSlug, PlatformContent>> = 
     safety:
       "SNS소셜팩토리는 비밀번호를 절대 묻지 않고 공개 URL만으로 작업하며, 모든 팔로워·좋아요는 한국인 실계정으로 검증됩니다. " +
       "봇 계정이 아니므로 알고리즘이 솎아내지 않고, 진행 상황을 확인하며 안정적으로 운영됩니다.",
-    relatedGuideSlugs: ["instagram-followers", "instagram-likes", "instagram-reels-views"],
+    relatedGuideSlugs: ["instagram-followers", "instagram-likes", "instagram-reels-views", "instagram-comments"],
   },
 
   youtube: {

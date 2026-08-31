@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getGuide, GUIDES_CONTENT_UPDATED } from "#shared/guides";
+import { getGuide, GUIDES, GUIDES_CONTENT_UPDATED } from "#shared/guides";
 
 const route = useRoute();
 const topic = computed(() => String(route.params.topic));
@@ -9,6 +9,14 @@ if (!guide) throw createError({ statusCode: 404, statusMessage: "가이드를 �
 
 // 표시 수정일 — 하드코딩 대신 콘텐츠 최종 재작성일(GUIDES_CONTENT_UPDATED)과 동기화(정직)
 const updatedDisplay = GUIDES_CONTENT_UPDATED.slice(0, 10).replace(/-/g, ".");
+
+// 가이드 클러스터 상호링크 — 같은 플랫폼 형제 가이드 우선, 그다음 타 플랫폼으로 채움(최대 6개)
+const siblingGuides = (() => {
+  const all = Object.values(GUIDES).filter((g) => g.slug !== guide!.slug);
+  const same = all.filter((g) => g.primaryCategorySlug === guide!.primaryCategorySlug);
+  const other = all.filter((g) => g.primaryCategorySlug !== guide!.primaryCategorySlug);
+  return [...same, ...other].slice(0, 6).map((g) => ({ slug: g.slug, label: g.breadcrumbLabel, same: g.primaryCategorySlug === guide!.primaryCategorySlug }));
+})();
 
 // SEO 메타 — 키워드 페이지 최우선
 // 전역 titleTemplate(seo-utils)가 " | SNS소셜팩토리"를 자동으로 덧붙이므로
@@ -176,18 +184,23 @@ useSchemaOrg([
       <ContactButtons class="mt-5" dark center />
     </section>
 
-    <!-- 관련 다른 가이드 -->
+    <!-- 관련 다른 가이드 — 같은 플랫폼 형제 우선(클러스터 상호링크) -->
     <section class="mt-14">
       <h2 class="font-display text-xl text-neutral-900">다른 가이드도 둘러보세요</h2>
-      <div class="mt-4 grid gap-3 sm:grid-cols-2">
-        <NuxtLink to="/guide" class="block rounded-2xl border border-neutral-200 bg-white p-4 transition hover:bg-neutral-50">
-          <p class="text-xs text-indigo-600">→ 전체 가이드</p>
-          <p class="mt-1 text-sm text-neutral-900">SNS 마케팅 가이드 모음</p>
+      <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <NuxtLink
+          v-for="sg in siblingGuides"
+          :key="sg.slug"
+          :to="`/guide/${sg.slug}`"
+          class="block rounded-2xl border border-neutral-200 bg-white p-4 transition hover:-translate-y-0.5 hover:border-indigo-200 hover:bg-neutral-50"
+        >
+          <p class="text-xs" :class="sg.same ? 'text-indigo-600' : 'text-neutral-400'">{{ sg.same ? '같은 주제' : '다른 주제' }} →</p>
+          <p class="mt-1 text-sm text-neutral-900">{{ sg.label }}</p>
         </NuxtLink>
-        <NuxtLink to="/reviews" class="block rounded-2xl border border-neutral-200 bg-white p-4 transition hover:bg-neutral-50">
-          <p class="text-xs text-amber-600">★ 실제 후기</p>
-          <p class="mt-1 text-sm text-neutral-900">고객 후기 — 진짜 효과 확인</p>
-        </NuxtLink>
+      </div>
+      <div class="mt-3 flex flex-wrap gap-3 text-sm">
+        <NuxtLink to="/guide" class="text-indigo-600 hover:underline">전체 가이드 모음 →</NuxtLink>
+        <NuxtLink to="/price" class="text-indigo-600 hover:underline">전체 가격표 →</NuxtLink>
       </div>
     </section>
   </article>
