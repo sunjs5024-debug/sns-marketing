@@ -5,6 +5,7 @@ const snsCol = SNS_PLATFORMS.map((s) => ({ href: `/sns/${s}`, label: PLATFORMS[s
 const marketingCol = MARKETING_PLATFORMS.map((s) => ({ href: `/marketing/${s}`, label: PLATFORMS[s].shortName }));
 const rankCol = RANK_PLATFORMS.map((s) => ({ href: `/rank/${s}`, label: PLATFORMS[s].shortName }));
 const helpCol = [
+  { href: "/kakao", label: "카카오채널 친구 늘리기" },
   { href: "/about", label: "회사소개" },
   { href: "/price", label: "전체 가격표" },
   { href: "/support", label: "고객센터" },
