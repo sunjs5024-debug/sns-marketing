@@ -142,17 +142,20 @@ export default defineEventHandler(async (event) => {
   // ── 2호점(nowsns) 릴레이 ──────────────────────────────────────────────
   // 같은 입금 계좌를 2호점과 공유하므로, 여기서 받은 입금 SMS를 2호점 웹훅으로도 넘긴다.
   // await + timeout + try/catch 로 감싸, 2호점 장애·지연이 1호점 처리에 절대 영향 없게 한다.
+  let branch2Matched = false;
   {
     const b2token = process.env.BRANCH2_SMS_TOKEN;
     const b2url = process.env.BRANCH2_SMS_URL || "https://nowsns.com/api/sms";
     if (b2token) {
       try {
-        await fetch(b2url, {
+        const b2res = await fetch(b2url, {
           method: "POST",
           headers: { "Content-Type": "application/json", "X-SMS-Token": b2token },
           body: JSON.stringify({ from: parsed.data.from ?? null, text: parsed.data.text }),
           signal: AbortSignal.timeout(4000),
         });
+        const b2json = (await b2res.json().catch(() => null)) as { matched?: boolean } | null;
+        if (b2json?.matched) branch2Matched = true; // 2호점이 이 입금을 매칭·처리함 → 1호점 미매칭 알림 생략
       } catch {
         // 2호점 릴레이 실패는 무시 — 1호점 입금 처리에 영향 없음
       }
@@ -297,7 +300,8 @@ export default defineEventHandler(async (event) => {
   }
 
   // 매칭 안 됨 + 파싱은 됐는데 매칭 후보 없음 → 어드민 알림
-  if (amount && depositor) {
+  // (단, 2호점이 이 입금을 매칭·처리했으면 1호점엔 미매칭이 정상이므로 알림 생략 — 공유계좌 노이즈 방지)
+  if (amount && depositor && !branch2Matched) {
     notifySmsUnmatched({
       bank,
       amount,
